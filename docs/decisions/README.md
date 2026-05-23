@@ -8,6 +8,7 @@
 |---|-------|--------|------|
 | 0001 | [Documentation conventions](0001-documentation-conventions.md) | Accepted | — |
 | 0002 | [Cross-agent code review](0002-cross-agent-review.md) | Accepted | — |
+| 0016 | [Railway as deploy provider](0016-railway-as-deploy-provider.md) | Accepted | 2026-05-24 |
 
 > **0001 / 0002 是 harness 的 process ADR**，所有專案繼承。
 > **0003 起是 architectural ADR**，**由各專案自己寫**（記錄選的 stack / tooling / patterns 為什麼）。

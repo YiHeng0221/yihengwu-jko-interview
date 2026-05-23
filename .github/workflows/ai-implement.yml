@@ -1,0 +1,178 @@
+name: ai-implement
+
+# Listens for the `status/ai-implement` label on a child issue (opened by the
+# PM agent). When a human flips `status/human-review` → `status/ai-implement`,
+# this workflow spawns the appropriate lane's agent (FE / BE / QA) on the
+# self-hosted runner to implement the issue.
+#
+# Flow:
+#   PM opens issue with labels: status/human-review + area/<api|web|e2e>
+#   Human reads HTML spec + AC, decides to ship
+#   Human: gh issue edit <NN> --remove-label status/human-review \
+#                              --add-label   status/ai-implement
+#   → this workflow fires, picks the lane from area/* label, runs claude
+#     -p /implement-issue <NN>
+#   → agent creates branch feature/epic-<EPIC>-<lane>-issue-<NN>, implements, opens PR
+#   → that PR flows into the usual ci.yml → review.yml → ai-fix.yml cycle.
+
+on:
+  issues:
+    types: [labeled]
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+concurrency:
+  # One implement-run per issue at a time. If a human re-flips the label
+  # while a run is in progress, cancel the older one — the latest flip is
+  # always the authoritative signal. Older queued runs would otherwise
+  # complete after the human's correction, possibly overwriting work.
+  group: ai-implement-issue-${{ github.event.issue.number }}
+  cancel-in-progress: true
+
+jobs:
+  guard:
+    name: Validate trigger
+    if: github.event.label.name == 'status/ai-implement'
+    runs-on: ubuntu-latest
+    outputs:
+      lane: ${{ steps.classify.outputs.lane }}
+      epic: ${{ steps.classify.outputs.epic }}
+    steps:
+      - name: Classify lane + epic from issue labels
+        id: classify
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const labels = context.payload.issue.labels.map((l) => l.name);
+            // Require EXACTLY one of area/api, area/web, area/e2e.
+            // `labels.find()` would silently pick the first match if a human
+            // mis-labels with two areas, dispatching the wrong agent.
+            const areaLabels = labels.filter((n) =>
+              ['area/api', 'area/web', 'area/e2e'].includes(n),
+            );
+            if (areaLabels.length !== 1) {
+              core.setFailed(`Issue #${context.payload.issue.number} must carry exactly one of area/api · area/web · area/e2e (got: ${areaLabels.join(', ') || 'none'}). PM must label correctly before flipping to ai-implement.`);
+              return;
+            }
+            const lane = ({
+              'area/api': 'be',
+              'area/web': 'fe',
+              'area/e2e': 'qa',
+            })[areaLabels[0]];
+
+            // Require EXACTLY one epic/<NN> for the same reason — multiple
+            // epic labels would make the branch-naming ambiguous.
+            const epicLabels = labels.filter((n) => n.startsWith('epic/'));
+            if (epicLabels.length !== 1) {
+              core.setFailed(`Issue #${context.payload.issue.number} must carry exactly one epic/<NN> label (got: ${epicLabels.join(', ') || 'none'}). PM must link to one epic before flipping to ai-implement.`);
+              return;
+            }
+            const epic = epicLabels[0].replace(/^epic\//, '');
+            core.setOutput('lane', lane);
+            core.setOutput('epic', epic);
+            core.info(`Lane: ${lane} · Epic: ${epic}`);
+
+      - name: Refuse if issue is closed
+        if: github.event.issue.state == 'closed'
+        run: |
+          echo "::error::Issue is closed; refusing to implement."
+          exit 1
+
+      - name: Post guard-failure comment on the issue
+        # When the classify step `core.setFailed`s (mis-labelled issue),
+        # GitHub marks the job red but no comment lands on the issue.
+        # Surface a comment so the human knows what to fix before re-flipping.
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            await github.rest.issues.createComment({
+              ...context.repo,
+              issue_number: context.payload.issue.number,
+              body: [
+                `⚠️ \`ai-implement\` guard failed — runner did not start.`,
+                ``,
+                `Most likely the issue is missing exactly one \`area/*\` label or one \`epic/<NN>\` label. Check the guard step:`,
+                ``,
+                runUrl,
+              ].join('\n'),
+            });
+
+  implement:
+    name: Local Claude Code · /implement-issue
+    needs: guard
+    runs-on: [self-hosted, allen-mac]
+    timeout-minutes: 60
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      ISSUE_NUMBER: ${{ github.event.issue.number }}
+      REPO: ${{ github.repository }}
+      LANE: ${{ needs.guard.outputs.lane }}
+      EPIC: ${{ needs.guard.outputs.epic }}
+      # Branch is per-ISSUE, not per-lane. The original formula
+      # `feature/epic-<EPIC>-<lane>` collided when an epic had more than
+      # one child in the same lane (e.g. epic #62 had 4 FE children, all
+      # of which would push to `feature/epic-62-fe`). Include the issue
+      # number so each child gets its own branch. See
+      # `docs/RETRO-PHASE-1.1.md` action item A2 for context.
+      BRANCH: feature/epic-${{ needs.guard.outputs.epic }}-${{ needs.guard.outputs.lane }}-issue-${{ github.event.issue.number }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Sanity — claude CLI present
+        run: |
+          if ! command -v claude >/dev/null; then
+            echo "::error::claude CLI not found on PATH on the self-hosted runner."
+            exit 1
+          fi
+          claude --version
+
+      - name: Configure git for commits
+        run: |
+          git config user.name "claude-code-implement-bot"
+          git config user.email "claude-code-implement@local"
+
+      - name: Create or check out the lane branch
+        run: |
+          set -euo pipefail
+          if git ls-remote --heads origin "$BRANCH" | grep -q "$BRANCH"; then
+            git fetch origin "$BRANCH":"$BRANCH"
+            git checkout "$BRANCH"
+          else
+            git checkout -b "$BRANCH"
+          fi
+
+      - name: Run /implement-issue
+        run: |
+          set -euo pipefail
+          echo "→ Implementing issue #${ISSUE_NUMBER} on branch ${BRANCH} (lane=${LANE}, epic=${EPIC})"
+          claude -p "/implement-issue ${ISSUE_NUMBER}" \
+            --permission-mode acceptEdits \
+            --allowed-tools "Read,Edit,Write,Grep,Bash(gh:*),Bash(git:*),Bash(make:*),Bash(pnpm:*),Bash(node:*),Bash(jq:*),Bash(prisma:*),mcp__figma__get_design_context,mcp__figma__get_screenshot,mcp__figma__get_metadata" \
+            --output-format text \
+            --no-session-persistence \
+            --setting-sources project,local
+
+      - name: Move label to status/in-progress on success
+        if: success()
+        run: |
+          set -euo pipefail
+          gh issue edit "$ISSUE_NUMBER" --repo "$REPO" \
+            --remove-label "status/ai-implement" \
+            --add-label "status/in-progress" 2>/dev/null || true
+
+      - name: Notify on failure
+        if: failure()
+        run: |
+          gh issue comment "$ISSUE_NUMBER" --repo "$REPO" --body \
+            "⚠️ Local \`/implement-issue\` session failed on self-hosted runner (lane=${LANE}, epic=${EPIC}, branch=${BRANCH}). See workflow run logs."
+          # Leave status/ai-implement on so a human can either fix the issue
+          # body and re-flip, or remove it manually to halt.

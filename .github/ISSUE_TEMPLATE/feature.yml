@@ -1,0 +1,53 @@
+name: Feature
+description: A new feature traced from a spec
+title: "[feature] "
+labels: ["kind/feature", "status/ready"]
+body:
+  - type: input
+    id: spec
+    attributes:
+      label: Spec reference
+      description: Path to the approved spec (e.g., docs/specs/0001-<slug>.md)
+      placeholder: docs/specs/0NNN-<slug>.md
+    validations:
+      required: true
+
+  - type: textarea
+    id: ac
+    attributes:
+      label: Acceptance Criteria (Given/When/Then)
+      placeholder: |
+        - Given …, when …, then …
+        - Given …, when …, then …
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options: [web, api, db, infra, docs, e2e]
+    validations:
+      required: true
+
+  - type: dropdown
+    id: risk
+    attributes:
+      label: Risk
+      options: [low, med, high]
+    validations:
+      required: true
+
+  - type: dropdown
+    id: size
+    attributes:
+      label: Estimated size (lines)
+      options: ["xs (<50)", "s (<200)", "m (<500)", "l (<800)"]
+    validations:
+      required: true
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: Implementation notes
+      description: Schema, contract, edge cases, dependencies

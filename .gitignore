@@ -1,0 +1,45 @@
+# ─── env ───
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# ─── node ───
+node_modules/
+.pnpm-store/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ─── build artefacts ───
+dist/
+build/
+out/
+*.tsbuildinfo
+# Vite cache
+.vite/
+# (left intentionally) Next.js — uncomment if you ever swap back
+# .next/
+
+# ─── tests ───
+coverage/
+e2e/test-results/
+e2e/playwright-report/
+e2e/blob-report/
+e2e/.cache/
+e2e/screenshots/
+
+# ─── prisma ───
+backend/prisma/migrations/dev.db*
+*.local.db
+
+# ─── editor ───
+.vscode/
+.idea/
+.DS_Store
+*.swp
+*.swo
+
+# ─── claude code working files (do NOT commit) ───
+_workspace/
+.claude/local/

@@ -1,0 +1,64 @@
+{
+  "$schema": "https://docs.anthropic.com/claude-code/settings.json",
+  "permissions": {
+    "allow": [
+      "Read",
+      "Write",
+      "Edit",
+      "Bash(make:*)",
+      "Bash(pnpm:*)",
+      "Bash(npm:*)",
+      "Bash(node:*)",
+      "Bash(docker compose:*)",
+      "Bash(git status)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push)",
+      "Bash(git checkout:*)",
+      "Bash(git branch:*)",
+      "Bash(gh:*)",
+      "Bash(prisma:*)",
+      "Bash(curl:*)",
+      "Bash(jq:*)",
+      "WebFetch"
+    ],
+    "deny": [
+      "Bash(rm -rf:*)",
+      "Bash(git push --force:*)",
+      "Bash(git push -f:*)",
+      "Bash(git reset --hard:*)",
+      "Bash(*--no-verify*)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          { "type": "command", "command": ".claude/hooks/pre-bash.sh" }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          { "type": "command", "command": ".claude/hooks/scan-secrets.sh" }
+        ]
+      }
+    ]
+  },
+  "modelPolicy": {
+    "default": "claude-sonnet-4-6",
+    "agents": {
+      "pm": "claude-opus-4-7",
+      "impl": "claude-sonnet-4-6",
+      "qa": "claude-sonnet-4-6",
+      "reviewer": "claude-opus-4-7",
+      "ai-fix": "claude-sonnet-4-6",
+      "orchestrator": "claude-haiku-4-5-20251001"
+    }
+  }
+}

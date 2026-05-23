@@ -1,0 +1,131 @@
+name: ai-fix
+
+on:
+  pull_request:
+    types: [labeled]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+concurrency:
+  group: ai-fix-pr-${{ github.event.pull_request.number }}
+  cancel-in-progress: false
+
+jobs:
+  guard:
+    name: Round counter (cap at 3)
+    if: github.event.label.name == 'ai-fix' && !github.event.pull_request.draft
+    runs-on: ubuntu-latest
+    outputs:
+      round: ${{ steps.counter.outputs.round }}
+      escalate: ${{ steps.counter.outputs.escalate }}
+    steps:
+      - name: Read round counter from PR body
+        id: counter
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const body = context.payload.pull_request.body || '';
+            const match = body.match(/<!-- AI-FIX-STATE\s*Round:\s*(\d+)\/3/);
+            const current = match ? parseInt(match[1], 10) : 0;
+            const next = current + 1;
+            core.setOutput('round', String(next));
+            core.setOutput('escalate', next > 3 ? 'true' : 'false');
+            core.info(`Round counter: ${current} → ${next} (escalate=${next > 3})`);
+
+      - name: Escalate to human-review if cap reached
+        if: steps.counter.outputs.escalate == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.pull_request.number;
+            await github.rest.issues.removeLabel({
+              ...context.repo, issue_number: pr, name: 'ai-fix',
+            }).catch(() => {});
+            await github.rest.issues.addLabels({
+              ...context.repo, issue_number: pr,
+              labels: ['human-review', 'agent/human-needed'],
+            });
+            await github.rest.issues.createComment({
+              ...context.repo, issue_number: pr,
+              body: '⚠️ AI fix loop exceeded 3 rounds. Escalating to human review. Automation paused on this PR.',
+            });
+            core.setFailed('AI fix cap reached');
+
+  fix:
+    name: Local Claude Code · /fix-pr
+    needs: guard
+    if: needs.guard.outputs.escalate == 'false'
+    runs-on: [self-hosted, allen-mac]
+    timeout-minutes: 30
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      PR_NUMBER: ${{ github.event.pull_request.number }}
+      REPO: ${{ github.repository }}
+      ROUND: ${{ needs.guard.outputs.round }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Sanity — claude CLI present
+        run: |
+          if ! command -v claude >/dev/null; then
+            echo "::error::claude CLI not found on PATH on the self-hosted runner."
+            exit 1
+          fi
+          claude --version
+
+      - name: Configure git for commits
+        run: |
+          git config user.name "claude-code-fix-bot"
+          git config user.email "claude-code-fix@local"
+
+      - name: Run /fix-pr
+        run: |
+          set -euo pipefail
+          echo "→ Fixing PR #${PR_NUMBER} round ${ROUND}/3"
+          claude -p "/fix-pr ${PR_NUMBER}" \
+            --permission-mode acceptEdits \
+            --allowed-tools "Read,Edit,Write,Grep,Bash(gh:*),Bash(git:*),Bash(make:*),Bash(pnpm:*),Bash(node:*),Bash(jq:*)" \
+            --output-format text \
+            --no-session-persistence \
+            --setting-sources project,local
+
+      - name: Update PR round counter
+        if: always()
+        uses: actions/github-script@v7
+        env:
+          ROUND: ${{ needs.guard.outputs.round }}
+        with:
+          script: |
+            const pr = await github.rest.pulls.get({
+              ...context.repo, pull_number: context.payload.pull_request.number,
+            });
+            const round = process.env.ROUND;
+            const now = new Date().toISOString();
+            const block = `<!-- AI-FIX-STATE\nRound: ${round}/3\nLast: ${now}\n-->`;
+            let body = pr.data.body || '';
+            if (/<!-- AI-FIX-STATE[\s\S]*?-->/.test(body)) {
+              body = body.replace(/<!-- AI-FIX-STATE[\s\S]*?-->/, block);
+            } else {
+              body = body + "\n\n" + block + "\n";
+            }
+            await github.rest.pulls.update({
+              ...context.repo, pull_number: pr.data.number, body,
+            });
+
+      - name: Remove ai-fix label so re-review can trigger
+        if: always()
+        run: |
+          gh pr edit "$PR_NUMBER" --repo "$REPO" --remove-label "ai-fix" 2>/dev/null || true
+
+      - name: Notify on failure
+        if: failure()
+        run: |
+          gh pr comment "$PR_NUMBER" --repo "$REPO" --body \
+            "⚠️ Local \`/fix-pr\` session failed on self-hosted runner (round ${ROUND}/3). See workflow run logs."

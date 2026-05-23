@@ -1,0 +1,49 @@
+name: Bug
+description: Defect found in dev, CI, or post-deploy E2E
+title: "[bug] "
+labels: ["kind/bug"]
+body:
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity
+      options: [low, med, high, critical]
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options: [web, api, db, infra, docs, e2e]
+    validations:
+      required: true
+
+  - type: textarea
+    id: repro
+    attributes:
+      label: Reproduction steps
+      placeholder: |
+        1. …
+        2. …
+        3. Expected: …
+           Actual: …
+    validations:
+      required: true
+
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence (screenshot / video / stack trace / log)
+
+  - type: input
+    id: commit
+    attributes:
+      label: First seen at commit
+      placeholder: abc1234
+
+  - type: input
+    id: env
+    attributes:
+      label: Environment
+      placeholder: staging / local / production

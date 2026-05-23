@@ -47,21 +47,23 @@ jobs:
         with:
           script: |
             const labels = context.payload.issue.labels.map((l) => l.name);
-            // Require EXACTLY one of area/api, area/web, area/e2e.
+            // Require EXACTLY one area label.
             // `labels.find()` would silently pick the first match if a human
             // mis-labels with two areas, dispatching the wrong agent.
-            const areaLabels = labels.filter((n) =>
-              ['area/api', 'area/web', 'area/e2e'].includes(n),
-            );
-            if (areaLabels.length !== 1) {
-              core.setFailed(`Issue #${context.payload.issue.number} must carry exactly one of area/api · area/web · area/e2e (got: ${areaLabels.join(', ') || 'none'}). PM must label correctly before flipping to ai-implement.`);
-              return;
-            }
-            const lane = ({
+            const AREA_TO_LANE = {
               'area/api': 'be',
               'area/web': 'fe',
               'area/e2e': 'qa',
-            })[areaLabels[0]];
+              'area/infra': 'infra',
+              'area/docs': 'docs',
+              'area/db': 'be',
+            };
+            const areaLabels = labels.filter((n) => n in AREA_TO_LANE);
+            if (areaLabels.length !== 1) {
+              core.setFailed(`Issue #${context.payload.issue.number} must carry exactly one area/* label (got: ${areaLabels.join(', ') || 'none'}). Supported: ${Object.keys(AREA_TO_LANE).join(' · ')}.`);
+              return;
+            }
+            const lane = AREA_TO_LANE[areaLabels[0]];
 
             // Require EXACTLY one epic/<NN> for the same reason — multiple
             // epic labels would make the branch-naming ambiguous.

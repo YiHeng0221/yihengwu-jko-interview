@@ -86,6 +86,9 @@ jobs:
           git config user.email "claude-code-fix@local"
 
       - name: Run /fix-pr
+        env:
+          # actions/checkout@v4 overrides HOME → claude can't reach keychain → "Not logged in".
+          HOME: /Users/wuyiheng
         run: |
           set -euo pipefail
           echo "→ Fixing PR #${PR_NUMBER} round ${ROUND}/3"

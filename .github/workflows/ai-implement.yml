@@ -153,6 +153,12 @@ jobs:
           fi
 
       - name: Run /implement-issue
+        env:
+          # actions/checkout@v4 overrides HOME to a temp dir for the whole job
+          # (for git-config isolation), which breaks claude CLI's keychain
+          # credential lookup → "Not logged in". Pin HOME to the runner user's
+          # real home so claude finds the OAuth token stored after `claude login`.
+          HOME: /Users/wuyiheng
         run: |
           set -euo pipefail
           echo "→ Implementing issue #${ISSUE_NUMBER} on branch ${BRANCH} (lane=${LANE}, epic=${EPIC})"

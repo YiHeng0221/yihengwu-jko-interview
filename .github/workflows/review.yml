@@ -111,6 +111,9 @@ jobs:
 
       - name: Run /review
         id: review
+        env:
+          # actions/checkout@v4 overrides HOME → claude can't reach keychain → "Not logged in".
+          HOME: /Users/wuyiheng
         run: |
           set -euo pipefail
           echo "→ Reviewing PR #${PR_NUMBER}"

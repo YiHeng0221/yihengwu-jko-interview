@@ -87,7 +87,7 @@ jobs:
 
       - name: Run /fix-pr
         env:
-          # actions/checkout@v4 overrides HOME → claude can't reach keychain → "Not logged in".
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           HOME: /Users/wuyiheng
         run: |
           set -euo pipefail

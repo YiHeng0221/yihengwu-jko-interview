@@ -1,0 +1,66 @@
+name: ci
+
+# Project-level CI workflow.
+# Two responsibilities:
+#   1. Run stack-specific quality checks (typecheck / lint / test / build / size guard).
+#      Currently best-effort — populate the steps below once ADR-0003+ lock in your stack.
+#   2. Provide a `workflow_run` signal so `review.yml` chains off ci completion
+#      (review.yml requires `workflow_run.workflows: [ci]`).
+#
+# **The workflow name MUST stay "ci"** — review.yml's trigger references it by name.
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  smoke:
+    name: Smoke check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # ─── Best-effort stack detection ──────────────────────────────────
+      # Project should populate these steps with real typecheck / lint /
+      # test / build once stack is decided. Until then we exit success so
+      # that the chain (ci → review.yml) is wired correctly from day one.
+      - name: Detect & run stack checks
+        run: |
+          set -e
+          if [ -f package.json ]; then
+            echo "::group::Detected JS/TS project — attempting standard pnpm checks"
+            corepack enable 2>/dev/null || npm install -g pnpm
+            if [ -f pnpm-lock.yaml ]; then
+              pnpm install --frozen-lockfile
+              pnpm -r typecheck 2>/dev/null || true
+              pnpm -r lint 2>/dev/null || true
+              pnpm -r test 2>/dev/null || true
+              pnpm -r build 2>/dev/null || true
+            fi
+            echo "::endgroup::"
+          else
+            echo "::notice::No package.json yet — CI runs as no-op. Populate this workflow once ADR-0003+ locks in stack."
+          fi
+
+      # ─── Tag PR for AI review ─────────────────────────────────────────
+      # The label is informational; review.yml's actual trigger is the
+      # workflow_run signal we emit on success of this entire run.
+      - name: Tag PR for AI review
+        if: github.event_name == 'pull_request' && success()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+        run: |
+          gh pr edit "$PR_NUMBER" --repo "$REPO" --add-label "ai-review" 2>/dev/null || true
+          echo "::notice::PR #$PR_NUMBER tagged ai-review. review.yml will chain off this run's completion."

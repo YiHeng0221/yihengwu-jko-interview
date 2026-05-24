@@ -13,7 +13,9 @@ const envSchema = z.object({
 const parsed = envSchema.safeParse(import.meta.env)
 
 if (!parsed.success) {
-  throw new Error(`Invalid env: ${parsed.error.message}`)
+  throw new Error(
+    `Invalid env:\n${JSON.stringify(parsed.error.flatten().fieldErrors, null, 2)}`
+  )
 }
 
 export const env = parsed.data

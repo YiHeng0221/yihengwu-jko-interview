@@ -85,6 +85,6 @@ Use **Railway** as the sole deploy provider for both the BE service, the FE serv
 
 ## How we'll know if this was right
 
-- Post-deploy Playwright e2e against `RAILWAY_STATIC_URL/health` returns HTTP 200 within 30 s of deploy completing (no cold-start failures).
+- Post-deploy Playwright e2e against `https://${RAILWAY_PUBLIC_DOMAIN}/health` returns HTTP 200 within 30 s of deploy completing (no cold-start failures). `RAILWAY_PUBLIC_DOMAIN` is Railway's built-in env var exposed to each service (`RAILWAY_STATIC_URL` was an earlier prototype name that never shipped).
 - `pg_trgm` GIN index migration applies cleanly in CI-triggered `prisma migrate deploy` with zero manual intervention.
 - Total Railway config time (first deploy to green health check): < 1 hour wall-clock.

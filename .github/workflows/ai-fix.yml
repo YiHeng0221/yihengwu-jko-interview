@@ -3,6 +3,12 @@ name: ai-fix
 on:
   pull_request:
     types: [labeled]
+  # NOTE: GITHUB_TOKEN loop guard means review.yml adding `ai-fix` won't
+  # trigger this workflow. Manual workarounds:
+  #   1. Human clicks "ai-fix" label in GitHub UI (user event = fires)
+  #   2. Human removes + re-adds the label via UI
+  #   3. Use a Personal Access Token in review.yml (requires repo secret)
+  # See docs/HARNESS-PITFALLS.md §C7 for full discussion.
 
 permissions:
   contents: write

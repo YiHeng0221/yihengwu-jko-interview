@@ -8,6 +8,11 @@
 |---|-------|--------|------|
 | 0001 | [Documentation conventions](0001-documentation-conventions.md) | Accepted | — |
 | 0002 | [Cross-agent code review](0002-cross-agent-review.md) | Accepted | — |
+| 0003 | [React + Vite over Next.js](0003-react-vite-over-nextjs.md) | Accepted | 2026-05-24 |
+| 0004 | [Zod as single source of truth for schemas](0004-zod-single-source-of-truth.md) | Accepted | 2026-05-24 |
+| 0005 | [Cursor-based pagination over offset](0005-cursor-pagination.md) | Accepted | 2026-05-24 |
+| 0006 | [oxlint over ESLint](0006-oxlint-over-eslint.md) | Accepted | 2026-05-24 |
+| 0007 | [snake_case wire + FE DTO mapper layer](0007-wire-snake-case-with-fe-dto-layer.md) | Accepted | 2026-05-24 |
 
 > **0001 / 0002 是 harness 的 process ADR**，所有專案繼承。
 > **0003 起是 architectural ADR**，**由各專案自己寫**（記錄選的 stack / tooling / patterns 為什麼）。

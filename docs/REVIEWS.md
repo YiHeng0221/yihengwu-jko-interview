@@ -42,6 +42,19 @@ Single-pass AI review has correlated blind spots. A second reviewer with a fresh
 
 <!-- Insert new RR-NNN entries below. Most recent at the top. -->
 
+## RR-010 — fix(skills): 嚴禁日文混雜 — review / fix-pr / implement-issue 全 ZH-TW only
+- PR: #96
+- Date: 2026-05-24
+- Reviewer: local Claude Code (first pass, claude-sonnet-4-6)
+- Verdict: pass
+- Findings: 🔴×0 · 🟡×1 · 🟣×0
+- Round: 1 of 3
+
+### Key concerns
+- `.claude/commands/implement-issue.md:18` — 缺少「若不小心打出日文 / 全英文段落，**回頭重寫整段**」自我修正規則，與 `fix-pr.md` 及 `review.md` 的語言 directive 不對稱（🟡 Nit）
+
+---
+
 ## RR-009 — docs(review): RR-008 review round 2 for PR #28
 - PR: #34
 - Date: 2026-05-25

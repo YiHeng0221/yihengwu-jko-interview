@@ -42,6 +42,26 @@ Single-pass AI review has correlated blind spots. A second reviewer with a fresh
 
 <!-- Insert new RR-NNN entries below. Most recent at the top. -->
 
+## RR-010 — feat(web): P1-FE-03 Input + Card + Skeleton primitives
+- PR: #84
+- Date: 2026-05-24
+- Reviewer (first): local Claude Code (claude-sonnet-4-6, via `/review`)
+- Reviewer (cross-agent): n/a
+- Verdict: pass
+- Findings: 🔴×0 · 🟡×3 · 🟣×0
+- Round: 2 of 3
+
+### Key concerns
+- `Input.tsx:8` — `InputProps` 繼承 `InputHTMLAttributes<HTMLInputElement>`，但 `className` 實際套在外層 `<label>` 容器，型別與結構不符，消費方易踩坑。🟡
+- `Skeleton.tsx:26` — `CardSkeleton` JSDoc 為多行 block（違反 CLAUDE.md 慣例）且「× 10 default」說法誤導讀者（元件渲染一張，由呼叫方組合多個）。🟡
+- `Card.test.tsx:49` — Card 四分支（article/button/anchor/div）中 `div` 分支缺對應測試案例。🟡
+
+### Round history
+- Round 1: 2026-05-24 — changes-requested（🔴×3；已由 commit `673173bd` 全數修復）
+- Round 2: 2026-05-24 — pass（🔴×0·🟡×3）
+
+---
+
 ## RR-009 — docs(review): RR-008 review round 2 for PR #28
 - PR: #34
 - Date: 2026-05-25

@@ -19,14 +19,32 @@ concurrency:
 
 jobs:
   guard:
-    name: Round counter (cap at 3)
+    name: Round counter (cap at 3) + PR-still-open check
     if: github.event.label.name == 'ai-fix' && !github.event.pull_request.draft
     runs-on: ubuntu-latest
     outputs:
       round: ${{ steps.counter.outputs.round }}
       escalate: ${{ steps.counter.outputs.escalate }}
+      proceed: ${{ steps.live_state.outputs.proceed }}
     steps:
+      - name: Skip if PR already merged / closed (live re-check)
+        id: live_state
+        env:
+          GH_TOKEN: ${{ secrets.BOT_PAT || secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+        run: |
+          # event payload may be stale if run was queued — re-fetch live PR state
+          STATE=$(gh pr view "$PR_NUMBER" --repo "$REPO" --json state --jq '.state')
+          if [ "$STATE" != "OPEN" ]; then
+            echo "::notice::PR #$PR_NUMBER is $STATE (not OPEN) — skipping ai-fix"
+            echo "proceed=false" >> $GITHUB_OUTPUT
+          else
+            echo "proceed=true" >> $GITHUB_OUTPUT
+          fi
+
       - name: Read round counter from PR body
+        if: steps.live_state.outputs.proceed == 'true'
         id: counter
         uses: actions/github-script@v7
         with:
@@ -40,7 +58,7 @@ jobs:
             core.info(`Round counter: ${current} → ${next} (escalate=${next > 3})`);
 
       - name: Escalate to human-review if cap reached
-        if: steps.counter.outputs.escalate == 'true'
+        if: steps.live_state.outputs.proceed == 'true' && steps.counter.outputs.escalate == 'true'
         uses: actions/github-script@v7
         with:
           script: |
@@ -61,8 +79,10 @@ jobs:
   fix:
     name: Local Claude Code · /fix-pr
     needs: guard
-    if: needs.guard.outputs.escalate == 'false'
-    runs-on: [self-hosted, runner-fix]
+    if: needs.guard.outputs.escalate == 'false' && needs.guard.outputs.proceed == 'true'
+    # GitHub-hosted ubuntu → 跨 PR 並行。原本 self-hosted runner-fix lane 保留
+    # 給臨時 fallback；正常情況下都走 ubuntu。
+    runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
       GH_TOKEN: ${{ secrets.BOT_PAT || secrets.GITHUB_TOKEN }}
@@ -79,12 +99,16 @@ jobs:
           # downstream workflows — breaks the fix-loop chain.
           token: ${{ secrets.BOT_PAT || secrets.GITHUB_TOKEN }}
 
-      - name: Sanity — claude CLI present
+      - name: Setup Node + install pnpm (for project deps in /fix-pr context)
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+
+      - uses: pnpm/action-setup@v4
+
+      - name: Install claude CLI
         run: |
-          if ! command -v claude >/dev/null; then
-            echo "::error::claude CLI not found on PATH on the self-hosted runner."
-            exit 1
-          fi
+          npm install -g @anthropic-ai/claude-code
           claude --version
 
       - name: Configure git for commits
@@ -95,7 +119,6 @@ jobs:
       - name: Run /fix-pr
         env:
           CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          HOME: /Users/wuyiheng
         run: |
           set -euo pipefail
           echo "→ Fixing PR #${PR_NUMBER} round ${ROUND}/3"

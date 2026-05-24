@@ -42,6 +42,31 @@ Single-pass AI review has correlated blind spots. A second reviewer with a fresh
 
 <!-- Insert new RR-NNN entries below. Most recent at the top. -->
 
+## RR-009 — docs(review): RR-008 review round 2 for PR #28
+- PR: #34
+- Date: 2026-05-25
+- Reviewer (first): local Claude Code (claude-sonnet-4-6)
+- Reviewer (cross-agent): n/a
+- Verdict: pass
+- Findings: 🔴×0 · 🟡×2 · 🟣×0
+- Cross-agent agreement: n/a
+
+### Key concerns
+- `docs/REVIEWS.md:48` — `Reviewer:` 欄位不符模板，應拆分為 `Reviewer (first):` / `Reviewer (cross-agent):` / `Cross-agent agreement:`，與 RR-001~007 格式不一致。🟡（已由 `e913349` 修復）
+- `docs/REVIEWS.md:57` — Round 1 findings 缺 `🔴×N·🟡×N` 計數與 Key concerns 條列，audit trail 完整性不對稱。🟡（已由 `e913349` 修復）
+
+### Round 2 (2026-05-25)
+- Verdict: pass
+- Findings: 🔴×0 · 🟡×1 · 🟣×0
+- What changed since round 1: `e913349` 補入 Reviewer 欄位拆分 + `### Round 1 findings（backfill）` sub-section
+- `docs/REVIEWS.md:51` — `Findings:` header 僅記錄 Round 2 計數（🔴×1·🟡×0）；補入 backfill 後 Round 1（🔴×1·🟡×3）未反映於 header，讀者會低估此 RR 總 finding 數。🟡 non-blocking
+
+### Round history
+- Round 1: 2026-05-25 — pass（🔴×0·🟡×2；兩條 nit 均由 `e913349` 修復）
+- Round 2: 2026-05-25 — pass（🔴×0·🟡×1；Findings header 語意落差，non-blocking）
+
+---
+
 ## RR-008 — chore(infra): add frontend multi-stage Dockerfile + nginx.conf (P0-12)
 - PR: #28
 - Date: 2026-05-24

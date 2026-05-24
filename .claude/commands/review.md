@@ -123,7 +123,12 @@ gh pr edit <N> --add-label review/pass --remove-label ai-fix,human-review
 gh pr edit <N> --add-label ai-fix --remove-label review/pass
 ```
 
-## Append to docs/REVIEWS.md
+## Append to docs/REVIEWS.md（**強制每個 PR 都寫，包含 docs / config 類**）
+
+> ⚠️ **不可省略**。即使 0🔴 0🟡 0🟣，也要寫一條 verdict=pass 的 minimal RR — 這就是「沒問題」的 audit 證據。漏寫違反 AGENTS.md Hard Rule #6（cross-agent review log）+ #8（no silent decisions）。
+>
+> **決定 RR 編號**：`grep -c '^## RR-' docs/REVIEWS.md` → +1。
+> **同 PR 重審**（round 2/3）：不開新 RR，append `### Round N` 到既有 RR 之下。
 
 ```markdown
 ## RR-NNN — <PR title>

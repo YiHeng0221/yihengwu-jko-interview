@@ -18,6 +18,11 @@
 | 0015 | [pg_trgm GIN over FTS for CJK substring search](0015-pg-trgm-gin-over-fts.md) | Accepted | 2026-05-24 |
 | 0017 | [categoryCode as String over Postgres enum](0017-category-code-string-over-pg-enum.md) | Accepted | 2026-05-24 |
 | 0018 | [OpenAPI auto-emit and drift CI](0018-openapi-auto-emit-and-drift-ci.md) | Accepted | 2026-05-24 |
+| 0008 | [Tailwind v4 `@theme` tokens](0008-tailwind-v4-theme-tokens.md) | Accepted | 2026-05-24 |
+| 0009 | [TanStack Query as data layer](0009-tanstack-query-as-data-layer.md) | Accepted | 2026-05-24 |
+| 0010 | [Custom UI primitives](0010-custom-ui-primitives.md) | Accepted | 2026-05-24 |
+| 0011 | [Storybook 8 + Vite builder](0011-storybook-8-vite-builder.md) | Accepted | 2026-05-24 |
+| 0012 | [Dialog/Drawer responsive strategy](0012-dialog-drawer-responsive-strategy.md) | Accepted | 2026-05-24 |
 
 > **0001 / 0002 是 harness 的 process ADR**，所有專案繼承。
 > **0003 起是 architectural ADR**，**由各專案自己寫**（記錄選的 stack / tooling / patterns 為什麼）。

@@ -25,7 +25,7 @@ export function Tabs<TValue extends string>({
   value,
   onChange,
   className,
-  ...rest
+  'aria-label': ariaLabel,
 }: TabsProps<TValue>) {
   const activeIndex = items.findIndex((item) => item.value === value)
   const tablistRef = useRef<HTMLDivElement>(null)
@@ -79,7 +79,7 @@ export function Tabs<TValue extends string>({
     <div
       ref={tablistRef}
       role="tablist"
-      aria-label={rest['aria-label']}
+      aria-label={ariaLabel}
       onKeyDown={handleKeyDown}
       className={clsx(
         'flex h-tabbar w-full items-stretch border-b border-border bg-surface',

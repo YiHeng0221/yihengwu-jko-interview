@@ -5,7 +5,7 @@ export type ErrorStateProps = {
   icon?: ReactNode
   title?: ReactNode
   description?: ReactNode
-  /** Retry button label，預設「重試」。傳 null 或 undefined 隱藏 retry */
+  /** Retry button label，預設「重試」。傳 null 或 undefined 隱藏 retry。⚠ 若 retryLabel 不為 null，應同時傳入 onRetry */
   retryLabel?: ReactNode | null
   onRetry?: () => void
   className?: string

@@ -2,6 +2,7 @@ import compress from '@fastify/compress'
 import cors from '@fastify/cors'
 import helmet from '@fastify/helmet'
 import rateLimit from '@fastify/rate-limit'
+import { PrismaClient } from '@prisma/client'
 import Fastify from 'fastify'
 import {
   serializerCompiler,
@@ -9,9 +10,10 @@ import {
 } from 'fastify-type-provider-zod'
 import { genReqId, requestIdPlugin } from './plugins/request-id.js'
 import { zodValidationPlugin } from './plugins/zod-validation.js'
+import { charitiesRoute, type CharitiesDb } from './routes/charities.js'
 import { healthRoute } from './routes/health.js'
 
-export async function buildApp() {
+export async function buildApp(opts?: { prisma?: CharitiesDb }) {
   const app = Fastify({
     logger: { level: process.env['LOG_LEVEL'] ?? 'info' },
     genReqId,
@@ -37,7 +39,10 @@ export async function buildApp() {
     await app.register(swaggerUi, { routePrefix: '/docs' })
   }
 
+  const prisma: CharitiesDb = opts?.prisma ?? new PrismaClient()
+
   await app.register(healthRoute)
+  await app.register(charitiesRoute, { prisma })
 
   return app
 }

@@ -22,7 +22,7 @@ describe('EmptyState', () => {
     expect(screen.getByRole('button', { name: '清除搜尋' })).toBeInTheDocument()
   })
 
-  it('omits description / action when not provided', () => {
+  it('omits action when not provided', () => {
     render(<EmptyState title="僅標題" />)
     expect(screen.queryByRole('button')).not.toBeInTheDocument()
   })
@@ -31,5 +31,19 @@ describe('EmptyState', () => {
     render(<EmptyState icon={<svg data-testid="icon" />} title="X" />)
     const icon = screen.getByTestId('icon')
     expect(icon.parentElement).toHaveAttribute('aria-hidden', 'true')
+  })
+
+  it('renders default no-data image when no icon provided', () => {
+    render(<EmptyState />)
+    const img = screen.getByTestId('empty-no-data-img')
+    expect(img).toBeInTheDocument()
+    expect(img).toHaveAttribute('width', '144')
+    expect(img).toHaveAttribute('height', '144')
+  })
+
+  it('renders default title and description', () => {
+    render(<EmptyState />)
+    expect(screen.getByText('查無相關資料')).toBeInTheDocument()
+    expect(screen.getByText('請調整關鍵字再重新搜尋')).toBeInTheDocument()
   })
 })

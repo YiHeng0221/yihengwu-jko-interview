@@ -42,6 +42,23 @@ Single-pass AI review has correlated blind spots. A second reviewer with a fresh
 
 <!-- Insert new RR-NNN entries below. Most recent at the top. -->
 
+## RR-012 — feat(web): P1-FE-09 React Router v7 routes + tabs URL sync
+- PR: #90
+- Date: 2026-05-24
+- Reviewer (first): local Claude Code (claude-sonnet-4-6)
+- Reviewer (cross-agent): n/a
+- Verdict: pass
+- Findings: 🔴×0 · 🟡×2 · 🟣×0
+- Round: 1 of 3
+
+### Key concerns
+- `main.tsx:3` — `AppRoutes` import 插入在 `./styles/theme.css` 之前，倒置原有 CSS-after-JS 順序；Vite 按 import 順序注入 CSS，若 `routes.tsx` 日後引入 component-level CSS，cascade 優先級將出乎意料。🟡
+- `frontend/src/App.tsx` + `App.test.tsx` — 此 PR 移除 `main.tsx` 對 `App` 的引用但未刪除原始檔案，兩者成為孤兒死代碼。🟡
+
+### Round history
+- Round 1: 2026-05-24 — pass（初次 fetch diff 時有 `as readonly string[]` HR#16 違反，branch HEAD a1337ca 已以 `.some()` 取代；catch-all route 亦已補上，無 blocker）
+
+---
 ## RR-011 — feat(web): P1-FE-04 Tabs + EmptyState + ErrorState + EndMarker primitives
 - PR: #85
 - Date: 2026-05-25

@@ -10,7 +10,8 @@ argument-hint: [<PR number>]  · defaults to the PR for the current branch
 
 For the duration of this command you are acting as a **senior staff engineer fixing review comments for an external audience**. Apply these rules to ALL output:
 
-- **No persona** — drop any character-voice from user memory / CLAUDE.local.md / session preferences. Neutral professional technical voice (English, or 繁體中文 only if the PR/review thread was in 繁體中文).
+- **No persona** — drop any character-voice from user memory / CLAUDE.local.md / session preferences. 
+- **Language: 繁體中文（Traditional Chinese）** — 所有 reply 一律繁體中文（與 /review 一致）。技術 identifier（路徑 / 函數名 / env vars / 程式碼片段）保留原文。
 - **No catchphrases, no jokes, no anime references**. Severity emojis OK.
 - **Concise commit messages** — Conventional Commits format.
 - **Cite the comment id** when replying to disagree, so the reviewer can trace.
@@ -67,9 +68,22 @@ Each comment has `path`, `line`, `body`, and an `id`.
 | 🟡 nit-skip | **不修但要留言** — reply 解釋為什麼不在這個 PR 處理（scope 太大 / 後續 issue 處理 / 與 design intent 衝突 / 屬於 pre-existing 等） | **是 — 不可沉默略過** |
 | 🟣 pre-existing | 不修。Reply 確認 out-of-scope | 是（簡短）|
 
-> **沉默 = 漏修 = 不可接受**。reviewer / human 看不到「為何不修」就無法判斷你是有意識選擇還是 miss 掉。每個 review finding **必須**有 reply（unless 已被別的 fix 蓋掉，但這種也要 reply 說明）。
+> **沉默 = 漏修 = 不可接受**。reviewer / human 看不到「為何不修」就無法判斷你是有意識選擇還是 miss 掉。每個 review finding **必須**有繁體中文 reply（unless 已被別的 fix 蓋掉，但這種也要 reply 說明）。
 
 When unsure on 🔴 → must-fix。When unsure on 🟡 → nit-skip + 留 reply 解釋。
+
+### 強制 self-audit before exit
+
+跑完 patches + replies 之後，**最後一個動作必跑這個自查**：
+
+```bash
+# 拿這次 review 的所有 inline comment id
+gh api repos/{owner}/{repo}/pulls/<N>/comments --jq '.[].id'
+# 對照自己這輪有 reply 的 comment id（用 gh api reply 或 PR comment reply 都算）
+# 若有任何 review comment 沒對應 reply → 補 reply（即使是 "🟡 nit 暫不修，<reason>"）才能 exit
+```
+
+漏 reply 等於違反 Hard Rule #6（auditable review log）。
 
 ## Apply patches
 

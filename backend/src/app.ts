@@ -11,6 +11,7 @@ import {
 import { genReqId, requestIdPlugin } from './plugins/request-id.js'
 import { swaggerPlugin } from './plugins/swagger.js'
 import { zodValidationPlugin } from './plugins/zod-validation.js'
+import { categoriesRoute } from './routes/categories.js'
 import { healthRoute } from './routes/health.js'
 import { charitiesDetailRoute } from './routes/charities.js'
 import type { CharityDb } from './routes/charities.js'
@@ -49,6 +50,7 @@ export async function buildApp(opts: { db?: CharityDb } = {}) {
 
   await app.register(healthRoute)
   await app.register(charitiesDetailRoute, { db })
+  await app.register(categoriesRoute)
 
   return app
 }

@@ -42,6 +42,23 @@ Single-pass AI review has correlated blind spots. A second reviewer with a fresh
 
 <!-- Insert new RR-NNN entries below. Most recent at the top. -->
 
+## RR-008 — chore(infra): add frontend multi-stage Dockerfile + nginx.conf (P0-12)
+- PR: #28
+- Date: 2026-05-24
+- Reviewer: local Claude Code (second pass)
+- Verdict: changes-requested
+- Findings: 🔴×1 · 🟡×0 · 🟣×0
+- Round: 2 of 3
+
+### Key concerns
+- `frontend/nginx.conf:27` — nginx `add_header` 不繼承：location /assets/ 與 = /index.html 定義了自己的 add_header，導致 server 層安全標頭（X-Content-Type-Options、X-Frame-Options、Referrer-Policy）在這兩個 location 的回應中消失，Round 1 修補失效。🔴
+
+### Round history
+- Round 1: 2026-05-24 — changes-requested → ai-fix applied (security headers, gzip, .git exclusion, image version pinning)
+- Round 2: 2026-05-24 — changes-requested (nginx add_header inheritance bug found)
+
+---
+
 ## RR-007 — chore(repo): add root scaffold files (pnpm workspace + tsconfig.base + Makefile)
 - PR: #23（Issue#6 / P0-05）
 - Date: 2026-05-24

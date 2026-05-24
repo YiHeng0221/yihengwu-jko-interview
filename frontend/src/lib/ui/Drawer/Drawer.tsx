@@ -1,5 +1,5 @@
 import { clsx } from 'clsx'
-import { useEffect, useRef, type MouseEvent, type ReactNode } from 'react'
+import { useEffect, useId, useRef, type MouseEvent, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 
 export type DrawerProps = {
@@ -14,13 +14,12 @@ export type DrawerProps = {
 const FOCUSABLE_SELECTOR =
   'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
 
-/**
- * 從底部 slide-up 的 drawer — 跟 Dialog 同 API 介面，
- * 視覺上：吸附 bottom、寬度 100%、上方圓角。手機常用。
- */
 export function Drawer({ open, onClose, title, children, closeLabel = '關閉', className }: DrawerProps) {
   const containerRef = useRef<HTMLDivElement | null>(null)
   const previousActiveRef = useRef<HTMLElement | null>(null)
+  const onCloseRef = useRef(onClose)
+  onCloseRef.current = onClose
+  const titleId = useId()
 
   useEffect(() => {
     if (!open) return
@@ -37,7 +36,7 @@ export function Drawer({ open, onClose, title, children, closeLabel = '關閉', 
     function handleKey(event: KeyboardEvent) {
       if (event.key === 'Escape') {
         event.stopPropagation()
-        onClose()
+        onCloseRef.current()
         return
       }
       if (event.key === 'Tab' && container) {
@@ -62,13 +61,13 @@ export function Drawer({ open, onClose, title, children, closeLabel = '關閉', 
       document.body.style.overflow = previousOverflow
       previousActiveRef.current?.focus()
     }
-  }, [open, onClose])
+  }, [open])
 
   if (!open) return null
 
   function handleOverlayClick(event: MouseEvent<HTMLDivElement>) {
     if (event.target === event.currentTarget) {
-      onClose()
+      onCloseRef.current()
     }
   }
 
@@ -83,14 +82,14 @@ export function Drawer({ open, onClose, title, children, closeLabel = '關閉', 
         ref={containerRef}
         role="dialog"
         aria-modal="true"
-        aria-label={typeof title === 'string' ? title : undefined}
+        aria-labelledby={titleId}
         className={clsx(
           'relative flex max-h-[85vh] w-full flex-col overflow-hidden rounded-t-card bg-surface shadow-md',
           className,
         )}
       >
         <header className="flex items-center justify-between border-b border-border px-4 py-3">
-          <h2 className="text-lg font-medium text-text-primary">{title}</h2>
+          <h2 id={titleId} className="text-lg font-medium text-text-primary">{title}</h2>
           <button
             type="button"
             onClick={onClose}

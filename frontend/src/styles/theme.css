@@ -1,24 +1,54 @@
 @import "tailwindcss";
 
+/* Design tokens — Tailwind v4 @theme CSS-first 模式
+   來源：街口公益捐款列表 Figma Style Guide
+   AC: AC-028 (header 44px), AC-036 (token), AC-037 (sticky layout heights) */
+
 @theme {
+  /* 主色：街口紅 */
   --color-brand: #e01e3c;
   --color-brand-dark: #b01530;
+  --color-brand-soft: #fde2e7;
+
+  /* 表面 + 文字 */
   --color-surface: #ffffff;
   --color-surface-muted: #f5f5f5;
+  --color-surface-overlay: rgba(0, 0, 0, 0.5);
   --color-text-primary: #1a1a1a;
   --color-text-secondary: #666666;
+  --color-text-tertiary: #999999;
   --color-text-on-brand: #ffffff;
   --color-border: #e5e5e5;
+  --color-border-strong: #cccccc;
 
+  /* 狀態色 */
+  --color-success: #1f9d55;
+  --color-warning: #f59e0b;
+  --color-danger: #dc2626;
+
+  /* Sticky header stack 三層高度（AC-028 / AC-037）
+     上方三層 = 44 + 48 + 48 = 140px */
   --spacing-topbar: 44px;
   --spacing-tabbar: 48px;
   --spacing-subrow: 48px;
 
+  /* Typography scale */
+  --font-size-xs: 0.75rem;
   --font-size-sm: 0.875rem;
   --font-size-base: 1rem;
   --font-size-lg: 1.125rem;
   --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
 
+  --line-height-tight: 1.25;
+  --line-height-normal: 1.5;
+
+  /* Radius */
   --radius-card: 0.5rem;
   --radius-chip: 9999px;
+  --radius-button: 0.375rem;
+
+  /* Shadow（行動端極簡）*/
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.08);
 }

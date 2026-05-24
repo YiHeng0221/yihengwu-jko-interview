@@ -4,6 +4,7 @@
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "lib": ["ES2022"],
+    // Fastify & Prisma type definitions have known incompatibilities with exactOptionalPropertyTypes: true
     "exactOptionalPropertyTypes": false
   },
   "include": ["src/**/*", "test/**/*"]

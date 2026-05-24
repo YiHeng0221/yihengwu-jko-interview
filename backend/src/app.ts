@@ -11,6 +11,7 @@ import {
 import { genReqId, requestIdPlugin } from './plugins/request-id.js'
 import { swaggerPlugin } from './plugins/swagger.js'
 import { zodValidationPlugin } from './plugins/zod-validation.js'
+import { categoriesRoute } from './routes/categories.js'
 import { charitiesRoute, type CharitiesDb } from './routes/charities.js'
 import { healthRoute } from './routes/health.js'
 
@@ -40,6 +41,7 @@ export async function buildApp(opts?: { prisma?: CharitiesDb }) {
 
   await app.register(healthRoute)
   await app.register(charitiesRoute, { prisma })
+  await app.register(categoriesRoute)
 
   return app
 }

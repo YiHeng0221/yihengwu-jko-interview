@@ -1,4 +1,5 @@
 import { BrowserRouter, Route, Routes } from 'react-router'
+import { OfflineBanner } from './components/OfflineBanner'
 
 /**
  * Placeholder route element — 待 FE-10 (#56) 補上真的 CharityListPage 後替換。
@@ -15,6 +16,7 @@ function CharityListPagePlaceholder() {
 export function AppRoutes() {
   return (
     <BrowserRouter>
+      <OfflineBanner />
       <Routes>
         <Route path="/" element={<CharityListPagePlaceholder />} />
         <Route path="*" element={<CharityListPagePlaceholder />} />

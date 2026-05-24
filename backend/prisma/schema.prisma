@@ -20,7 +20,9 @@ model Charity {
   tab          CharityTab
   categoryCode String
   logoUrl      String?
+  /// 單位：NTD 整數（元）
   amountRaised Int        @default(0)
+  /// 單位：NTD 整數（元）；null = 無募款目標
   amountGoal   Int?
   createdAt    DateTime   @default(now())
 

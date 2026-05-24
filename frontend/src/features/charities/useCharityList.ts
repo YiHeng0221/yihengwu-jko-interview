@@ -2,14 +2,12 @@ import { useInfiniteQuery } from '@tanstack/react-query'
 import { env } from '../../lib/env'
 import { charitiesListResponseSchema } from './dto/charitiesListDTO'
 import type { CharitiesListResponse } from './dto/charitiesListDTO'
-import type { CharityTab } from './useTabSync'
+import type { CharityTab } from './constants'
 
 export type UseCharityListParams = {
   tab: CharityTab
   q?: string
 }
-
-const INITIAL_CURSOR: string | null = null
 
 type FetchParams = {
   tab: CharityTab
@@ -37,7 +35,7 @@ export function useCharityList({ tab, q }: UseCharityListParams) {
     queryKey: ['charities', tab, q ?? ''],
     queryFn: ({ pageParam, signal }) =>
       fetchCharitiesPage({ tab, q, cursor: pageParam, signal }),
-    initialPageParam: INITIAL_CURSOR,
+    initialPageParam: null,
     getNextPageParam: (lastPage) => lastPage.nextCursor,
   })
 }

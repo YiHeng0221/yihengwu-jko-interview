@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom/vitest'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { render, screen, waitFor } from '@testing-library/react'
+import { act, render, screen, waitFor } from '@testing-library/react'
 import type { ReactNode } from 'react'
 import { MemoryRouter, Route, Routes } from 'react-router'
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -116,6 +116,40 @@ describe('CharityListPage', () => {
     await waitFor(() =>
       expect(screen.getByRole('alert')).toBeInTheDocument(),
     )
+  })
+
+  it('shows inline ErrorState while preserving existing cards when pagination fetch fails', async () => {
+    // Re-stub with a fresh mock so that vi.restoreAllMocks() in beforeEach
+    // does not leave observe in an unusable state for this test.
+    const mockObserver = { observe: vi.fn(), unobserve: vi.fn(), disconnect: vi.fn() }
+    let lastIoCallback: IntersectionObserverCallback | null = null
+    vi.stubGlobal(
+      'IntersectionObserver',
+      vi.fn().mockImplementation((cb: IntersectionObserverCallback) => {
+        lastIoCallback = cb
+        return mockObserver
+      }),
+    )
+
+    vi.spyOn(globalThis, 'fetch')
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({ items: [makeItem('c1')], next_cursor: 'cursor1' }),
+          { status: 200 },
+        ),
+      )
+      .mockResolvedValueOnce(new Response('{}', { status: 500 }))
+
+    setup()
+
+    await waitFor(() => expect(screen.getByText('Org c1')).toBeInTheDocument())
+
+    act(() => {
+      lastIoCallback?.([{ isIntersecting: true } as IntersectionObserverEntry], {} as IntersectionObserver)
+    })
+
+    await waitFor(() => expect(screen.getByRole('alert')).toBeInTheDocument())
+    expect(screen.getByText('Org c1')).toBeInTheDocument()
   })
 
   it('defaults to ORG tab', () => {

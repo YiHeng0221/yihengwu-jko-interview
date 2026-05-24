@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { CHARITY_TABS } from '../useTabSync'
+import { CHARITY_TABS } from '../constants'
 
 const charityItemSchema = z
   .object({
@@ -8,7 +8,7 @@ const charityItemSchema = z
     description: z.string(),
     tab: z.enum(CHARITY_TABS),
     category_code: z.string(),
-    logo_url: z.string().nullable().optional(),
+    logo_url: z.string().url().nullable().optional(),
     amount_raised: z.number().int(),
     amount_goal: z.number().int().nullable().optional(),
     created_at: z.string().datetime(),

@@ -9,8 +9,9 @@ import { CardSkeleton } from '../../lib/ui/Skeleton/Skeleton'
 import { Tabs } from '../../lib/ui/Tabs/Tabs'
 import type { CharityItem } from './dto/charitiesListDTO'
 import { useCharityList } from './useCharityList'
-import { CHARITY_TABS, useTabSync } from './useTabSync'
-import type { CharityTab } from './useTabSync'
+import { CHARITY_TABS } from './constants'
+import type { CharityTab } from './constants'
+import { useTabSync } from './useTabSync'
 
 const TAB_LABELS: Record<CharityTab, string> = {
   ORG: '公益團體',
@@ -57,7 +58,7 @@ export function CharityListPage() {
     error,
     fetchNextPage,
     hasNextPage,
-    isFetching,
+    isPending,
     isFetchingNextPage,
     refetch,
   } = useCharityList({ tab })
@@ -70,7 +71,7 @@ export function CharityListPage() {
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry?.isIntersecting && hasNextPage && !isFetchingNextPage) {
+        if (entry?.isIntersecting && hasNextPage) {
           void fetchNextPage()
         }
       },
@@ -78,12 +79,13 @@ export function CharityListPage() {
     )
     observer.observe(el)
     return () => observer.disconnect()
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage])
+  }, [hasNextPage, fetchNextPage])
 
   const allItems = data?.pages.flatMap((p) => p.items) ?? []
-  const isInitialLoading = isFetching && allItems.length === 0
+  const isInitialLoading = isPending
   const hasError = error !== null && allItems.length === 0
-  const isDone = !hasNextPage && data !== undefined && !isInitialLoading
+  const hasPaginationError = error !== null && allItems.length > 0
+  const isDone = !hasNextPage && !hasPaginationError && data !== undefined && !isInitialLoading
 
   return (
     <div className="flex min-h-screen flex-col bg-surface">
@@ -123,6 +125,7 @@ export function CharityListPage() {
                 ))}
               </div>
             )}
+            {hasPaginationError && <ErrorState onRetry={() => void fetchNextPage()} />}
             {isDone && <EndMarker />}
             <div ref={sentinelRef} aria-hidden="true" />
           </>

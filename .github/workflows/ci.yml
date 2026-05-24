@@ -29,18 +29,28 @@ jobs:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
-      - name: Check PR diff size
+      - name: Check PR diff size (excluding auto-generated files)
         env:
           GH_TOKEN: ${{ secrets.BOT_PAT || secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
         run: |
-          additions=$(gh pr view ${{ github.event.pull_request.number }} \
-            --repo ${{ github.repository }} --json additions --jq '.additions')
-          deletions=$(gh pr view ${{ github.event.pull_request.number }} \
-            --repo ${{ github.repository }} --json deletions --jq '.deletions')
-          total=$((additions + deletions))
-          echo "PR size: +${additions} -${deletions} = ${total} total"
+          # 排除 lockfile / snapshot 等自動產生檔，
+          # 因為這些檔 line count 跟 PR 的「人類審 review effort」不成比例。
+          total=$(gh pr view "$PR_NUMBER" --repo "$REPO" --json files --jq '
+            [.files[]
+              | select(.path | endswith("pnpm-lock.yaml") | not)
+              | select(.path | endswith("package-lock.json") | not)
+              | select(.path | endswith("yarn.lock") | not)
+              | select(.path | endswith(".snap") | not)
+              | .additions + .deletions
+            ] | add // 0')
+          raw=$(gh pr view "$PR_NUMBER" --repo "$REPO" --json additions,deletions \
+            --jq '.additions + .deletions')
+          echo "PR size (excluding lockfile / snapshot): ${total} LoC"
+          echo "Raw additions + deletions (incl. generated): ${raw} LoC"
           if [ "$total" -gt 800 ]; then
-            echo "::error::PR exceeds 800 LoC limit (${total} lines). Split per AGENTS.md Hard Rule #11."
+            echo "::error::PR exceeds 800 LoC limit (${total} lines, excluding generated). Split per AGENTS.md Hard Rule #11."
             exit 1
           fi
           echo "✅ PR size: ${total} LoC ≤ 800"

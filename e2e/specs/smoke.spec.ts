@@ -6,9 +6,8 @@ test.describe('smoke — /health', () => {
     const response = await request.get('/health');
     expect(response.status()).toBe(200);
 
-    const body: unknown = await response.json();
-    expect(body).toMatchObject({ status: 'ok' });
-    expect(typeof (body as Record<string, unknown>)['ts']).toBe('string');
+    const body = await response.json();
+    expect(body).toMatchObject({ status: 'ok', ts: expect.any(String) });
   });
 
   test('frontend root passes axe-core a11y scan', async ({ page }) => {

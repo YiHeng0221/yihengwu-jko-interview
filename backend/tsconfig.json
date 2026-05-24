@@ -7,5 +7,5 @@
     // Fastify & Prisma type definitions have known incompatibilities with exactOptionalPropertyTypes: true
     "exactOptionalPropertyTypes": false
   },
-  "include": ["src/**/*", "test/**/*"]
+  "include": ["src/**/*", "test/**/*", "scripts/**/*"]
 }

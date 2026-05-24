@@ -32,16 +32,20 @@ jobs:
       - name: Check PR diff size (excluding auto-generated files)
         env:
           GH_TOKEN: ${{ secrets.BOT_PAT || secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
         run: |
-          # 排除 lockfile / Storybook build / e2e artefact 等自動產生檔，
+          # 排除 lockfile / snapshot 等自動產生檔，
           # 因為這些檔 line count 跟 PR 的「人類審 review effort」不成比例。
-          # 過濾規則跟 .gitignore 的精神一致：機器生成的不算。
-          excluded='^(pnpm-lock\.yaml|package-lock\.json|yarn\.lock|.*\.snap)$'
-          total=$(gh pr view ${{ github.event.pull_request.number }} \
-            --repo ${{ github.repository }} --json files \
-            --jq "[.files[] | select(.path | test(\"${excluded}\") | not) | .additions + .deletions] | add // 0")
-          raw=$(gh pr view ${{ github.event.pull_request.number }} \
-            --repo ${{ github.repository }} --json additions,deletions \
+          total=$(gh pr view "$PR_NUMBER" --repo "$REPO" --json files --jq '
+            [.files[]
+              | select(.path | endswith("pnpm-lock.yaml") | not)
+              | select(.path | endswith("package-lock.json") | not)
+              | select(.path | endswith("yarn.lock") | not)
+              | select(.path | endswith(".snap") | not)
+              | .additions + .deletions
+            ] | add // 0')
+          raw=$(gh pr view "$PR_NUMBER" --repo "$REPO" --json additions,deletions \
             --jq '.additions + .deletions')
           echo "PR size (excluding lockfile / snapshot): ${total} LoC"
           echo "Raw additions + deletions (incl. generated): ${raw} LoC"

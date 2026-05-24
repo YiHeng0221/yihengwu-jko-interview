@@ -105,6 +105,19 @@ describe('useSearch', () => {
     expect(result.current.error?.message).toMatch(/HTTP 500/)
   })
 
+  it('sets error when backend returns invalid shape (ZodError)', async () => {
+    mockFetch.mockResolvedValue(
+      new Response(JSON.stringify({ items: null, next_cursor: null }), { status: 200 }),
+    )
+    const { result } = renderHook(() => useSearch('bad'))
+    await act(async () => {
+      await vi.runAllTimersAsync()
+    })
+    expect(result.current.error).toBeInstanceOf(Error)
+    expect(result.current.items).toHaveLength(0)
+    expect(result.current.isLoading).toBe(false)
+  })
+
   it('aborts previous in-flight fetch when query changes mid-debounce', async () => {
     mockFetch.mockResolvedValue(
       new Response(JSON.stringify({ items: [], next_cursor: null }), { status: 200 }),

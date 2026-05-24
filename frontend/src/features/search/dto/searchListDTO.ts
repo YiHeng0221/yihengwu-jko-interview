@@ -1,23 +1,25 @@
 import { z } from 'zod'
 
-const categoryCodeSchema = z.enum([
-  'CHILD_CARE',
-  'ANIMAL_PROTECTION',
-  'SPECIAL_MEDICAL',
-  'ELDER_CARE',
-  'DISABILITY_SERVICE',
-  'WOMEN_CARE',
-  'SPORTS_DEV',
-  'EDUCATION_ADVOCACY',
-  'ENV_PROTECTION',
-  'MULTI_ETHNIC',
-  'MEDIA',
-  'PUBLIC_ISSUE',
-  'CULTURE_ARTS',
-  'COMMUNITY_DEV',
-  'POVERTY_RELIEF',
-  'INTL_RESCUE',
-])
+const categoryCodeSchema = z
+  .enum([
+    'CHILD_CARE',
+    'ANIMAL_PROTECTION',
+    'SPECIAL_MEDICAL',
+    'ELDER_CARE',
+    'DISABILITY_SERVICE',
+    'WOMEN_CARE',
+    'SPORTS_DEV',
+    'EDUCATION_ADVOCACY',
+    'ENV_PROTECTION',
+    'MULTI_ETHNIC',
+    'MEDIA',
+    'PUBLIC_ISSUE',
+    'CULTURE_ARTS',
+    'COMMUNITY_DEV',
+    'POVERTY_RELIEF',
+    'INTL_RESCUE',
+  ])
+  .catch('CHILD_CARE')
 
 const wireItemSchema = z.object({
   id: z.string(),

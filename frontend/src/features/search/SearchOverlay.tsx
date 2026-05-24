@@ -50,7 +50,12 @@ const CloseIcon = () => (
 export function SearchOverlay({ onClose }: SearchOverlayProps) {
   const [query, setQuery] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
+  const onCloseRef = useRef(onClose)
   const { items, isLoading, isEmpty, error } = useSearch(query)
+
+  useEffect(() => {
+    onCloseRef.current = onClose
+  }, [onClose])
 
   useEffect(() => {
     inputRef.current?.focus()
@@ -59,15 +64,15 @@ export function SearchOverlay({ onClose }: SearchOverlayProps) {
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === 'Escape') {
-        onClose()
+        onCloseRef.current()
       }
     }
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [onClose])
+  }, [])
 
   return (
-    <div>
+    <div role="search">
       {/* Search bar — 同 SubRow 高度，置於 header 下 / tabs 上 */}
       <div className="flex h-subrow items-center gap-2 border-b border-border bg-surface px-3">
         <Input
@@ -101,7 +106,7 @@ export function SearchOverlay({ onClose }: SearchOverlayProps) {
         {!isLoading && !error && isEmpty && (
           <EmptyState title="找不到相關項目" description="請嘗試不同的關鍵字" />
         )}
-        {!isLoading &&
+        {!isLoading && !error &&
           items.map((item) => (
             <Card key={item.id} label={item.title} description={item.description} />
           ))}

@@ -38,6 +38,7 @@ describe('isCategoryCode', () => {
     expect(isCategoryCode('')).toBe(false)
     expect(isCategoryCode(null)).toBe(false)
     expect(isCategoryCode(42)).toBe(false)
+    expect(isCategoryCode(undefined)).toBe(false)
   })
 })
 

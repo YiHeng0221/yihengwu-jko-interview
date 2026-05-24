@@ -22,6 +22,7 @@ export const CATEGORIES = [
 
 export type CategoryCode = (typeof CATEGORIES)[number]['code']
 
+// z.enum() requires a non-empty tuple; CATEGORIES is as const with 17 entries so this cast is safe
 const CATEGORY_CODES = CATEGORIES.map((c) => c.code) as [
   CategoryCode,
   ...CategoryCode[],
@@ -30,5 +31,5 @@ const CATEGORY_CODES = CATEGORIES.map((c) => c.code) as [
 export const CategoryCodeSchema = z.enum(CATEGORY_CODES)
 
 export function isCategoryCode(value: unknown): value is CategoryCode {
-  return typeof value === 'string' && CATEGORY_CODES.includes(value as CategoryCode)
+  return CategoryCodeSchema.safeParse(value).success
 }

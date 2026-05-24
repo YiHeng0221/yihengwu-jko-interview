@@ -10,7 +10,9 @@
     "typecheck": "tsc --noEmit",
     "lint": "oxlint --config .oxlintrc.json src",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.64.2",
@@ -20,6 +22,10 @@
     "zod": "^3.24.2"
   },
   "devDependencies": {
+    "@storybook/addon-a11y": "^8",
+    "@storybook/addon-essentials": "^8",
+    "@storybook/react": "^8",
+    "@storybook/react-vite": "^8",
     "@tailwindcss/vite": "^4.1.4",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.0",
@@ -29,6 +35,7 @@
     "@vitejs/plugin-react": "^4.3.4",
     "jsdom": "^26.0.0",
     "oxlint": "^0.16.6",
+    "storybook": "^8",
     "tailwindcss": "^4.1.4",
     "typescript": "^5.7.3",
     "vite": "^6.2.2",

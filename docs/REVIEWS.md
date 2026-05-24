@@ -45,13 +45,22 @@ Single-pass AI review has correlated blind spots. A second reviewer with a fresh
 ## RR-008 — chore(infra): add frontend multi-stage Dockerfile + nginx.conf (P0-12)
 - PR: #28
 - Date: 2026-05-24
-- Reviewer: local Claude Code (second pass)
+- Reviewer (first): local Claude Code (claude-sonnet-4-6)
+- Reviewer (cross-agent): n/a（single-pass round 2）
 - Verdict: changes-requested
 - Findings: 🔴×1 · 🟡×0 · 🟣×0
 - Round: 2 of 3
+- Cross-agent agreement: n/a
 
 ### Key concerns
 - `frontend/nginx.conf:27` — nginx `add_header` 不繼承：location /assets/ 與 = /index.html 定義了自己的 add_header，導致 server 層安全標頭（X-Content-Type-Options、X-Frame-Options、Referrer-Policy）在這兩個 location 的回應中消失，Round 1 修補失效。🔴
+
+### Round 1 findings（backfill）
+- Findings: 🔴×1 · 🟡×3 · 🟣×0
+- `frontend/nginx.conf:6` — 缺少基線安全標頭（X-Content-Type-Options、X-Frame-Options、Referrer-Policy）。🔴
+- `frontend/.dockerignore:19` — `.git/` 未排除 build context，影響建構速度。🟡
+- `frontend/Dockerfile` — `nginx:alpine` 未釘定具體版本，reproducibility 受損。🟡
+- `frontend/nginx.conf:46` — 未啟用 gzip 壓縮。🟡
 
 ### Round history
 - Round 1: 2026-05-24 — changes-requested → ai-fix applied (security headers, gzip, .git exclusion, image version pinning)

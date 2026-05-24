@@ -86,7 +86,7 @@ jobs:
     name: Local Claude Code · /review
     needs: resolve
     if: needs.resolve.outputs.proceed == 'true'
-    runs-on: [self-hosted, allen-mac]
+    runs-on: [self-hosted, runner-review]
     timeout-minutes: 20
     env:
       # See `resolve` job for why we use BOT_PAT instead of GITHUB_TOKEN.

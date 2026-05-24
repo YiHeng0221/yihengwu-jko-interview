@@ -1,6 +1,7 @@
 import type { FastifyInstance } from 'fastify'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { buildApp } from '../src/app.js'
+import { HealthResponseSchema } from '../src/routes/health.js'
 
 describe('GET /health', () => {
   let app: FastifyInstance
@@ -22,9 +23,10 @@ describe('GET /health', () => {
 
     expect(response.statusCode).toBe(200)
 
-    const body = response.json<{ status: string; ts: string }>()
+    const result = HealthResponseSchema.safeParse(response.json())
+    expect(result.success).toBe(true)
+    const body = result.data!
     expect(body.status).toBe('ok')
-    expect(typeof body.ts).toBe('string')
     expect(new Date(body.ts).toISOString()).toBe(body.ts)
   })
 })

@@ -6,3 +6,24 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+enum CharityTab {
+  ORG
+  CAMPAIGN
+  MERCHANDISE
+}
+
+model Charity {
+  id           String     @id @default(cuid())
+  title        String
+  description  String
+  tab          CharityTab
+  categoryCode String
+  logoUrl      String?
+  amountRaised Int        @default(0)
+  amountGoal   Int?
+  createdAt    DateTime   @default(now())
+
+  @@index([tab, createdAt(sort: Desc)])
+  @@index([categoryCode])
+}

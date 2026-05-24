@@ -107,7 +107,7 @@ jobs:
   implement:
     name: Local Claude Code · /implement-issue
     needs: guard
-    runs-on: [self-hosted, allen-mac]
+    runs-on: [self-hosted, runner-fix]
     timeout-minutes: 60
     env:
       GH_TOKEN: ${{ secrets.BOT_PAT || secrets.GITHUB_TOKEN }}

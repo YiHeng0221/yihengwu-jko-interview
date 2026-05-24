@@ -13,6 +13,11 @@
 | 0005 | [Cursor-based pagination over offset](0005-cursor-pagination.md) | Accepted | 2026-05-24 |
 | 0006 | [oxlint over ESLint](0006-oxlint-over-eslint.md) | Accepted | 2026-05-24 |
 | 0007 | [snake_case wire + FE DTO mapper layer](0007-wire-snake-case-with-fe-dto-layer.md) | Accepted | 2026-05-24 |
+| 0013 | [Fastify over Express / Hono / Elysia](0013-fastify-over-express-hono-elysia.md) | Accepted | 2026-05-24 |
+| 0014 | [Prisma over Drizzle / Kysely](0014-prisma-over-drizzle-kysely.md) | Accepted | 2026-05-24 |
+| 0015 | [pg_trgm GIN over FTS for CJK substring search](0015-pg-trgm-gin-over-fts.md) | Accepted | 2026-05-24 |
+| 0017 | [categoryCode as String over Postgres enum](0017-category-code-string-over-pg-enum.md) | Accepted | 2026-05-24 |
+| 0018 | [OpenAPI auto-emit and drift CI](0018-openapi-auto-emit-and-drift-ci.md) | Accepted | 2026-05-24 |
 | 0008 | [Tailwind v4 `@theme` tokens](0008-tailwind-v4-theme-tokens.md) | Accepted | 2026-05-24 |
 | 0009 | [TanStack Query as data layer](0009-tanstack-query-as-data-layer.md) | Accepted | 2026-05-24 |
 | 0010 | [Custom UI primitives](0010-custom-ui-primitives.md) | Accepted | 2026-05-24 |

@@ -47,7 +47,9 @@ describe('charityToWire', () => {
     expect(wire.amount_goal).toBeNull()
   })
 
-  it('serialises createdAt as ISO string', () => {
+  it('serialises createdAt as UTC ISO string regardless of input offset', () => {
+    // non-UTC offset: 2026-05-01T08:00:00+08:00 === 2026-05-01T00:00:00.000Z
+    const nonUtcDate = new Date('2026-05-01T08:00:00+08:00')
     const wire = charityToWire({
       id: 'clzzz',
       title: 'T',
@@ -57,7 +59,7 @@ describe('charityToWire', () => {
       logoUrl: null,
       amountRaised: 0,
       amountGoal: null,
-      createdAt,
+      createdAt: nonUtcDate,
     })
 
     expect(wire.created_at).toBe('2026-05-01T00:00:00.000Z')

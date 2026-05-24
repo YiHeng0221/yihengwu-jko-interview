@@ -1,7 +1,7 @@
 import { buildApp } from './app.js'
 
 const host = process.env['HOST'] ?? '0.0.0.0'
-const port = Number(process.env['PORT'] || 3000)
+const port = Number(process.env['PORT'] || 3001)
 
 let app: Awaited<ReturnType<typeof buildApp>>
 try {

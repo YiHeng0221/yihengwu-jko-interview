@@ -9,6 +9,7 @@ import {
 } from 'fastify-type-provider-zod'
 import { genReqId, requestIdPlugin } from './plugins/request-id.js'
 import { zodValidationPlugin } from './plugins/zod-validation.js'
+import { categoriesRoute } from './routes/categories.js'
 import { healthRoute } from './routes/health.js'
 
 export async function buildApp() {
@@ -38,6 +39,7 @@ export async function buildApp() {
   }
 
   await app.register(healthRoute)
+  await app.register(categoriesRoute)
 
   return app
 }

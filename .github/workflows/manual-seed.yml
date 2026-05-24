@@ -1,0 +1,67 @@
+name: manual-seed
+
+# One-shot workflow_dispatch for seeding the Railway Postgres database.
+# MUST NOT be in the deploy chain (HARNESS-PITFALLS §C1).
+# Uses Railway CLI to fetch DATABASE_PUBLIC_URL — the GH Actions runner is
+# external and cannot reach the internal Railway service hostname (§D1).
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: "Type 'seed' to confirm — this rewrites all seeded rows"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  seed:
+    name: Prisma seed via Railway (one-shot)
+    if: github.event.inputs.confirm == 'seed'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        run: corepack enable
+
+      - name: Install backend deps
+        run: pnpm --filter=backend install --frozen-lockfile
+
+      - name: Install Railway CLI
+        run: npm install -g @railway/cli@latest
+
+      - name: Fetch DATABASE_PUBLIC_URL from Railway
+        id: dburl
+        env:
+          RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
+          RAILWAY_SERVICE_ID: ${{ secrets.RAILWAY_BE_SERVICE_ID }}
+        run: |
+          set -euo pipefail
+          # railway variables --json outputs a flat {KEY: value} map for the service.
+          # Prefer DATABASE_PUBLIC_URL (external) over DATABASE_URL (internal hostname).
+          DB_URL=$(railway variables \
+            --project "$RAILWAY_PROJECT_ID" \
+            --service "$RAILWAY_SERVICE_ID" \
+            --json \
+            | jq -r '.DATABASE_PUBLIC_URL // .DATABASE_URL // empty')
+          if [ -z "$DB_URL" ]; then
+            echo "::error::DATABASE_PUBLIC_URL / DATABASE_URL not found in Railway service variables"
+            exit 1
+          fi
+          echo "::add-mask::$DB_URL"
+          echo "db_url=$DB_URL" >> "$GITHUB_OUTPUT"
+
+      - name: Run Prisma seed
+        env:
+          DATABASE_URL: ${{ steps.dburl.outputs.db_url }}
+        run: |
+          set -euo pipefail
+          pnpm --filter=backend exec prisma migrate deploy
+          pnpm --filter=backend exec tsx prisma/seed.ts
+          echo "✅ Seed complete"

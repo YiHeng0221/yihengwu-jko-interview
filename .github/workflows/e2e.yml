@@ -1,0 +1,87 @@
+name: e2e
+
+# Chains off deploy.yml — runs Playwright + axe-core against the Railway staging
+# environment once the deploy health check passes. Auto-opens a kind/bug issue on
+# test failure (Hard Rule #15: a11y is part of "done").
+
+on:
+  workflow_run:
+    workflows: [deploy]
+    types: [completed]
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  e2e:
+    name: Playwright + axe-core (staging)
+    if: github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      BE_URL: ${{ secrets.RAILWAY_BE_URL }}
+      FE_URL: ${{ secrets.RAILWAY_FE_URL }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+
+      - name: Check e2e workspace is scaffolded
+        id: workspace
+        run: |
+          if [ -d "e2e" ] && [ -f "e2e/playwright.config.ts" ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::e2e workspace not yet scaffolded (P0-10 pending) — skipping tests"
+          fi
+
+      - name: Setup pnpm + install deps
+        if: steps.workspace.outputs.ready == 'true'
+        run: |
+          corepack enable
+          pnpm install --frozen-lockfile
+
+      - name: Install Playwright browsers
+        if: steps.workspace.outputs.ready == 'true'
+        run: pnpm --filter=e2e exec playwright install --with-deps chromium
+
+      - name: Run Playwright + axe-core
+        if: steps.workspace.outputs.ready == 'true'
+        id: tests
+        env:
+          PLAYWRIGHT_BASE_URL: ${{ secrets.RAILWAY_FE_URL }}
+          BE_URL: ${{ secrets.RAILWAY_BE_URL }}
+        run: pnpm --filter=e2e test
+
+      - name: Upload Playwright report on failure
+        if: failure() && steps.workspace.outputs.ready == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-${{ github.run_id }}
+          path: e2e/playwright-report/
+          retention-days: 7
+
+      - name: Open kind/bug issue on test failure
+        if: failure() && steps.workspace.outputs.ready == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.BOT_PAT || secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          SHA: ${{ github.event.workflow_run.head_sha }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          SHORT_SHA=$(echo "$SHA" | cut -c1-7)
+          COMMIT_MSG=$(gh api "repos/$REPO/commits/$SHA" --jq '.commit.message | split("\n")[0]')
+
+          BODY_FILE=$(mktemp)
+          printf "## E2E failure on staging\n\n**Commit**: \`%s\`\n**Message**: %s\n**Workflow run**: %s\n\nThe Playwright + axe-core suite failed against the Railway staging environment after deploy completed.\nDownload the \`playwright-report-%s\` artifact from the run for failure details.\n\n- FE URL tested: %s\n- BE URL tested: %s\n" \
+            "$SHA" "$COMMIT_MSG" "$RUN_URL" "$GITHUB_RUN_ID" "$FE_URL" "$BE_URL" \
+            > "$BODY_FILE"
+
+          gh issue create \
+            --repo "$REPO" \
+            --title "🐛 [e2e] Staging tests failed on ${SHORT_SHA}: ${COMMIT_MSG}" \
+            --label "kind/bug,area/e2e" \
+            --body-file "$BODY_FILE" || true

@@ -1,4 +1,4 @@
-.PHONY: up down migrate seed dev test lint typecheck build ci-local
+.PHONY: up down migrate seed dev test lint typecheck build types ci-local
 
 up:
 	docker compose up -d
@@ -28,5 +28,10 @@ typecheck:
 build:
 	pnpm -r run build
 
+types:
+	@if [ -d backend ]; then pnpm --filter backend run generate:openapi; fi
+	@if [ -d frontend ]; then pnpm --filter frontend run generate:types; fi
+
 ci-local: typecheck lint test build
+	@if [ -d backend ]; then $(MAKE) types && git diff --exit-code; fi
 	@echo "✅ ci-local: all checks passed"

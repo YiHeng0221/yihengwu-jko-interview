@@ -116,37 +116,23 @@ jobs:
       - name: Sanity — gh CLI authenticated
         run: gh auth status
 
-      - name: Run /review
+      - name: Run /review (sonnet, single-pass)
         id: review
         env:
           CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           HOME: /Users/wuyiheng
         run: |
           set -euo pipefail
-          echo "→ Reviewing PR #${PR_NUMBER}"
-          # No --bare: we want project context (CLAUDE.md, spec, ADRs).
-          # Persona override lives inside .claude/commands/review.md so leak is prevented.
-          claude -p "/review ${PR_NUMBER}" \
+          echo "→ Reviewing PR #${PR_NUMBER} (sonnet, single-pass)"
+          # Speed optimisation (2026-05-24): use sonnet instead of opus for review
+          # (~3× faster, sufficient quality for current scope of PRs). Cross-agent
+          # second pass dropped — for small/medium PRs the additional latency cost
+          # outweighs marginal coverage gain. Re-enable --cross + opus for PRs
+          # touching auth, payments, schema migrations, or anything security-critical.
+          # Persona override lives inside .claude/commands/review.md (no leak).
+          claude --model sonnet -p "/review ${PR_NUMBER}" \
             --permission-mode acceptEdits \
             --allowed-tools "Read,Edit,Write,Grep,Bash(gh:*),Bash(git diff:*),Bash(git log:*),Bash(git status),Bash(make types-check),Bash(jq:*)" \
-            --output-format text \
-            --no-session-persistence \
-            --setting-sources project,local
-
-      - name: Run /review --cross (fresh-context second pass)
-        if: success()
-        env:
-          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          HOME: /Users/wuyiheng
-        run: |
-          set -euo pipefail
-          echo "→ Cross-agent reviewing PR #${PR_NUMBER}（fresh context）"
-          # --no-session-persistence ensures fresh state (no first-pass context leak)
-          # /review with --cross flag: read first pass findings, form independent ones,
-          # append `### Round 2 (cross-agent)` to the existing RR entry in REVIEWS.md
-          claude -p "/review ${PR_NUMBER} --cross" \
-            --permission-mode acceptEdits \
-            --allowed-tools "Read,Edit,Write,Grep,Bash(gh:*),Bash(git diff:*),Bash(git log:*),Bash(git status),Bash(jq:*)" \
             --output-format text \
             --no-session-persistence \
             --setting-sources project,local

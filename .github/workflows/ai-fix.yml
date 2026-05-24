@@ -96,7 +96,7 @@ jobs:
         run: |
           set -euo pipefail
           echo "→ Fixing PR #${PR_NUMBER} round ${ROUND}/3"
-          claude -p "/fix-pr ${PR_NUMBER}" \
+          claude --model sonnet -p "/fix-pr ${PR_NUMBER}" \
             --permission-mode acceptEdits \
             --allowed-tools "Read,Edit,Write,Grep,Bash(gh:*),Bash(git:*),Bash(make:*),Bash(pnpm:*),Bash(node:*),Bash(jq:*)" \
             --output-format text \

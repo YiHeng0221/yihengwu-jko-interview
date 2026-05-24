@@ -140,7 +140,8 @@ jobs:
       - name: Always remove ai-review label (success or fail)
         if: always()
         run: |
-          gh pr edit "$PR_NUMBER" --repo "$REPO" --remove-label "ai-review" 2>/dev/null || true
+          # gh pr edit --remove-label silently fails on this repo (Projects-classic GraphQL).
+          set +e; gh api -X DELETE "repos/${REPO}/issues/${PR_NUMBER}/labels/ai-review" >/dev/null 2>&1; exit 0
 
       - name: Notify on failure
         if: failure()

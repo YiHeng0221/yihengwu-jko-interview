@@ -8,6 +8,11 @@
 |---|-------|--------|------|
 | 0001 | [Documentation conventions](0001-documentation-conventions.md) | Accepted | — |
 | 0002 | [Cross-agent code review](0002-cross-agent-review.md) | Accepted | — |
+| 0003 | [React + Vite over Next.js](0003-react-vite-over-nextjs.md) | Accepted | 2026-05-24 |
+| 0004 | [Zod as single source of truth for schemas](0004-zod-single-source-of-truth.md) | Accepted | 2026-05-24 |
+| 0005 | [Cursor-based pagination over offset](0005-cursor-pagination.md) | Accepted | 2026-05-24 |
+| 0006 | [oxlint over ESLint](0006-oxlint-over-eslint.md) | Accepted | 2026-05-24 |
+| 0007 | [snake_case wire + FE DTO mapper layer](0007-wire-snake-case-with-fe-dto-layer.md) | Accepted | 2026-05-24 |
 | 0013 | [Fastify over Express / Hono / Elysia](0013-fastify-over-express-hono-elysia.md) | Accepted | 2026-05-24 |
 | 0014 | [Prisma over Drizzle / Kysely](0014-prisma-over-drizzle-kysely.md) | Accepted | 2026-05-24 |
 | 0015 | [pg_trgm GIN over FTS for CJK substring search](0015-pg-trgm-gin-over-fts.md) | Accepted | 2026-05-24 |

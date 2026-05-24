@@ -22,12 +22,18 @@ importers:
       '@fastify/rate-limit':
         specifier: ^10.0.0
         version: 10.3.0
+      '@paralleldrive/cuid2':
+        specifier: ^2.2.2
+        version: 2.3.1
       '@prisma/client':
         specifier: ^6.0.0
         version: 6.19.3(prisma@6.19.3(typescript@5.9.3))(typescript@5.9.3)
       fastify:
         specifier: ^5.0.0
         version: 5.8.5
+      fastify-plugin:
+        specifier: ^5.0.0
+        version: 5.1.0
       fastify-type-provider-zod:
         specifier: ^4.0.0
         version: 4.0.2(fastify@5.8.5)(zod@3.25.76)
@@ -834,6 +840,10 @@ packages:
       '@types/react': '>=16'
       react: '>=16'
 
+  '@noble/hashes@1.8.0':
+    resolution: {integrity: sha512-jCs9ldd7NwzpgXDIf6P3+NrHh9/sD6CQdxHyjQI+h/6rDNo88ypBxxz45UDuZHz9r3tNz7N/VInSVoVdtXEI4A==}
+    engines: {node: ^14.21.3 || >=16}
+
   '@oxlint/binding-android-arm-eabi@1.66.0':
     resolution: {integrity: sha512-f7kq8N51T4phpzqfBpA2qaVTI/KrkCmNwaj3t/97I/WLTDI+UhlP5GL9eER+zVxBhtlx5rKXWByJU1/zDAvyaw==}
     engines: {node: ^20.19.0 || >=22.12.0}
@@ -987,6 +997,9 @@ packages:
     resolution: {integrity: sha512-Ae1fx7wmAcMVqzS8rLINaFRpAdh29QzHh133bEYMHzfWBYyK/hLu9g4GLwC/lEIVQu9884b8qutGfdOk6Qia3w==}
     cpu: [x64]
     os: [win32]
+
+  '@paralleldrive/cuid2@2.3.1':
+    resolution: {integrity: sha512-XO7cAxhnTZl0Yggq6jOgjiOHhbgcO4NqFqwSmQpjK3b6TEE6Uj/jfSk6wzYyemh3+I0sHirKSetjQwn5cZktFw==}
 
   '@pinojs/redact@0.4.0':
     resolution: {integrity: sha512-k2ENnmBugE/rzQfEcdWHcCY+/FM3VLzH9cYEsbdsoqrvzAKRhUZeRNhAZvB8OitQJ1TBed3yqWtdjzS6wJKBwg==}
@@ -3658,6 +3671,8 @@ snapshots:
       '@types/react': 19.2.15
       react: 19.2.6
 
+  '@noble/hashes@1.8.0': {}
+
   '@oxlint/binding-android-arm-eabi@1.66.0':
     optional: true
 
@@ -3738,6 +3753,10 @@ snapshots:
 
   '@oxlint/win32-x64@0.16.12':
     optional: true
+
+  '@paralleldrive/cuid2@2.3.1':
+    dependencies:
+      '@noble/hashes': 1.8.0
 
   '@pinojs/redact@0.4.0': {}
 

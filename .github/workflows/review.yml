@@ -96,7 +96,9 @@ jobs:
     name: Local Claude Code · /review
     needs: resolve
     if: needs.resolve.outputs.proceed == 'true'
-    runs-on: [self-hosted, runner-review]
+    # 跑 GitHub-hosted ubuntu → 跨 PR 並行（free tier 上限 ~20 parallel）。
+    # 不再依賴 self-hosted Mac runner。Claude OAuth token 用 env var 注入。
+    runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
       # See `resolve` job for why we use BOT_PAT instead of GITHUB_TOKEN.
@@ -115,22 +117,20 @@ jobs:
           ref: ${{ steps.prinfo.outputs.sha }}
           fetch-depth: 0
 
-      - name: Sanity — claude CLI present
-        run: |
-          if ! command -v claude >/dev/null; then
-            echo "::error::claude CLI not found on PATH. The self-hosted runner user needs Claude Code installed."
-            exit 1
-          fi
-          claude --version
+      - name: Setup Node (for claude CLI install)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
 
-      - name: Sanity — gh CLI authenticated
-        run: gh auth status
+      - name: Install claude CLI
+        run: |
+          npm install -g @anthropic-ai/claude-code
+          claude --version
 
       - name: Run /review (sonnet, single-pass)
         id: review
         env:
           CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          HOME: /Users/wuyiheng
         run: |
           set -euo pipefail
           echo "→ Reviewing PR #${PR_NUMBER} (sonnet, single-pass)"

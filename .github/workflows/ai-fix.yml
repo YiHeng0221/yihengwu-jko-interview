@@ -80,7 +80,9 @@ jobs:
     name: Local Claude Code · /fix-pr
     needs: guard
     if: needs.guard.outputs.escalate == 'false' && needs.guard.outputs.proceed == 'true'
-    runs-on: [self-hosted, runner-fix]
+    # GitHub-hosted ubuntu → 跨 PR 並行。原本 self-hosted runner-fix lane 保留
+    # 給臨時 fallback；正常情況下都走 ubuntu。
+    runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
       GH_TOKEN: ${{ secrets.BOT_PAT || secrets.GITHUB_TOKEN }}
@@ -97,12 +99,16 @@ jobs:
           # downstream workflows — breaks the fix-loop chain.
           token: ${{ secrets.BOT_PAT || secrets.GITHUB_TOKEN }}
 
-      - name: Sanity — claude CLI present
+      - name: Setup Node + install pnpm (for project deps in /fix-pr context)
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+
+      - uses: pnpm/action-setup@v4
+
+      - name: Install claude CLI
         run: |
-          if ! command -v claude >/dev/null; then
-            echo "::error::claude CLI not found on PATH on the self-hosted runner."
-            exit 1
-          fi
+          npm install -g @anthropic-ai/claude-code
           claude --version
 
       - name: Configure git for commits
@@ -113,7 +119,6 @@ jobs:
       - name: Run /fix-pr
         env:
           CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          HOME: /Users/wuyiheng
         run: |
           set -euo pipefail
           echo "→ Fixing PR #${PR_NUMBER} round ${ROUND}/3"

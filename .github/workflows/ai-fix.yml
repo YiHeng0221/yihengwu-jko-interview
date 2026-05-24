@@ -62,7 +62,7 @@ jobs:
     name: Local Claude Code · /fix-pr
     needs: guard
     if: needs.guard.outputs.escalate == 'false'
-    runs-on: [self-hosted, allen-mac]
+    runs-on: [self-hosted, runner-fix]
     timeout-minutes: 30
     env:
       GH_TOKEN: ${{ secrets.BOT_PAT || secrets.GITHUB_TOKEN }}

@@ -4,11 +4,18 @@ import { SEED_CHARITIES } from './seed-data.js'
 const prisma = new PrismaClient()
 
 async function main(): Promise<void> {
-  await prisma.charity.deleteMany()
-  const { count } = await prisma.charity.createMany({ data: SEED_CHARITIES })
+  const { count } = await prisma.$transaction(async (tx) => {
+    await tx.charity.deleteMany()
+    return tx.charity.createMany({ data: SEED_CHARITIES })
+  })
   console.log(`Seeded ${count} charities`)
 }
 
 main()
-  .catch(console.error)
-  .finally(() => void prisma.$disconnect())
+  .catch((e) => {
+    console.error(e)
+    process.exit(1)
+  })
+  .finally(async () => {
+    await prisma.$disconnect()
+  })

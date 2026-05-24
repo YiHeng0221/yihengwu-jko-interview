@@ -9,8 +9,7 @@ export interface SpinnerProps {
   className?: string
 }
 
-/** SVG canvas + tick 尺寸對應表
- *  tick 寬:高:長 = 維持跟 canvas ≈ 1:12:2.5 比例，視覺一致 */
+/** SVG canvas + tick 尺寸對應表，各 size 獨立調整視覺重量 */
 const SIZE_SPEC: Record<SpinnerSize, { canvas: number; tickW: number; tickH: number }> = {
   sm: { canvas: 16, tickW: 1.5, tickH: 4 },
   md: { canvas: 24, tickW: 2, tickH: 5 },
@@ -38,7 +37,6 @@ export function Spinner({ size = 'md', 'aria-label': ariaLabel = '載入中', cl
   return (
     <span
       role="status"
-      aria-live="polite"
       aria-label={ariaLabel || undefined}
       className={clsx('inline-flex text-text-tertiary', className)}
     >
@@ -47,7 +45,6 @@ export function Spinner({ size = 'md', 'aria-label': ariaLabel = '載入中', cl
         height={canvas}
         viewBox="0 0 24 24"
         aria-hidden="true"
-        focusable="false"
       >
         {Array.from({ length: TICK_COUNT }, (_, i) => (
           <rect

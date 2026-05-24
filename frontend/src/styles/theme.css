@@ -53,8 +53,8 @@
   --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
-/* iOS-style activity indicator (Spinner) — 8 個 tick 繞圓心，
-   各自 animation-delay 錯開 1/8 秒造成「一條亮的在轉」漸隱效果。 */
+/* component: Spinner — iOS-style activity indicator
+   8 個 tick 繞圓心，各自 animation-delay 錯開 1/8 秒造成漸隱效果。 */
 @keyframes spinner-tick-fade {
   0%, 39%, 100% {
     opacity: 0.15;

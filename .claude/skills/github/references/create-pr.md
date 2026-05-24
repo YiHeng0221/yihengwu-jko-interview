@@ -71,7 +71,7 @@ gh issue view "$ISSUE_NUM" --json title,body,labels
 - **只描述 diff 真的有的東西**，不要編造
 - **保持 template 區段順序**：Pull Request Changes → AC traceability → Checklist → Self-check log → Breaking Changes → Deprecated → To-do → Architectural decisions → Screenshots / Demo → footer
 - **空區段直接刪掉**（不要留「N/A」或「無」這種佔位文字）
-- **footer `Refs Issue#<NN>` 必填**
+- **footer `Closes #<NN>` 必填**（GitHub 看到這條會在 PR merge 後自動關掉對應 issue；用 `Refs Issue#NN` 不會自動關）
 
 template 內容範例（拿 `.github/PULL_REQUEST_TEMPLATE.md` 開始填）：
 
@@ -114,7 +114,7 @@ template 內容範例（拿 `.github/PULL_REQUEST_TEMPLATE.md` 開始填）：
 - 對應 ADR-YYYY（同上）
 - 或：不需新 ADR，因為本 PR 沒引入新的架構決策。
 
-Refs Issue#<NN>
+Closes #<NN>
 ```
 
 ## Step 5 — 產 PR title（Conventional Commits）
@@ -147,7 +147,7 @@ BODY_FILE=$(mktemp)
 cat > "$BODY_FILE" <<'EOF'
 ## Pull Request Changes
 ...（依上面 template 填好）...
-Refs Issue#42
+Closes #42
 EOF
 
 gh pr create \
@@ -185,5 +185,5 @@ gh pr edit <num> --add-label "status/human-review,epic/<NN>,area/<lane>,size/<s|
 - ❌ Self-check log 亂貼或編造 — 必須是真的跑出來的 output
 - ❌ AC traceability 全部勾起來但實際沒交付 — 跨 agent review 會抓
 - ❌ 留空 section 寫「N/A」「無」「TBD」— 直接刪掉
-- ❌ footer 漏 `Refs Issue#<NN>` — `ai-fix.yml` workflow 解析失敗會卡住
+- ❌ footer 漏 `Closes #<NN>` — `ai-fix.yml` workflow 解析失敗會卡住
 - ❌ 直接 `--body "$VAR"` 用 shell 變數 — 中文 / 換行容易壞掉，用 `--body-file` 暫存檔

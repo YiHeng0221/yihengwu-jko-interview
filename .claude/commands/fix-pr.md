@@ -57,12 +57,19 @@ Each comment has `path`, `line`, `body`, and an `id`.
 
 ## Classify
 
-For each 🔴 finding:
+掃 PR 上所有 review comments（🔴 / 🟡 / 🟣 都要看），對每一條決定動作：
 
-- **must-fix** — reviewer is correct. Patch the code.
-- **disagree-with-reason** — reviewer is wrong / out-of-scope. Reply with evidence; do NOT patch.
+| Severity | 動作 | 必須留言？ |
+|----------|------|-----------|
+| 🔴 must-fix | Patch 程式碼 + 在該 comment thread 回 `✅ Fixed in <short-sha>` | **是** |
+| 🔴 disagree-with-reason | 不 patch；reply 解釋理由 + 引用具體 spec/AC/HR 段落 | **是** |
+| 🟡 nit-fix | Patch（若改動 ≤ 5 LOC 且符合 PR scope）+ reply `✅ Applied as suggested` | **是** |
+| 🟡 nit-skip | **不修但要留言** — reply 解釋為什麼不在這個 PR 處理（scope 太大 / 後續 issue 處理 / 與 design intent 衝突 / 屬於 pre-existing 等） | **是 — 不可沉默略過** |
+| 🟣 pre-existing | 不修。Reply 確認 out-of-scope | 是（簡短）|
 
-When unsure → must-fix.
+> **沉默 = 漏修 = 不可接受**。reviewer / human 看不到「為何不修」就無法判斷你是有意識選擇還是 miss 掉。每個 review finding **必須**有 reply（unless 已被別的 fix 蓋掉，但這種也要 reply 說明）。
+
+When unsure on 🔴 → must-fix。When unsure on 🟡 → nit-skip + 留 reply 解釋。
 
 ## Apply patches
 
@@ -129,5 +136,6 @@ If `Round == 3` and after this fix there are still expected-to-be 🔴 findings:
 - Don't use `--no-verify`.
 - Don't patch in a way that *might* be wrong "just to make the reviewer happy".
 - Don't argue style preferences — push back politely on bad 🔴 but yield on 🟡 noise.
+- **Never silently skip a finding**：即使是 🟡 nit decide 不修，也要在該 inline comment thread 留 reply 講原因，不然 reviewer 不知道你看過。
 - Don't touch files outside the diff under review — open a new issue instead.
 - Don't auto-resolve threads.

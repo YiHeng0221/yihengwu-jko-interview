@@ -110,7 +110,7 @@ jobs:
     runs-on: [self-hosted, allen-mac]
     timeout-minutes: 60
     env:
-      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GH_TOKEN: ${{ secrets.BOT_PAT || secrets.GITHUB_TOKEN }}
       ISSUE_NUMBER: ${{ github.event.issue.number }}
       REPO: ${{ github.repository }}
       LANE: ${{ needs.guard.outputs.lane }}

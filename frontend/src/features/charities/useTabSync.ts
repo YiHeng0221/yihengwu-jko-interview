@@ -37,5 +37,5 @@ export function useTabSync(): readonly [CharityTab, (next: CharityTab) => void] 
     [setParams],
   )
 
-  return [current, setTab] as const
+  return [current, setTab]
 }

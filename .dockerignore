@@ -1,0 +1,26 @@
+# Root-level .dockerignore — effective when build context is repo root.
+# docker build -f frontend/Dockerfile -t <image> .
+#
+# frontend/.dockerignore is ignored by Docker (only the context root is read);
+# exclusions must live here to take effect.
+
+# Frontend deps/build artifacts
+frontend/node_modules
+frontend/dist
+
+# Local env — never bake secrets into image layers
+frontend/.env
+frontend/.env.*
+!frontend/.env.example
+
+# Test / dev artifacts
+frontend/coverage
+frontend/vitest.config.*
+frontend/src/test-setup.*
+
+# Editor state
+frontend/.vscode
+frontend/.idea
+
+# Git history
+.git

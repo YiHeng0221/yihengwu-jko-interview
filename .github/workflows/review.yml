@@ -72,6 +72,16 @@ jobs:
               exit 0
             fi
           fi
+          # Skip if PR is already merged / closed — review run may have queued
+          # while PR was open but ran after merge (queue backlog scenario).
+          # Reviewing a merged PR wastes runner cycles + leaves inline comments
+          # that no one will action.
+          PR_STATE=$(gh pr view "$PR" --repo "$REPO" --json state --jq '.state')
+          if [ "$PR_STATE" != "OPEN" ]; then
+            echo "::notice::PR #$PR is $PR_STATE (not OPEN) — skipping review"
+            echo "proceed=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
           # Verify PR has ai-review label (signal from ci.yml that review is wanted)
           HAS_LABEL=$(gh pr view "$PR" --repo "$REPO" --json labels --jq '.labels[].name' | grep -c '^ai-review$' || true)
           if [ "$HAS_LABEL" -eq 0 ]; then

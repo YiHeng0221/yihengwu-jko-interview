@@ -9,6 +9,8 @@ frontend/node_modules/
 e2e/node_modules/
 
 # ── Other workspaces (not needed for BE build; stubs created by RUN) ──
+# NOTE: When adding new workspaces to pnpm-workspace.yaml, add them here too
+# to prevent build context from silently growing.
 frontend/
 e2e/
 

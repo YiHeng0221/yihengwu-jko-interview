@@ -54,7 +54,7 @@ RUN cp -r backend/dist /standalone/dist \
 # Use -rL to follow pnpm symlinks so real files (not dangling links) are copied.
 RUN cp -rL /repo/backend/node_modules/prisma /standalone/node_modules/prisma \
     && mkdir -p /standalone/node_modules/.bin \
-    && printf '#!/bin/sh\nexec node "$(dirname "$0")/../prisma/bin.js" "$@"\n' \
+    && printf '#!/bin/sh\nexec node "$(dirname "$0")/../prisma/build/index.js" "$@"\n' \
         > /standalone/node_modules/.bin/prisma \
     && chmod +x /standalone/node_modules/.bin/prisma
 
@@ -83,6 +83,9 @@ ENV PORT=3001
 ENV HOST=0.0.0.0
 
 EXPOSE 3001
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+    CMD wget -qO- http://localhost:${PORT:-3001}/health || exit 1
 
 USER nodejs
 

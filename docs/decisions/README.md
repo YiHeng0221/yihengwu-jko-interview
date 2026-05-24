@@ -14,6 +14,11 @@
 | 0006 | [oxlint over ESLint](0006-oxlint-over-eslint.md) | Accepted | 2026-05-24 |
 | 0007 | [snake_case wire + FE DTO mapper layer](0007-wire-snake-case-with-fe-dto-layer.md) | Accepted | 2026-05-24 |
 | 0016 | [Railway as deploy provider](0016-railway-as-deploy-provider.md) | Accepted | 2026-05-24 |
+| 0008 | [Tailwind v4 `@theme` tokens](0008-tailwind-v4-theme-tokens.md) | Accepted | 2026-05-24 |
+| 0009 | [TanStack Query as data layer](0009-tanstack-query-as-data-layer.md) | Accepted | 2026-05-24 |
+| 0010 | [Custom UI primitives](0010-custom-ui-primitives.md) | Accepted | 2026-05-24 |
+| 0011 | [Storybook 8 + Vite builder](0011-storybook-8-vite-builder.md) | Accepted | 2026-05-24 |
+| 0012 | [Dialog/Drawer responsive strategy](0012-dialog-drawer-responsive-strategy.md) | Accepted | 2026-05-24 |
 
 > **0001 / 0002 是 harness 的 process ADR**，所有專案繼承。
 > **0003 起是 architectural ADR**，**由各專案自己寫**（記錄選的 stack / tooling / patterns 為什麼）。

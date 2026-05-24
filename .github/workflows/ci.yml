@@ -62,5 +62,9 @@ jobs:
           PR_NUMBER: ${{ github.event.pull_request.number }}
           REPO: ${{ github.repository }}
         run: |
-          gh pr edit "$PR_NUMBER" --repo "$REPO" --add-label "ai-review" 2>/dev/null || true
+          # gh pr edit --add-label silently fails (Projects-classic GraphQL deprecation).
+          # Use REST API directly.
+          set +e
+          echo '{"labels":["ai-review"]}' | gh api -X POST "repos/${REPO}/issues/${PR_NUMBER}/labels" --input - >/dev/null 2>&1
           echo "::notice::PR #$PR_NUMBER tagged ai-review. review.yml will chain off this run's completion."
+          exit 0

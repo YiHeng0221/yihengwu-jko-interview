@@ -7,7 +7,7 @@
 
 ```
 .claude/
-├── agents/       # 5 個 agent persona（PM / impl / reviewer / ai-fix / orchestrator + qa）
+├── agents/       # 6 個 agent persona（PM / impl / reviewer / ai-fix / orchestrator / qa）
 ├── commands/     # 3 slash commands（/review · /fix-pr · /implement-issue）
 ├── skills/       # github create-pr skill
 ├── hooks/        # pre-bash · scan-secrets · verify-ac

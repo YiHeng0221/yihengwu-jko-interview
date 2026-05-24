@@ -74,7 +74,10 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.ref }}
           fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
+          # BOT_PAT so subsequent `git push` triggers ci.yml.
+          # GITHUB_TOKEN pushes hit GitHub's loop guard and don't fire
+          # downstream workflows — breaks the fix-loop chain.
+          token: ${{ secrets.BOT_PAT || secrets.GITHUB_TOKEN }}
 
       - name: Sanity — claude CLI present
         run: |
@@ -96,7 +99,7 @@ jobs:
         run: |
           set -euo pipefail
           echo "→ Fixing PR #${PR_NUMBER} round ${ROUND}/3"
-          claude -p "/fix-pr ${PR_NUMBER}" \
+          claude --model sonnet -p "/fix-pr ${PR_NUMBER}" \
             --permission-mode acceptEdits \
             --allowed-tools "Read,Edit,Write,Grep,Bash(gh:*),Bash(git:*),Bash(make:*),Bash(pnpm:*),Bash(node:*),Bash(jq:*)" \
             --output-format text \
@@ -129,7 +132,12 @@ jobs:
       - name: Remove ai-fix label so re-review can trigger
         if: always()
         run: |
-          gh pr edit "$PR_NUMBER" --repo "$REPO" --remove-label "ai-fix" 2>/dev/null || true
+          # `gh pr edit --remove-label` fails with exit 1 on repos affected by
+          # GitHub's Projects-classic deprecation GraphQL warning, AND silently
+          # fails to actually remove the label. Use the REST API directly.
+          set +e
+          gh api -X DELETE "repos/${REPO}/issues/${PR_NUMBER}/labels/ai-fix" >/dev/null 2>&1
+          exit 0
 
       - name: Notify on failure
         if: failure()

@@ -1,0 +1,83 @@
+name: deploy
+
+# Railway auto-deploys when main is pushed (ADR-0016 §GitHub integration).
+# This workflow polls the BE health endpoint to confirm the new deployment is live,
+# then posts a commit comment with the demo URLs.
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: deploy
+  cancel-in-progress: true
+
+jobs:
+  health-check:
+    name: Await Railway deploy + health check
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      BE_URL: ${{ secrets.RAILWAY_BE_URL }}
+      FE_URL: ${{ secrets.RAILWAY_FE_URL }}
+    steps:
+      - name: Poll BE /health (max 10 min)
+        id: health
+        run: |
+          set -euo pipefail
+          # Sleep 60s to allow Railway to start building before the first poll.
+          echo "Waiting 60 s for Railway to initiate the build pipeline..."
+          sleep 60
+          deadline=$((SECONDS + 540))
+          while [ $SECONDS -lt $deadline ]; do
+            status=$(curl -s -o /dev/null -w "%{http_code}" \
+              --max-time 5 "$BE_URL/health" 2>/dev/null || echo "000")
+            if [ "$status" = "200" ]; then
+              echo "✅ BE /health → 200"
+              exit 0
+            fi
+            echo "[${status}] deploying... (${SECONDS}s elapsed)"
+            sleep 15
+          done
+          echo "❌ Health check timed out after 10 minutes"
+          exit 1
+
+      - name: Post commit comment — deploy live
+        if: success()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          SHA: ${{ github.sha }}
+        run: |
+          BODY="🚀 **Deploy live**
+
+          | Service | URL |
+          |---------|-----|
+          | BE API  | ${BE_URL} |
+          | FE App  | ${FE_URL} |
+
+          Health: \`${BE_URL}/health\` → 200 ✅"
+
+          jq -n --arg body "$BODY" '{body: $body}' | \
+            gh api "repos/$REPO/commits/$SHA/comments" --method POST --input -
+
+      - name: Post commit comment — health check failed
+        if: failure()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          SHA: ${{ github.sha }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          BODY="❌ **Deploy health check timed out**
+
+          Railway may still be building. See [workflow run](${RUN_URL}) for details.
+
+          - BE: ${BE_URL}
+          - FE: ${FE_URL}"
+
+          jq -n --arg body "$BODY" '{body: $body}' | \
+            gh api "repos/$REPO/commits/$SHA/comments" --method POST --input -

@@ -1,4 +1,4 @@
-import clsx from 'clsx'
+import { clsx } from 'clsx'
 import type { InputHTMLAttributes, ReactNode, Ref } from 'react'
 
 type InputSize = 'sm' | 'md' | 'lg'

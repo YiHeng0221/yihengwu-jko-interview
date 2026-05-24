@@ -55,4 +55,29 @@ describe('Tabs', () => {
     await userEvent.keyboard('{ArrowRight}')
     expect(onChange).toHaveBeenLastCalledWith('MERCHANDISE')
   })
+
+  it('moves DOM focus to the next tab on ArrowRight (roving-tabindex)', async () => {
+    const onChange = vi.fn()
+    render(<Tabs items={items} value="ORG" onChange={onChange} aria-label="主分類" />)
+    const tabs = screen.getAllByRole('tab')
+    tabs[0]!.focus()
+    await userEvent.keyboard('{ArrowRight}')
+    expect(document.activeElement).toBe(tabs[1])
+  })
+
+  it('jumps to first enabled tab on Home key (WAI-ARIA APG)', async () => {
+    const onChange = vi.fn()
+    render(<Tabs items={items} value="CAMPAIGN" onChange={onChange} aria-label="主分類" />)
+    screen.getByRole('tab', { selected: true }).focus()
+    await userEvent.keyboard('{Home}')
+    expect(onChange).toHaveBeenLastCalledWith('ORG')
+  })
+
+  it('jumps to last enabled tab on End key (WAI-ARIA APG)', async () => {
+    const onChange = vi.fn()
+    render(<Tabs items={items} value="CAMPAIGN" onChange={onChange} aria-label="主分類" />)
+    screen.getByRole('tab', { selected: true }).focus()
+    await userEvent.keyboard('{End}')
+    expect(onChange).toHaveBeenLastCalledWith('MERCHANDISE')
+  })
 })

@@ -16,7 +16,7 @@ export function EndMarker({ label = '愛心沒有底線', className }: EndMarker
         className,
       )}
     >
-      <span aria-hidden="true">❤</span>
+      <span aria-hidden="true">❤️</span>
       <span>{label}</span>
     </div>
   )

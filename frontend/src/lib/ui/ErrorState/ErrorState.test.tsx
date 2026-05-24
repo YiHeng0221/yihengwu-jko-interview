@@ -38,4 +38,11 @@ describe('ErrorState', () => {
     expect(screen.getByText('工程師正在搶救')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: '再來一次' })).toBeInTheDocument()
   })
+
+  it('retry button is outside role=alert (a11y: AT does not interrupt focus)', () => {
+    render(<ErrorState onRetry={() => {}} />)
+    const alert = screen.getByRole('alert')
+    const button = screen.getByRole('button', { name: '重試' })
+    expect(alert).not.toContainElement(button)
+  })
 })

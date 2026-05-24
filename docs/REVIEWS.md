@@ -42,6 +42,24 @@ Single-pass AI review has correlated blind spots. A second reviewer with a fresh
 
 <!-- Insert new RR-NNN entries below. Most recent at the top. -->
 
+## RR-013 — fix(ci): types-drift check 改為 advisory (解開 BE PR 互鎖)
+- PR: #112
+- Date: 2026-05-24
+- Reviewer (first): local Claude Code (claude-sonnet-4-6)
+- Reviewer (cross-agent): n/a
+- Verdict: pass
+- Findings: 🔴×0 · 🟡×2 · 🟣×0
+- Round: 1 of 3
+
+### Key concerns
+- `.github/workflows/ci.yml:159` — `make types || true` 靜默吞掉 `make types` 失敗，git diff 對未更新檔案驗證給出「no drift」假陰性，advisory trail 失效。🟡
+- `.github/workflows/ci.yml:151` — `continue-on-error: true` 與現行 shell 邏輯重複（step 永遠 exit 0），但移除後若有人同時移除 `|| true` 會引發非預期靜默 continue；建議加行內注釋說明安全網角色。🟡
+
+### Round history
+- Round 1: 2026-05-24 — pass（核心修法方向正確；`make types || true` false-negative 為 nit，不擋 merge）
+
+---
+
 ## RR-012 — feat(web): P1-FE-09 React Router v7 routes + tabs URL sync
 - PR: #90
 - Date: 2026-05-24

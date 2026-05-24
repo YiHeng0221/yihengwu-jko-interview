@@ -1,5 +1,5 @@
 import { clsx } from 'clsx'
-import { useEffect, useRef, type MouseEvent, type ReactNode } from 'react'
+import { useEffect, useId, useRef, type MouseEvent, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 
 export type DialogProps = {
@@ -25,6 +25,13 @@ const FOCUSABLE_SELECTOR =
 export function Dialog({ open, onClose, title, children, closeLabel = '關閉', className }: DialogProps) {
   const containerRef = useRef<HTMLDivElement | null>(null)
   const previousActiveRef = useRef<HTMLElement | null>(null)
+  const onCloseRef = useRef(onClose)
+  const titleId = useId()
+
+  // Keep ref in sync with the latest onClose without re-running the open effect
+  useEffect(() => {
+    onCloseRef.current = onClose
+  })
 
   useEffect(() => {
     if (!open) return
@@ -41,7 +48,7 @@ export function Dialog({ open, onClose, title, children, closeLabel = '關閉', 
     function handleKey(event: KeyboardEvent) {
       if (event.key === 'Escape') {
         event.stopPropagation()
-        onClose()
+        onCloseRef.current()
         return
       }
       if (event.key === 'Tab' && container) {
@@ -66,7 +73,7 @@ export function Dialog({ open, onClose, title, children, closeLabel = '關閉', 
       document.body.style.overflow = previousOverflow
       previousActiveRef.current?.focus()
     }
-  }, [open, onClose])
+  }, [open])
 
   if (!open) return null
 
@@ -78,7 +85,7 @@ export function Dialog({ open, onClose, title, children, closeLabel = '關閉', 
 
   return createPortal(
     <div
-      onMouseDown={handleOverlayClick}
+      onClick={handleOverlayClick}
       className={clsx(
         'fixed inset-0 z-50 flex items-center justify-center bg-surface-overlay p-4',
       )}
@@ -87,14 +94,14 @@ export function Dialog({ open, onClose, title, children, closeLabel = '關閉', 
         ref={containerRef}
         role="dialog"
         aria-modal="true"
-        aria-label={typeof title === 'string' ? title : undefined}
+        aria-labelledby={titleId}
         className={clsx(
           'relative flex max-h-[90vh] w-full max-w-md flex-col overflow-hidden rounded-card bg-surface shadow-md',
           className,
         )}
       >
         <header className="flex items-center justify-between border-b border-border px-4 py-3">
-          <h2 className="text-lg font-medium text-text-primary">{title}</h2>
+          <h2 id={titleId} className="text-lg font-medium text-text-primary">{title}</h2>
           <button
             type="button"
             onClick={onClose}

@@ -14,7 +14,7 @@ importers:
         specifier: ^4.10.1
         version: 4.11.3(playwright-core@1.60.0)
       '@playwright/test':
-        specifier: ^1.50.1
+        specifier: ^1.60.0
         version: 1.60.0
       '@types/node':
         specifier: ^22.0.0

@@ -16,14 +16,14 @@ describe('SubRow', () => {
   })
 
   it('applies subrow height + border + flex-between layout', () => {
-    const { container } = render(<SubRow />)
-    const root = container.firstChild as HTMLElement
+    render(<SubRow data-testid="subrow" />)
+    const root = screen.getByTestId('subrow')
     expect(root.className).toContain('h-subrow')
     expect(root.className).toContain('justify-between')
   })
 
   it('merges custom className', () => {
-    const { container } = render(<SubRow className="custom" />)
-    expect((container.firstChild as HTMLElement).className).toContain('custom')
+    render(<SubRow data-testid="subrow" className="custom" />)
+    expect(screen.getByTestId('subrow').className).toContain('custom')
   })
 })

@@ -23,8 +23,8 @@ describe('TopBar', () => {
   })
 
   it('applies brand background + topbar height token (AC-028)', () => {
-    const { container } = render(<TopBar title="X" />)
-    const header = container.firstChild as HTMLElement
+    render(<TopBar title="X" />)
+    const header = screen.getByRole('banner')
     expect(header.className).toContain('h-topbar')
     expect(header.className).toContain('bg-brand')
   })

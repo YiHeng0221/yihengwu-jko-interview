@@ -20,22 +20,22 @@ describe('StickyHeaderStack', () => {
   })
 
   it('applies sticky + top-0 layout', () => {
-    const { container } = render(
-      <StickyHeaderStack>
+    render(
+      <StickyHeaderStack data-testid="sticky-header">
         <div>X</div>
       </StickyHeaderStack>,
     )
-    const root = container.firstChild as HTMLElement
+    const root = screen.getByTestId('sticky-header')
     expect(root.className).toContain('sticky')
     expect(root.className).toContain('top-0')
   })
 
   it('merges custom className', () => {
-    const { container } = render(
-      <StickyHeaderStack className="custom">
+    render(
+      <StickyHeaderStack data-testid="sticky-header" className="custom">
         <div>X</div>
       </StickyHeaderStack>,
     )
-    expect((container.firstChild as HTMLElement).className).toContain('custom')
+    expect(screen.getByTestId('sticky-header').className).toContain('custom')
   })
 })

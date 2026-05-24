@@ -2,8 +2,8 @@ import { clsx } from 'clsx'
 import type { ReactNode } from 'react'
 
 export type TopBarProps = {
-  /** 標題（置中顯示）*/
-  title: ReactNode
+  /** 標題（置中顯示）— 純文字，不接受 interactive ReactNode */
+  title: string
   /** 左側 slot — 常見：返回 IconButton */
   leading?: ReactNode
   /** 右側 slot — 偶爾用（例如 actions）*/
@@ -23,13 +23,13 @@ export function TopBar({ title, leading, trailing, className }: TopBarProps) {
         className,
       )}
     >
-      <div className="z-10 flex items-center">{leading}</div>
+      <div className="flex items-center">{leading}</div>
       <h1
         className="pointer-events-none absolute inset-0 flex items-center justify-center text-base font-medium"
       >
         {title}
       </h1>
-      <div className="z-10 flex items-center">{trailing}</div>
+      <div className="flex items-center">{trailing}</div>
     </header>
   )
 }

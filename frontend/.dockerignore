@@ -1,0 +1,19 @@
+node_modules
+dist
+
+# test / dev artifacts
+*.test.*
+*.spec.*
+vitest.config.*
+src/test-setup.*
+coverage
+
+# local env
+.env
+.env.*
+!.env.example
+
+# editor
+.vscode
+.idea
+*.swp

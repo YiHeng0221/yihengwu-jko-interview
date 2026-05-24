@@ -50,8 +50,10 @@ describe('Input', () => {
     expect(onClear).toHaveBeenCalledTimes(1)
   })
 
-  it('signals invalid state via aria-invalid + danger border', () => {
-    render(<Input aria-label="搜尋" invalid />)
+  it('signals invalid state via aria-invalid + border-danger class', () => {
+    const { container } = render(<Input aria-label="搜尋" invalid />)
     expect(screen.getByLabelText('搜尋')).toHaveAttribute('aria-invalid', 'true')
+    // Input 包在 <label> 內，border-danger 套在最外層 label container
+    expect(container.firstChild).toHaveClass('border-danger')
   })
 })

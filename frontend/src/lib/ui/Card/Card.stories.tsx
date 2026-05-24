@@ -16,7 +16,7 @@ const Chevron = () => (
 // Card 是 polymorphic（discriminated union on `as`），用 article 變體當 stories 預設。
 // 其他變體（button/anchor）用 render-only story 展示，不透過 args 傳遞，避免 union 推導爆炸。
 type ArticleArgs = {
-  title: string
+  label: string
   description?: string
   leading?: React.ReactNode
   trailing?: React.ReactNode
@@ -27,7 +27,7 @@ const meta = {
   title: 'UI/Card',
   component: Card,
   args: {
-    title: '台灣動物保護協會',
+    label: '台灣動物保護協會',
     description: '幫助流浪動物找到一個溫暖的家',
     leading: <Logo />,
     trailing: <Chevron />,
@@ -49,7 +49,7 @@ export const InteractiveButton: Story = {
     <Card
       as="button"
       interactive
-      title={args.title}
+      label={args.label}
       description={args.description}
       leading={args.leading}
       trailing={args.trailing}
@@ -63,7 +63,7 @@ export const InteractiveAnchor: Story = {
       as="a"
       href="https://example.com"
       interactive
-      title={args.title}
+      label={args.label}
       description={args.description}
       leading={args.leading}
       trailing={args.trailing}
@@ -71,9 +71,9 @@ export const InteractiveAnchor: Story = {
   ),
 }
 
-export const LongTitle: Story = {
+export const LongLabel: Story = {
   args: {
-    title: '這是一個非常非常非常非常非常非常非常非常長的標題會被 truncate',
+    label: '這是一個非常非常非常非常非常非常非常非常長的標題會被 truncate',
     description: '同樣的，描述也會被 truncate 處理避免破壞 list layout',
   },
 }

@@ -17,3 +17,6 @@ coverage
 .vscode
 .idea
 *.swp
+
+# git history — excluded to keep build context lean
+.git

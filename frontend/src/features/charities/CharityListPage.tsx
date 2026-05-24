@@ -1,0 +1,133 @@
+import { useEffect, useRef } from 'react'
+import { StickyHeaderStack } from '../../lib/layout/StickyHeaderStack/StickyHeaderStack'
+import { SubRow } from '../../lib/layout/SubRow/SubRow'
+import { TopBar } from '../../lib/layout/TopBar/TopBar'
+import { Card } from '../../lib/ui/Card/Card'
+import { EndMarker } from '../../lib/ui/EndMarker/EndMarker'
+import { ErrorState } from '../../lib/ui/ErrorState/ErrorState'
+import { CardSkeleton } from '../../lib/ui/Skeleton/Skeleton'
+import { Tabs } from '../../lib/ui/Tabs/Tabs'
+import type { CharityItem } from './dto/charitiesListDTO'
+import { useCharityList } from './useCharityList'
+import { CHARITY_TABS, useTabSync } from './useTabSync'
+import type { CharityTab } from './useTabSync'
+
+const TAB_LABELS: Record<CharityTab, string> = {
+  ORG: '公益團體',
+  CAMPAIGN: '捐款專案',
+  MERCHANDISE: '義賣商品',
+}
+
+const TAB_ITEMS = CHARITY_TABS.map((tab) => ({
+  value: tab,
+  label: TAB_LABELS[tab],
+}))
+
+const SKELETON_KEYS = [
+  'sk-0', 'sk-1', 'sk-2', 'sk-3', 'sk-4',
+  'sk-5', 'sk-6', 'sk-7', 'sk-8', 'sk-9',
+] as const
+
+function CharityCardItem({ item }: { item: CharityItem }) {
+  return (
+    <Card
+      label={item.title}
+      description={item.description}
+      leading={
+        item.logoUrl ? (
+          <img
+            src={item.logoUrl}
+            alt=""
+            aria-hidden="true"
+            className="size-12 rounded-full object-cover"
+          />
+        ) : (
+          <div aria-hidden="true" className="size-12 rounded-full bg-surface-muted" />
+        )
+      }
+      className="mx-3 my-2"
+    />
+  )
+}
+
+export function CharityListPage() {
+  const [tab, setTab] = useTabSync()
+  const {
+    data,
+    error,
+    fetchNextPage,
+    hasNextPage,
+    isFetching,
+    isFetchingNextPage,
+    refetch,
+  } = useCharityList({ tab })
+
+  const sentinelRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const el = sentinelRef.current
+    if (!el) return
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry?.isIntersecting && hasNextPage && !isFetchingNextPage) {
+          void fetchNextPage()
+        }
+      },
+      { rootMargin: '200px' },
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage])
+
+  const allItems = data?.pages.flatMap((p) => p.items) ?? []
+  const isInitialLoading = isFetching && allItems.length === 0
+  const hasError = error !== null && allItems.length === 0
+  const isDone = !hasNextPage && data !== undefined && !isInitialLoading
+
+  return (
+    <div className="flex min-h-screen flex-col bg-surface">
+      <StickyHeaderStack>
+        <TopBar title="所有捐款項目" />
+        <Tabs
+          items={TAB_ITEMS}
+          value={tab}
+          onChange={setTab}
+          aria-label="捐款類別"
+        />
+        <SubRow />
+      </StickyHeaderStack>
+
+      <main className="flex-1">
+        {hasError ? (
+          <ErrorState onRetry={() => void refetch()} />
+        ) : isInitialLoading ? (
+          <div aria-busy="true" aria-label="載入中">
+            {SKELETON_KEYS.map((key) => (
+              <CardSkeleton key={key} className="mx-3 my-2" />
+            ))}
+          </div>
+        ) : (
+          <>
+            <ul aria-label={`${TAB_LABELS[tab]}列表`}>
+              {allItems.map((item) => (
+                <li key={item.id}>
+                  <CharityCardItem item={item} />
+                </li>
+              ))}
+            </ul>
+            {isFetchingNextPage && (
+              <div aria-busy="true" aria-label="載入更多">
+                {SKELETON_KEYS.map((key) => (
+                  <CardSkeleton key={key} className="mx-3 my-2" />
+                ))}
+              </div>
+            )}
+            {isDone && <EndMarker />}
+            <div ref={sentinelRef} aria-hidden="true" />
+          </>
+        )}
+      </main>
+    </div>
+  )
+}

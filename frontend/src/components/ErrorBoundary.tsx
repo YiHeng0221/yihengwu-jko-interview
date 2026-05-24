@@ -1,9 +1,12 @@
 import { Component, type ReactNode } from 'react'
 import { ErrorState } from '../lib/ui/ErrorState/ErrorState'
 
+interface StatusError extends Error { status: number }
+function isStatusError(err: Error): err is StatusError {
+  return 'status' in err && typeof (err as StatusError).status === 'number'
+}
 function getErrorStatus(err: Error): number | undefined {
-  const desc = Object.getOwnPropertyDescriptor(err, 'status')
-  return typeof desc?.value === 'number' ? desc.value : undefined
+  return isStatusError(err) ? err.status : undefined
 }
 
 function isRetriable(err: Error): boolean {

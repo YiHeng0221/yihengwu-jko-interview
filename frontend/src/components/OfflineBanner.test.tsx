@@ -28,9 +28,9 @@ describe('OfflineBanner', () => {
     expect(screen.getByText('目前離線')).toBeInTheDocument()
   })
 
-  it('banner has aria-live="polite" for screen reader announcement', () => {
+  it('banner has no explicit aria-live (role="status" carries implicit polite live region per ARIA spec)', () => {
     vi.mocked(useOnline).mockReturnValue(false)
     render(<OfflineBanner />)
-    expect(screen.getByRole('status')).toHaveAttribute('aria-live', 'polite')
+    expect(screen.getByRole('status')).not.toHaveAttribute('aria-live')
   })
 })

@@ -1,0 +1,38 @@
+# This .dockerignore applies when building with the repo root as context:
+#   docker build -f backend/Dockerfile -t <image> .
+# BuildKit reads <Dockerfile-path>.dockerignore (backend/.dockerignore) over root .dockerignore.
+
+# ── Installed deps (rebuilt inside Docker) ──
+node_modules/
+backend/node_modules/
+frontend/node_modules/
+e2e/node_modules/
+
+# ── Other workspaces (not needed for BE build; stubs created by RUN) ──
+# NOTE: When adding new workspaces to pnpm-workspace.yaml, add them here too
+# to prevent build context from silently growing.
+frontend/
+e2e/
+
+# ── Local build artifacts ──
+backend/dist/
+**/*.tsbuildinfo
+
+# ── Test files ──
+backend/test/
+**/*.test.ts
+**/*.spec.ts
+
+# ── Git ──
+.git/
+.gitignore
+
+# ── Local env files (secrets must never enter build context) ──
+.env
+.env.*
+!.env.example
+
+# ── Editor / OS noise ──
+.vscode/
+.idea/
+.DS_Store

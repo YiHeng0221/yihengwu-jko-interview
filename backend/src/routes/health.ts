@@ -2,7 +2,7 @@ import type { FastifyPluginAsync } from 'fastify'
 import type { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { z } from 'zod'
 
-const HealthResponseSchema = z.object({
+export const HealthResponseSchema = z.object({
   status: z.literal('ok'),
   ts: z.string().datetime(),
 })

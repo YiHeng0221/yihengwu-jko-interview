@@ -1,3 +1,5 @@
+import { z } from 'zod'
+
 export type CharityTab = 'ORG' | 'CAMPAIGN' | 'MERCHANDISE'
 
 export type CharityRow = {
@@ -12,17 +14,19 @@ export type CharityRow = {
   createdAt: Date
 }
 
-export type CharityWire = {
-  id: string
-  title: string
-  description: string
-  tab: CharityTab
-  category_code: string
-  logo_url: string | null
-  amount_raised: number
-  amount_goal: number | null
-  created_at: string
-}
+export const CharityWireSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  description: z.string(),
+  tab: z.enum(['ORG', 'CAMPAIGN', 'MERCHANDISE']),
+  category_code: z.string(),
+  logo_url: z.string().nullable(),
+  amount_raised: z.number().int(),
+  amount_goal: z.number().int().nullable(),
+  created_at: z.string().datetime(),
+})
+
+export type CharityWire = z.infer<typeof CharityWireSchema>
 
 export function charityToWire(row: CharityRow): CharityWire {
   return {

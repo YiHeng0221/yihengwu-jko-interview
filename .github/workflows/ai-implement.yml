@@ -127,7 +127,10 @@ jobs:
         with:
           ref: main
           fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
+          # BOT_PAT so impl agent's push to new branch + gh pr create both
+          # trigger downstream workflows (ci.yml). GITHUB_TOKEN events
+          # are loop-guarded.
+          token: ${{ secrets.BOT_PAT || secrets.GITHUB_TOKEN }}
 
       - name: Sanity — claude CLI present
         run: |
@@ -174,9 +177,11 @@ jobs:
         if: success()
         run: |
           set -euo pipefail
-          gh issue edit "$ISSUE_NUMBER" --repo "$REPO" \
-            --remove-label "status/ai-implement" \
-            --add-label "status/in-progress" 2>/dev/null || true
+          # gh issue edit fails silently on Projects-classic GraphQL deprecation. Use REST API.
+          set +e
+          gh api -X DELETE "repos/${REPO}/issues/${ISSUE_NUMBER}/labels/status/ai-implement" >/dev/null 2>&1
+          echo '{"labels":["status/in-progress"]}' | gh api -X POST "repos/${REPO}/issues/${ISSUE_NUMBER}/labels" --input - >/dev/null 2>&1
+          exit 0
 
       - name: Notify on failure
         if: failure()

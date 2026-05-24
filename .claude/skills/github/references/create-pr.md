@@ -21,7 +21,7 @@ digraph create_pr {
   title      [label="5. Generate PR title\nConventional Commits"];
   selfcheck  [label="6. Self-check log\ntypecheck / lint / test / build"];
   create     [label="7. gh pr create"];
-  label      [label="8. Add labels\nstatus/human-review, epic/<NN>, area/<lane>"];
+  label      [label="8. Add labels\nepic/<NN>, area/<lane>, size/<X>"];
   output     [label="9. Output PR URL"];
   precheck -> validate -> diff -> issue -> description -> title -> selfcheck -> create -> label -> output;
 }
@@ -168,11 +168,13 @@ gh pr edit <num> --body-file "$BODY_FILE"
 每個 PR 開完都要補 label（這是 CI 跟 review pipeline 接得到的關鍵）：
 
 ```bash
-gh pr edit <num> --add-label "status/human-review,epic/<NN>,area/<lane>,size/<s|m|l>"
+gh pr edit <num> --add-label "epic/<NN>,area/<lane>,size/<s|m|l>"
 ```
 
 `area/<lane>` 依照 issue 的 lane：`area/api` / `area/web` / `area/e2e`。
 `size/` 依 hand-written LOC：`xs <50` / `s <200` / `m <500` / `l <800`。
+
+> **不要加 `status/human-review` 到 PR**。那個 label 是 ISSUE 端的 gate（PM 開 issue → human-review → ai-implement）。PR 開出本來就 implies「等 human merge」狀態，加上去只會跟 issue 端 label 同名造成語意混淆。PR 端狀態靠 `review/pass` / `ai-fix` / `human-review`（這個是 fix loop > 3 後的 escalation）區分。
 
 ## Step 9 — Output
 

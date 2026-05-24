@@ -24,9 +24,7 @@ export const categoriesRoute: FastifyPluginAsync = async (fastify) => {
     },
     async (_, reply) => {
       reply.header('Cache-Control', 'public, max-age=86400')
-      return {
-        items: CATEGORIES.map((c) => ({ code: c.code, label: c.label })),
-      }
+      return { items: [...CATEGORIES] }
     },
   )
 }

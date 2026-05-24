@@ -78,9 +78,9 @@ describe('GET /categories', () => {
 
   it('returns exactly 17 items', async () => {
     const response = await app.inject({ method: 'GET', url: '/categories' })
-    const body = response.json<{ items: unknown[] }>()
+    const body = response.json<{ items: Array<{ code: string; label: string }> }>()
 
-    expect(body.items).toHaveLength(17)
+    expect(body.items).toHaveLength(CATEGORIES.length)
   })
 
   it('preserves order from CATEGORIES constant', async () => {

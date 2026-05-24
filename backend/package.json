@@ -9,13 +9,16 @@
     "typecheck": "tsc --noEmit",
     "lint": "oxlint --config ../.oxlintrc.json src test",
     "test": "vitest run",
-    "start": "node dist/server.js"
+    "start": "node dist/server.js",
+    "generate:openapi": "tsx scripts/generate-openapi.ts"
   },
   "dependencies": {
     "@fastify/compress": "^8.0.0",
     "@fastify/cors": "^10.0.0",
     "@fastify/helmet": "^12.0.0",
     "@fastify/rate-limit": "^10.0.0",
+    "@fastify/swagger": "^9.0.0",
+    "@fastify/swagger-ui": "^5.0.0",
     "@paralleldrive/cuid2": "^2.2.2",
     "@prisma/client": "^6.0.0",
     "fastify": "^5.0.0",
@@ -24,8 +27,6 @@
     "zod": "^3.24.0"
   },
   "devDependencies": {
-    "@fastify/swagger": "^9.0.0",
-    "@fastify/swagger-ui": "^5.0.0",
     "@types/node": "^22.0.0",
     "oxlint": "^0.16.0",
     "prisma": "^6.0.0",

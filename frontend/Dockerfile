@@ -13,7 +13,8 @@ COPY pnpm-workspace.yaml package.json pnpm-lock.yaml ./
 COPY frontend/package.json ./frontend/package.json
 
 # Stub other workspace packages so pnpm workspace resolution succeeds
-# even when backend/ and e2e/ are not present in the build context
+# even when backend/ and e2e/ are not present in the build context.
+# IMPORTANT: keep this list in sync with pnpm-workspace.yaml packages.
 RUN mkdir -p backend e2e \
     && printf '{"name":"backend","version":"0.0.0","private":true}\n' > backend/package.json \
     && printf '{"name":"e2e","version":"0.0.0","private":true}\n' > e2e/package.json
@@ -35,6 +36,9 @@ RUN rm /etc/nginx/conf.d/default.conf
 
 COPY frontend/nginx.conf /etc/nginx/conf.d/app.conf
 COPY --from=builder /repo/frontend/dist /usr/share/nginx/html
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+    CMD wget --quiet --tries=1 --spider http://localhost:80/ || exit 1
 
 EXPOSE 80
 

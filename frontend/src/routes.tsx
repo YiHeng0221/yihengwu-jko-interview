@@ -17,6 +17,7 @@ export function AppRoutes() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<CharityListPagePlaceholder />} />
+        <Route path="*" element={<CharityListPagePlaceholder />} />
       </Routes>
     </BrowserRouter>
   )

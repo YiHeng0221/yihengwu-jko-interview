@@ -6,7 +6,7 @@ export type CharityTab = (typeof CHARITY_TABS)[number]
 export const DEFAULT_TAB: CharityTab = 'ORG'
 
 function isCharityTab(value: string | null): value is CharityTab {
-  return value !== null && (CHARITY_TABS as readonly string[]).includes(value)
+  return value !== null && CHARITY_TABS.some((t) => t === value)
 }
 
 /**

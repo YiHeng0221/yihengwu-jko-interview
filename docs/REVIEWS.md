@@ -74,25 +74,33 @@ Single-pass AI review has correlated blind spots. A second reviewer with a fresh
 - Reviewer (cross-agent): n/a（single-pass round 2）
 - Verdict: changes-requested
 - Findings: 🔴×1 · 🟡×0 · 🟣×0
+- Round: 2 of 3
 - Cross-agent agreement: n/a
 
-### Round 1 (2026-05-24)（backfill）
+### Key concerns
+- `frontend/nginx.conf:27` — nginx `add_header` 不繼承：location /assets/ 與 = /index.html 定義了自己的 add_header，導致 server 層安全標頭（X-Content-Type-Options、X-Frame-Options、Referrer-Policy）在這兩個 location 的回應中消失，Round 1 修補失效。🔴
+
+### Round 1 findings（backfill）
 - Findings: 🔴×1 · 🟡×3 · 🟣×0
 - `frontend/nginx.conf:6` — 缺少基線安全標頭（X-Content-Type-Options、X-Frame-Options、Referrer-Policy）。🔴
 - `frontend/.dockerignore:19` — `.git/` 未排除 build context，影響建構速度。🟡
 - `frontend/Dockerfile` — `nginx:alpine` 未釘定具體版本，reproducibility 受損。🟡
 - `frontend/nginx.conf:46` — 未啟用 gzip 壓縮。🟡
 
-### Round 2 (2026-05-24)
-- `frontend/nginx.conf:27` — nginx `add_header` 不繼承：location /assets/ 與 = /index.html 定義了自己的 add_header，導致 server 層安全標頭（X-Content-Type-Options、X-Frame-Options、Referrer-Policy）在這兩個 location 的回應中消失，Round 1 修補失效。🔴
-
 ### Round history
 - Round 1: 2026-05-24 — changes-requested → ai-fix applied (security headers, gzip, .git exclusion, image version pinning)
 - Round 2: 2026-05-24 — changes-requested (nginx add_header inheritance bug found)
+- Round 3: 2026-05-25 — **pass** (round 1/2 🔴 全部 fix；後續 ai-fix 還補 CSP / .dockerignore 位置 / Dockerfile stub 警示注釋 等)
 
----
+### Round 3 (2026-05-25)
+- Reviewer: local Claude Code (claude-opus-4-7, via `/review`)
+- Verdict: **pass** ✅
+- Findings: 🔴×0 · 🟡×2 · 🟣×0
+- What changed since round 2: nginx add_header 在 location /assets/ 與 = /index.html 重複宣告（修好繼承斷裂）；CSP 完整化（連 connect-src / base-uri / default-src）；.dockerignore 從 frontend/ 搬到 repo root（解決 Docker build context 不讀 sub-dir .dockerignore 的問題）；Dockerfile stub 加上同步警示注釋；HEALTHCHECK + image version pin 完整保留
 
-## RR-007 — chore(repo): add root scaffold files (pnpm workspace + tsconfig.base + Makefile)
+### Round 3 nit findings（不 blocker）
+- `frontend/nginx.conf:3` — `server_tokens off;` 未設定，nginx 預設 `Server: nginx/1.27.x` 暴露版本。🟡
+- `frontend/Dockerfile:21` — stub `backend/package.json` 寫 `name: "backend"`，但真實 package 名為 `@yihengwu-jko/backend`。目前 pnpm 用路徑 key 不靠 name 比對所以能 build，但若未來 frontend 用 `workspace:*` 引用 backend 會踩雷。🟡
 - PR: #23（Issue#6 / P0-05）
 - Date: 2026-05-24
 - Reviewer (first): local Claude Code（claude-opus-4-7, via `/review`）

@@ -99,4 +99,12 @@ describe('SearchOverlay', () => {
     render(<SearchOverlay onClose={() => undefined} />)
     expect(screen.getByRole('region', { name: '搜尋結果' })).toBeInTheDocument()
   })
+
+  it('shows ErrorState when API call fails', () => {
+    mockUseSearch.mockReturnValue(makeState({ error: new Error('HTTP 500') }))
+    render(<SearchOverlay onClose={() => undefined} />)
+    expect(screen.getByRole('alert')).toBeInTheDocument()
+    expect(screen.getByText('搜尋發生錯誤')).toBeInTheDocument()
+    expect(screen.queryByText('找不到相關項目')).not.toBeInTheDocument()
+  })
 })

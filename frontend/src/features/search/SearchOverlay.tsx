@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Button } from '../../lib/ui/Button/Button'
 import { Card } from '../../lib/ui/Card/Card'
 import { EmptyState } from '../../lib/ui/EmptyState/EmptyState'
+import { ErrorState } from '../../lib/ui/ErrorState/ErrorState'
 import { IconButton } from '../../lib/ui/IconButton/IconButton'
 import { Input } from '../../lib/ui/Input/Input'
 import { CardSkeleton } from '../../lib/ui/Skeleton/Skeleton'
@@ -49,7 +50,7 @@ const CloseIcon = () => (
 export function SearchOverlay({ onClose }: SearchOverlayProps) {
   const [query, setQuery] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
-  const { items, isLoading, isEmpty } = useSearch(query)
+  const { items, isLoading, isEmpty, error } = useSearch(query)
 
   useEffect(() => {
     inputRef.current?.focus()
@@ -94,7 +95,10 @@ export function SearchOverlay({ onClose }: SearchOverlayProps) {
       {/* Results area */}
       <div role="region" aria-label="搜尋結果" className="flex flex-col gap-2 p-3">
         {isLoading && Array.from({ length: 5 }, (_, i) => <CardSkeleton key={i} />)}
-        {!isLoading && isEmpty && (
+        {!isLoading && error && (
+          <ErrorState title="搜尋發生錯誤" description="請稍後再試" retryLabel={null} />
+        )}
+        {!isLoading && !error && isEmpty && (
           <EmptyState title="找不到相關項目" description="請嘗試不同的關鍵字" />
         )}
         {!isLoading &&

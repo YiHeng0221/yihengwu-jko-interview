@@ -1,45 +1,70 @@
-import { render, screen } from '@testing-library/react'
+import '@testing-library/jest-dom/vitest'
+import { fireEvent, render, screen } from '@testing-library/react'
 import { userEvent } from '@testing-library/user-event'
+import { describe, expect, it, vi } from 'vitest'
 import { Drawer } from './Drawer'
 
 describe('Drawer', () => {
-  it('renders nothing when closed', () => {
-    render(<Drawer open={false} onClose={vi.fn()}>Content</Drawer>)
+  it('does not render when open=false', () => {
+    render(
+      <Drawer open={false} onClose={() => {}} title="X">
+        <p>內容</p>
+      </Drawer>,
+    )
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
   })
 
-  it('renders children when open', () => {
-    render(<Drawer open onClose={vi.fn()}>Drawer content</Drawer>)
-    expect(screen.getByRole('dialog')).toBeInTheDocument()
-    expect(screen.getByText('Drawer content')).toBeInTheDocument()
+  it('renders with aria-modal + accessible name when open', () => {
+    render(
+      <Drawer open onClose={() => {}} title="選擇類別">
+        <p>內容</p>
+      </Drawer>,
+    )
+    expect(screen.getByRole('dialog', { name: '選擇類別' })).toHaveAttribute('aria-modal', 'true')
   })
 
-  it('renders title when provided', () => {
-    render(<Drawer open onClose={vi.fn()} title="類別">Content</Drawer>)
-    expect(screen.getByText('類別')).toBeInTheDocument()
-  })
-
-  it('calls onClose when close button is clicked', async () => {
-    const user = userEvent.setup()
+  it('closes on Esc', async () => {
     const onClose = vi.fn()
-    render(<Drawer open onClose={onClose}>Content</Drawer>)
-    await user.click(screen.getByRole('button', { name: '關閉' }))
+    render(
+      <Drawer open onClose={onClose} title="X">
+        <button type="button">inner</button>
+      </Drawer>,
+    )
+    await userEvent.keyboard('{Escape}')
+    expect(onClose).toHaveBeenCalled()
+  })
+
+  it('closes when clicking close button', async () => {
+    const onClose = vi.fn()
+    render(
+      <Drawer open onClose={onClose} title="X">
+        <p>x</p>
+      </Drawer>,
+    )
+    await userEvent.click(screen.getByRole('button', { name: '關閉' }))
     expect(onClose).toHaveBeenCalledTimes(1)
   })
 
-  it('calls onClose when backdrop is clicked', async () => {
-    const user = userEvent.setup()
+  it('closes when clicking overlay', () => {
     const onClose = vi.fn()
-    render(<Drawer open onClose={onClose}>Content</Drawer>)
-    await user.click(screen.getByRole('presentation'))
+    render(
+      <Drawer open onClose={onClose} title="X">
+        <p>x</p>
+      </Drawer>,
+    )
+    const overlay = document.querySelector('.fixed.inset-0') as HTMLElement
+    fireEvent.mouseDown(overlay)
     expect(onClose).toHaveBeenCalledTimes(1)
   })
 
-  it('calls onClose on Escape key', async () => {
-    const user = userEvent.setup()
-    const onClose = vi.fn()
-    render(<Drawer open onClose={onClose}>Content</Drawer>)
-    await user.keyboard('{Escape}')
-    expect(onClose).toHaveBeenCalledTimes(1)
+  it('restores body scroll on unmount', () => {
+    const { unmount } = render(
+      <Drawer open onClose={() => {}} title="X">
+        <p>x</p>
+      </Drawer>,
+    )
+    expect(document.body.style.overflow).toBe('hidden')
+    unmount()
+    expect(document.body.style.overflow).toBe('')
   })
 })

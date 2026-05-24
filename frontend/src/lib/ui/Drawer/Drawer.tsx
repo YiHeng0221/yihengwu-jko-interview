@@ -1,59 +1,110 @@
-import { useEffect, useRef } from 'react'
-import type { ReactNode } from 'react'
+import { clsx } from 'clsx'
+import { useEffect, useId, useRef, type MouseEvent, type ReactNode } from 'react'
+import { createPortal } from 'react-dom'
 
-export interface DrawerProps {
+export type DrawerProps = {
   open: boolean
   onClose: () => void
+  title: ReactNode
   children: ReactNode
-  title?: string
+  closeLabel?: string
+  className?: string
 }
 
-export function Drawer({ open, onClose, children, title }: DrawerProps) {
-  const containerRef = useRef<HTMLDivElement>(null)
+const FOCUSABLE_SELECTOR =
+  'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+
+export function Drawer({ open, onClose, title, children, closeLabel = '關閉', className }: DrawerProps) {
+  const containerRef = useRef<HTMLDivElement | null>(null)
+  const previousActiveRef = useRef<HTMLElement | null>(null)
+  const onCloseRef = useRef(onClose)
+  onCloseRef.current = onClose
+  const titleId = useId()
 
   useEffect(() => {
     if (!open) return
-    containerRef.current?.focus()
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose()
+
+    previousActiveRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null
+
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+
+    const container = containerRef.current
+    const firstFocusable = container?.querySelector<HTMLElement>(FOCUSABLE_SELECTOR)
+    firstFocusable?.focus()
+
+    function handleKey(event: KeyboardEvent) {
+      if (event.key === 'Escape') {
+        event.stopPropagation()
+        onCloseRef.current()
+        return
+      }
+      if (event.key === 'Tab' && container) {
+        const focusables = container.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)
+        if (focusables.length === 0) return
+        const first = focusables[0]!
+        const last = focusables[focusables.length - 1]!
+        const active = document.activeElement
+        if (event.shiftKey && active === first) {
+          event.preventDefault()
+          last.focus()
+        } else if (!event.shiftKey && active === last) {
+          event.preventDefault()
+          first.focus()
+        }
+      }
     }
-    document.addEventListener('keydown', handler)
-    return () => document.removeEventListener('keydown', handler)
-  }, [open, onClose])
+
+    document.addEventListener('keydown', handleKey)
+    return () => {
+      document.removeEventListener('keydown', handleKey)
+      document.body.style.overflow = previousOverflow
+      previousActiveRef.current?.focus()
+    }
+  }, [open])
 
   if (!open) return null
 
-  return (
+  function handleOverlayClick(event: MouseEvent<HTMLDivElement>) {
+    if (event.target === event.currentTarget) {
+      onCloseRef.current()
+    }
+  }
+
+  return createPortal(
     <div
-      role="presentation"
-      className="fixed inset-0 z-50 flex items-end justify-center"
-      onClick={onClose}
+      onMouseDown={handleOverlayClick}
+      className={clsx(
+        'fixed inset-0 z-50 flex items-end justify-center bg-surface-overlay',
+      )}
     >
-      <div className="absolute inset-0 bg-[var(--color-surface-overlay)]" aria-hidden="true" />
       <div
+        ref={containerRef}
         role="dialog"
         aria-modal="true"
-        aria-label={title ?? '選單'}
-        tabIndex={-1}
-        ref={containerRef}
-        className="relative z-10 bg-[var(--color-surface)] rounded-t-[var(--radius-card)] w-full max-h-[80vh] overflow-y-auto p-6 focus:outline-none"
-        onClick={(e) => e.stopPropagation()}
+        aria-labelledby={titleId}
+        className={clsx(
+          'relative flex max-h-[85vh] w-full flex-col overflow-hidden rounded-t-card bg-surface shadow-md',
+          className,
+        )}
       >
-        <div className="flex items-center justify-between mb-4">
-          {title != null && (
-            <h2 className="text-lg font-medium text-[var(--color-text-primary)]">{title}</h2>
-          )}
+        <header className="flex items-center justify-between border-b border-border px-4 py-3">
+          <h2 id={titleId} className="text-lg font-medium text-text-primary">{title}</h2>
           <button
             type="button"
-            aria-label="關閉"
             onClick={onClose}
-            className="ml-auto p-2 hover:bg-[var(--color-surface-muted)] rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+            aria-label={closeLabel}
+            className="rounded-button p-1 text-text-secondary transition-colors hover:bg-surface-muted hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
           >
-            ✕
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
           </button>
-        </div>
-        {children}
+        </header>
+        <div className="flex-1 overflow-auto px-4 py-4">{children}</div>
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }

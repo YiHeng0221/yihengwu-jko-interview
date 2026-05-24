@@ -42,6 +42,61 @@ Single-pass AI review has correlated blind spots. A second reviewer with a fresh
 
 <!-- Insert new RR-NNN entries below. Most recent at the top. -->
 
+## RR-012 — feat(web): P1-FE-09 React Router v7 routes + tabs URL sync
+- PR: #90
+- Date: 2026-05-24
+- Reviewer (first): local Claude Code (claude-sonnet-4-6)
+- Reviewer (cross-agent): n/a
+- Verdict: pass
+- Findings: 🔴×0 · 🟡×2 · 🟣×0
+- Round: 1 of 3
+
+### Key concerns
+- `main.tsx:3` — `AppRoutes` import 插入在 `./styles/theme.css` 之前，倒置原有 CSS-after-JS 順序；Vite 按 import 順序注入 CSS，若 `routes.tsx` 日後引入 component-level CSS，cascade 優先級將出乎意料。🟡
+- `frontend/src/App.tsx` + `App.test.tsx` — 此 PR 移除 `main.tsx` 對 `App` 的引用但未刪除原始檔案，兩者成為孤兒死代碼。🟡
+
+### Round history
+- Round 1: 2026-05-24 — pass（初次 fetch diff 時有 `as readonly string[]` HR#16 違反，branch HEAD a1337ca 已以 `.some()` 取代；catch-all route 亦已補上，無 blocker）
+
+---
+## RR-011 — feat(web): P1-FE-04 Tabs + EmptyState + ErrorState + EndMarker primitives
+- PR: #85
+- Date: 2026-05-25
+- Reviewer (first): local Claude Code (claude-opus-4-7)
+- Reviewer (cross-agent): pending
+- Verdict: changes-requested
+- Findings: 🔴×3 · 🟡×5 · 🟣×1
+- Round: 1 of 3
+
+### Key concerns
+- `frontend/src/lib/ui/Tabs/Tabs.tsx:40` — Roving tabindex 未完成：onChange 觸發後 focus 被瀏覽器拋回 <body>，違反 WAI-ARIA APG Tabs Pattern；測試未覆蓋 focus 移轉。🔴
+- `frontend/src/lib/ui/Tabs/Tabs.tsx:32` — Home / End 鍵盤 key 未實作，違反 APG SHOULD 與 fe-feature-spec.md §5 a11y AC。🔴
+- `frontend/src/lib/ui/ErrorState/ErrorState.tsx:24` — role=alert 包住整個 ErrorState（含 retry button），AT 會 assertive 打斷但無 focus 落點，retry 行動不可達。🔴
+- `frontend/src/lib/ui/Tabs/Tabs.tsx:64` — aria-controls 指向 tabpanel-${value} 但 panel 不存在，axe aria-valid-attr-value 會 fail。🟡
+- `frontend/src/lib/ui/Tabs/Tabs.tsx:29` — activeIndex === -1 無 defensive 處理，非法 value 時 UI 靜默。🟡
+- `frontend/src/lib/ui/ErrorState/ErrorState.tsx:39` — retryLabel !== null 無法區分 null 與 undefined，default 啟動條件與意圖落差。🟡
+- `frontend/src/lib/ui/EndMarker/EndMarker.tsx:19` — ❤ emoji 經 user 拍板移除（spec mock 重複裝飾）。🟡 → resolved
+- `frontend/src/lib/ui/Tabs/Tabs.tsx` — ...rest spread 僅承載 aria-label，可讀性下降；建議顯式取 prop。🟡
+- `docs/specs/fe-feature-spec.md:194` — spec 仍寫 index.ts，與 ADR-0019 衝突；本 PR 不阻塞但需另開 issue 修。🟣
+
+### Round history
+- Round 1: 2026-05-25 — changes-requested（焦點 a11y：3 條 🔴 圍繞鍵盤 / 螢幕閱讀器互動完整性）
+
+---
+
+## RR-010 — fix(skills): 嚴禁日文混雜 — review / fix-pr / implement-issue 全 ZH-TW only
+- PR: #96
+- Date: 2026-05-24
+- Reviewer: local Claude Code (first pass, claude-sonnet-4-6)
+- Verdict: pass
+- Findings: 🔴×0 · 🟡×1 · 🟣×0
+- Round: 1 of 3
+
+### Key concerns
+- `.claude/commands/implement-issue.md:18` — 缺少「若不小心打出日文 / 全英文段落，**回頭重寫整段**」自我修正規則，與 `fix-pr.md` 及 `review.md` 的語言 directive 不對稱（🟡 Nit）
+
+---
+
 ## RR-009 — docs(review): RR-008 review round 2 for PR #28
 - PR: #34
 - Date: 2026-05-25

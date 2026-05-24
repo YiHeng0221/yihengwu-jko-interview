@@ -106,6 +106,18 @@ jobs:
             pnpm install
           fi
 
+      - name: Generate Prisma client (backend only, if schema exists)
+        run: |
+          # backend code imports types from @prisma/client (PrismaClient, Prisma.*, model
+          # types). These types are emitted by `prisma generate`, NOT shipped in the npm
+          # package. Without this step, `tsc --noEmit` fails with TS2305 'has no exported
+          # member' on any file referencing Prisma types.
+          if [ -f backend/prisma/schema.prisma ]; then
+            pnpm --filter @yihengwu-jko/backend exec prisma generate
+          else
+            echo "::notice::backend/prisma/schema.prisma missing — skip prisma generate"
+          fi
+
       - name: Typecheck
         run: |
           if [ -f backend/package.json ] || [ -f frontend/package.json ] || [ -f e2e/package.json ]; then

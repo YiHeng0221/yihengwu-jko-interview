@@ -1,38 +1,34 @@
+import '@testing-library/jest-dom/vitest'
 import { render, screen } from '@testing-library/react'
 import { userEvent } from '@testing-library/user-event'
+import { describe, expect, it, vi } from 'vitest'
 import { Chip } from './Chip'
 
 describe('Chip', () => {
-  it('renders label text', () => {
-    render(<Chip label="兒少照護" />)
-    expect(screen.getByRole('button', { name: '兒少照護' })).toBeInTheDocument()
-  })
-
-  it('is not pressed by default', () => {
-    render(<Chip label="全部" />)
-    expect(screen.getByRole('button')).toHaveAttribute('aria-pressed', 'false')
+  it('renders label + role=button + aria-pressed=false by default', () => {
+    render(<Chip label="動保" />)
+    const btn = screen.getByRole('button', { name: '動保' })
+    expect(btn).toHaveAttribute('aria-pressed', 'false')
   })
 
   it('reflects active state via aria-pressed', () => {
-    render(<Chip label="全部" active />)
+    render(<Chip label="動保" active />)
     expect(screen.getByRole('button')).toHaveAttribute('aria-pressed', 'true')
   })
 
-  it('calls onClick when clicked', async () => {
-    const user = userEvent.setup()
+  it('fires onClick when not disabled', async () => {
     const onClick = vi.fn()
-    render(<Chip label="動物保護" onClick={onClick} />)
-    await user.click(screen.getByRole('button'))
+    render(<Chip label="動保" onClick={onClick} />)
+    await userEvent.click(screen.getByRole('button'))
     expect(onClick).toHaveBeenCalledTimes(1)
   })
 
-  it('is disabled when disabled prop is set', () => {
-    render(<Chip label="身心障礙服務" disabled />)
-    expect(screen.getByRole('button')).toBeDisabled()
-  })
-
-  it('applies custom className', () => {
-    render(<Chip label="全部" className="extra-class" />)
-    expect(screen.getByRole('button')).toHaveClass('extra-class')
+  it('does not fire onClick when disabled', async () => {
+    const onClick = vi.fn()
+    render(<Chip label="動保" disabled onClick={onClick} />)
+    const btn = screen.getByRole('button')
+    expect(btn).toBeDisabled()
+    await userEvent.click(btn)
+    expect(onClick).not.toHaveBeenCalled()
   })
 })

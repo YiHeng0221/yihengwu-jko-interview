@@ -1,23 +1,30 @@
-import type { ButtonHTMLAttributes } from 'react'
+import { clsx } from 'clsx'
+import type { ButtonHTMLAttributes, ReactNode, Ref } from 'react'
 
-export interface ChipProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  label: string
+export type ChipProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children'> & {
+  label: ReactNode
+  /** 是否為選中狀態（紅底白字）*/
   active?: boolean
+  ref?: Ref<HTMLButtonElement>
 }
 
-const BASE =
-  'inline-flex items-center px-4 py-2 text-sm font-medium rounded-[var(--radius-chip)] border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed'
-const ACTIVE = 'bg-brand text-[var(--color-text-on-brand)] border-brand'
-const INACTIVE =
-  'bg-[var(--color-surface)] text-[var(--color-text-primary)] border-[var(--color-border)] hover:bg-[var(--color-surface-muted)]'
-
-export function Chip({ label, active = false, className = '', ...props }: ChipProps) {
+export function Chip({ label, active = false, className, disabled, type = 'button', ref, ...rest }: ChipProps) {
   return (
     <button
-      type="button"
+      ref={ref}
+      type={type}
+      disabled={disabled}
       aria-pressed={active}
-      className={[BASE, active ? ACTIVE : INACTIVE, className].join(' ').trim()}
-      {...props}
+      className={clsx(
+        'inline-flex items-center justify-center rounded-chip border px-3 py-1 text-sm transition-colors',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2',
+        active
+          ? 'border-brand bg-brand text-text-on-brand'
+          : 'border-border bg-surface text-text-primary hover:border-brand hover:text-brand',
+        disabled && 'cursor-not-allowed opacity-40 hover:border-border hover:text-text-primary',
+        className,
+      )}
+      {...rest}
     >
       {label}
     </button>

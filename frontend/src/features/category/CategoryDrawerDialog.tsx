@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
-import { Dialog } from '../../lib/ui/Dialog'
-import { Drawer } from '../../lib/ui/Drawer'
+import { Dialog } from '../../lib/ui/Dialog/Dialog'
+import { Drawer } from '../../lib/ui/Drawer/Drawer'
 
 function useMediaQuery(query: string): boolean {
   const [matches, setMatches] = useState(() => {
@@ -30,22 +30,20 @@ export function CategoryDrawerDialog({
   open,
   onClose,
   children,
-  title,
+  title = '選擇類別',
 }: CategoryDrawerDialogProps) {
   const isDesktop = useMediaQuery('(min-width: 768px)')
 
-  const titleProp = title != null ? { title } : {}
-
   if (isDesktop) {
     return (
-      <Dialog open={open} onClose={onClose} {...titleProp}>
+      <Dialog open={open} onClose={onClose} title={title}>
         {children}
       </Dialog>
     )
   }
 
   return (
-    <Drawer open={open} onClose={onClose} {...titleProp}>
+    <Drawer open={open} onClose={onClose} title={title}>
       {children}
     </Drawer>
   )

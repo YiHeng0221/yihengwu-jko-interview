@@ -23,7 +23,9 @@ describe('GET /health', () => {
 
     expect(response.statusCode).toBe(200)
 
-    const body = HealthResponseSchema.parse(response.json())
+    const result = HealthResponseSchema.safeParse(response.json())
+    expect(result.success).toBe(true)
+    const body = result.data!
     expect(body.status).toBe('ok')
     expect(new Date(body.ts).toISOString()).toBe(body.ts)
   })

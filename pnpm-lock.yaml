@@ -22,12 +22,6 @@ importers:
       '@fastify/rate-limit':
         specifier: ^10.0.0
         version: 10.3.0
-      '@fastify/swagger':
-        specifier: ^9.0.0
-        version: 9.7.0
-      '@fastify/swagger-ui':
-        specifier: ^5.0.0
-        version: 5.2.6
       '@prisma/client':
         specifier: ^6.0.0
         version: 6.19.3(prisma@6.19.3(typescript@5.9.3))(typescript@5.9.3)
@@ -41,6 +35,12 @@ importers:
         specifier: ^3.24.0
         version: 3.25.76
     devDependencies:
+      '@fastify/swagger':
+        specifier: ^9.0.0
+        version: 9.7.0
+      '@fastify/swagger-ui':
+        specifier: ^5.0.0
+        version: 5.2.6
       '@types/node':
         specifier: ^22.0.0
         version: 22.19.19

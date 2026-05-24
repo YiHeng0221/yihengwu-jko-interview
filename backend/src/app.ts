@@ -20,11 +20,12 @@ export async function buildApp() {
   await app.register(compress)
   await app.register(helmet)
   await app.register(cors, {
-    origin: process.env['ALLOWED_ORIGINS']?.split(',') ?? false,
+    origin: process.env['ALLOWED_ORIGINS']?.split(',') ??
+      (process.env['NODE_ENV'] !== 'production'),
   })
   await app.register(rateLimit, { max: 100, timeWindow: '1 minute' })
 
-  if (process.env['NODE_ENV'] !== 'production') {
+  if (process.env['NODE_ENV'] === 'development') {
     const { default: swagger } = await import('@fastify/swagger')
     const { default: swaggerUi } = await import('@fastify/swagger-ui')
     await app.register(swagger, { openapi: { info: { title: 'API', version: '0.0.0' } } })

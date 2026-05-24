@@ -74,7 +74,10 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.ref }}
           fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
+          # BOT_PAT so subsequent `git push` triggers ci.yml.
+          # GITHUB_TOKEN pushes hit GitHub's loop guard and don't fire
+          # downstream workflows — breaks the fix-loop chain.
+          token: ${{ secrets.BOT_PAT || secrets.GITHUB_TOKEN }}
 
       - name: Sanity — claude CLI present
         run: |

@@ -127,7 +127,10 @@ jobs:
         with:
           ref: main
           fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
+          # BOT_PAT so impl agent's push to new branch + gh pr create both
+          # trigger downstream workflows (ci.yml). GITHUB_TOKEN events
+          # are loop-guarded.
+          token: ${{ secrets.BOT_PAT || secrets.GITHUB_TOKEN }}
 
       - name: Sanity — claude CLI present
         run: |

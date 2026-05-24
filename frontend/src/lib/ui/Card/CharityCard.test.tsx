@@ -27,11 +27,9 @@ describe('CharityCard', () => {
     expect(screen.queryByText('幫助流浪動物')).not.toBeInTheDocument()
   })
 
-  it('renders as article element', () => {
-    const { container } = render(
-      <CharityCard logoSrc="https://example.com/logo.png" name="Test" />,
-    )
-    expect(container.firstChild?.nodeName).toBe('ARTICLE')
+  it('renders as article element with accessible name', () => {
+    render(<CharityCard logoSrc="https://example.com/logo.png" name="台灣動物保護協會" />)
+    expect(screen.getByRole('article', { name: '台灣動物保護協會' })).toBeInTheDocument()
   })
 
   it('logo has correct dimensions', () => {

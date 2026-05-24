@@ -34,7 +34,7 @@ export function EmptyState({
         <img src={emptyNoData} alt="" width={144} height={144} data-testid="empty-no-data-img" />
       )}
       <div className="text-lg font-medium text-text-primary">{title}</div>
-      {description && (
+      {description != null && (
         <div className="text-sm text-text-secondary">{description}</div>
       )}
       {action && <div className="mt-2">{action}</div>}

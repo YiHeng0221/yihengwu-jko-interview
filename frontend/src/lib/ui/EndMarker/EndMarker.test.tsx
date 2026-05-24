@@ -23,7 +23,7 @@ describe('EndMarker', () => {
 
   it('renders two line dividers', () => {
     render(<EndMarker />)
-    const lines = screen.getAllByTestId('end-marker-line')
-    expect(lines).toHaveLength(2)
+    expect(screen.getByTestId('end-marker-line-left')).toBeInTheDocument()
+    expect(screen.getByTestId('end-marker-line-right')).toBeInTheDocument()
   })
 })

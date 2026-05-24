@@ -9,6 +9,7 @@ import {
   validatorCompiler,
 } from 'fastify-type-provider-zod'
 import { genReqId, requestIdPlugin } from './plugins/request-id.js'
+import { swaggerPlugin } from './plugins/swagger.js'
 import { zodValidationPlugin } from './plugins/zod-validation.js'
 import { charitiesRoute, type CharitiesDb } from './routes/charities.js'
 import { healthRoute } from './routes/health.js'
@@ -24,6 +25,7 @@ export async function buildApp(opts?: { prisma?: CharitiesDb }) {
 
   await app.register(requestIdPlugin)
   await app.register(zodValidationPlugin)
+  await app.register(swaggerPlugin)
   await app.register(compress)
   await app.register(helmet)
   await app.register(cors, {
@@ -32,13 +34,8 @@ export async function buildApp(opts?: { prisma?: CharitiesDb }) {
   })
   await app.register(rateLimit, { max: 100, timeWindow: '1 minute' })
 
-  if (process.env['NODE_ENV'] === 'development') {
-    const { default: swagger } = await import('@fastify/swagger')
-    const { default: swaggerUi } = await import('@fastify/swagger-ui')
-    await app.register(swagger, { openapi: { info: { title: 'API', version: '0.0.0' } } })
-    await app.register(swaggerUi, { routePrefix: '/docs' })
-  }
-
+  // main 的 swaggerPlugin（line 28）已處理 OpenAPI registration；
+  // 不再 inline 重複 register。prisma client 留下供 charitiesRoute 用。
   const prisma: CharitiesDb = opts?.prisma ?? new PrismaClient()
 
   await app.register(healthRoute)

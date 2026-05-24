@@ -13,12 +13,7 @@ export function encodeCursor(payload: CursorPayload): string {
 }
 
 export function decodeCursor(token: string): CursorPayload {
-  let json: string
-  try {
-    json = Buffer.from(token, 'base64url').toString('utf8')
-  } catch {
-    throw new CursorDecodeError()
-  }
+  const json = Buffer.from(token, 'base64url').toString('utf8')
 
   let raw: unknown
   try {

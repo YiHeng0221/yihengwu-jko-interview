@@ -62,13 +62,14 @@ describe('decodeCursor — error cases', () => {
   })
 
   it('CursorDecodeError carries statusCode 400 and body {error:"invalid"}', () => {
+    expect.assertions(3)
     try {
       decodeCursor('garbage')
     } catch (err) {
       expect(err).toBeInstanceOf(CursorDecodeError)
-      const e = err as CursorDecodeError
-      expect(e.statusCode).toBe(400)
-      expect(e.body).toEqual({ error: 'invalid' })
+      if (!(err instanceof CursorDecodeError)) throw new Error('unexpected error type')
+      expect(err.statusCode).toBe(400)
+      expect(err.body).toEqual({ error: 'invalid' })
     }
   })
 })

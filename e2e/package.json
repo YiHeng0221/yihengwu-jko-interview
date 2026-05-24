@@ -3,7 +3,8 @@
   "private": true,
   "version": "0.0.0",
   "scripts": {
-    "test": "playwright test",
+    "test": "echo 'e2e: pnpm -r test is a no-op for this package; run via .github/workflows/e2e.yml against staging.'",
+    "test:e2e": "playwright test",
     "typecheck": "tsc --noEmit",
     "lint": "oxlint ."
   },

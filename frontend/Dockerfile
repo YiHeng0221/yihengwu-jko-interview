@@ -16,7 +16,7 @@ COPY frontend/package.json ./frontend/package.json
 # even when backend/ and e2e/ are not present in the build context.
 # IMPORTANT: keep this list in sync with pnpm-workspace.yaml packages.
 RUN mkdir -p backend e2e \
-    && printf '{"name":"backend","version":"0.0.0","private":true}\n' > backend/package.json \
+    && printf '{"name":"@yihengwu-jko/backend","version":"0.0.0","private":true}\n' > backend/package.json \
     && printf '{"name":"e2e","version":"0.0.0","private":true}\n' > e2e/package.json
 
 RUN pnpm install --frozen-lockfile

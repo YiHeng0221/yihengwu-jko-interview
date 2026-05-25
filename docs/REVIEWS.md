@@ -42,6 +42,24 @@ Single-pass AI review has correlated blind spots. A second reviewer with a fresh
 
 <!-- Insert new RR-NNN entries below. Most recent at the top. -->
 
+## RR-016 — fix(web): Tabs active 樣式修正 + 浮動 indicator 切換動畫
+- PR: #123
+- Date: 2026-05-25
+- Reviewer (first): local Claude Code (claude-sonnet-4-6, via `/review`)
+- Reviewer (cross-agent): n/a
+- Verdict: pass
+- Findings: 🔴×0 · 🟡×2 · 🟣×0
+- Round: 1 of 3
+
+### Key concerns
+- `Tabs.tsx:46` — `useLayoutEffect` deps 只有 `[activeIndex]`，遺漏 `items`；label 文字長度改變但 activeIndex 不變時，indicator 寬度不會重算。🟡
+- `Tabs.tsx:137` — floating indicator 的 `transition` 以 inline style 硬碼，與 tab button 使用的 Tailwind `transition-all duration-200 ease-out` 混用；duration/easing 需同步兩處。🟡
+
+### Round history
+- Round 1: 2026-05-25 — pass（🔴×0・🟡×2；全 non-blocking）
+
+---
+
 ## RR-015 — feat(web): Spinner 改 iOS-style activity indicator (8-tick chase fade)
 - PR: #108
 - Date: 2026-05-25

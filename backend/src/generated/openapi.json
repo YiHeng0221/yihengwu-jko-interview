@@ -176,6 +176,29 @@
                       "enum": [
                         "invalid"
                       ]
+                    },
+                    "issues": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "path": {
+                            "type": "string"
+                          },
+                          "message": {
+                            "type": "string"
+                          },
+                          "code": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "path",
+                          "message",
+                          "code"
+                        ],
+                        "additionalProperties": false
+                      }
                     }
                   },
                   "required": [

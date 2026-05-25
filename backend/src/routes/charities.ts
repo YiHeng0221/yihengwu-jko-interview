@@ -7,15 +7,21 @@ import { prisma } from '../lib/prisma.js'
 import { CharityListQuerySchema, CharityListResponseSchema } from '../lib/schemas.js'
 import { charityToWire } from '../lib/toWire.js'
 
-const ErrorSchema = z.object({ error: z.literal('invalid') })
+// 對齊 plugins/zod-validation.ts setErrorHandler 的實際回傳 shape：
+// `{ error: 'invalid', issues: [{ path, message, code }] }`
+// FE 用 openapi.json 做 codegen 才能拿到正確型別。
+const ErrorIssueSchema = z.object({
+  path: z.string(),
+  message: z.string(),
+  code: z.string(),
+})
+const ErrorSchema = z.object({
+  error: z.literal('invalid'),
+  issues: z.array(ErrorIssueSchema).optional(),
+})
 
 export const charitiesRoute: FastifyPluginAsync = async (fastify) => {
   const app = fastify.withTypeProvider<ZodTypeProvider>()
-
-  // Graceful shutdown: SIGTERM / Ctrl-C 時清乾淨 PrismaClient connection pool。
-  fastify.addHook('onClose', async () => {
-    await prisma.$disconnect()
-  })
 
   app.get(
     '/charities',

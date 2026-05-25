@@ -10,6 +10,11 @@ export const CharityWireSchema = z.object({
   amount_raised: z.number().int(),
   amount_goal: z.number().int().nullable(),
   created_at: z.string().datetime(),
+  banner_image_url: z.string().nullable(),
+  org_name: z.string().nullable(),
+  tags: z.array(z.string()),
+  product_image_url: z.string().nullable(),
+  price_ntd: z.number().int().nullable(),
 })
 
 export const CharityListQuerySchema = z.object({

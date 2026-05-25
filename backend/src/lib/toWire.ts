@@ -23,5 +23,10 @@ export function charityToWire(row: CharityRow): CharityWire {
     amount_raised: row.amountRaised,
     amount_goal: row.amountGoal,
     created_at: row.createdAt.toISOString(),
+    banner_image_url: row.bannerImageUrl,
+    org_name: row.orgName,
+    tags: row.tags,
+    product_image_url: row.productImageUrl,
+    price_ntd: row.priceNtd,
   }
 }

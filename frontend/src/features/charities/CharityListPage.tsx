@@ -66,10 +66,10 @@ function OrgCardItem({ item }: { item: CharityItem }) {
             src={item.logoUrl}
             alt=""
             aria-hidden="true"
-            className="size-12 rounded-full object-cover"
+            className="size-12 rounded object-cover"
           />
         ) : (
-          <div aria-hidden="true" className="size-12 rounded-full bg-surface-muted" />
+          <div aria-hidden="true" className="size-12 rounded bg-surface-muted" />
         )
       }
       className="mx-3 my-2"

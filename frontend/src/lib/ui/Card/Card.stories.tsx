@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 import { Card } from './Card'
 
 const Logo = () => (
-  <div className="size-12 rounded-full bg-brand-soft text-brand flex items-center justify-center font-bold">
+  <div className="size-12 rounded bg-brand-soft text-brand flex items-center justify-center font-bold">
     ❤
   </div>
 )

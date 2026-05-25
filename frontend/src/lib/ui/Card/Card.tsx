@@ -21,7 +21,7 @@ type ButtonCardProps = CommonCardProps & Omit<ButtonHTMLAttributes<HTMLButtonEle
 export type CardProps = ArticleCardProps | AnchorCardProps | ButtonCardProps
 
 const CARD_CLASSES =
-  'flex w-full items-start gap-3 rounded-card border border-border bg-surface p-3'
+  'flex items-start gap-3 rounded-card border border-border bg-surface p-3'
 const INTERACTIVE_CLASSES =
   'cursor-pointer transition-colors hover:bg-surface-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2'
 

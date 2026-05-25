@@ -32,16 +32,14 @@ describe('CampaignCard', () => {
     expect(img).toHaveAttribute('src', 'https://example.com/banner.png')
   })
 
-  it('renders tag chips', () => {
+  it('renders tags as joined line with ・ separator', () => {
     render(
       <CampaignCard
         title="偏鄉兒童閱讀計畫"
         tags={['身心障礙服務', '特殊醫療', '弱勢扶貧']}
       />,
     )
-    expect(screen.getByText('身心障礙服務')).toBeInTheDocument()
-    expect(screen.getByText('特殊醫療')).toBeInTheDocument()
-    expect(screen.getByText('弱勢扶貧')).toBeInTheDocument()
+    expect(screen.getByText('身心障礙服務・特殊醫療・弱勢扶貧')).toBeInTheDocument()
   })
 
   it('renders no tags when tags array is empty', () => {

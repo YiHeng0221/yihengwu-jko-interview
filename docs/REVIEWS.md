@@ -449,6 +449,25 @@ Phase 1（含 Phase 1.1 polish）正式收尾。所有 22 個 ADR 落地（含 A
 
 ---
 
+## RR-022 — docs: Phase 2 submission polish — README/CLAUDE.md/DEMO.md/prompts/retro
+
+- PR: #150
+- Date: 2026-05-25
+- Reviewer: local Claude Code（first pass）
+- Verdict: changes-requested
+- Findings: 🔴×3 · 🟡×2 · 🟣×0
+- Round: 1 of 3
+
+### Key concerns
+- 分支命名 `docs/phase-2-submission-polish` 不符 CLAUDE.md `feature/epic-<NN>-<lane>-issue-<NN>` 合約（Hard Rule）
+- commit footer `Refs Phase 2 PM tasks.html P0+P1` 不符 AGENTS.md 要求的 `Refs Issue#NN` 格式（Hard Rule）
+- `docs/REVIEWS.md:435` RR-021 的 `**PR**:` 欄位記錄分支名而非 PR 編號，audit trail 斷絕
+
+### Round history
+- Round 1: 2026-05-25 — changes-requested（3🔴 均為 metadata/process 違反，docs 內容本身品質高）
+
+---
+
 > **本批 RR-001 ~ RR-007 為 backfill**：原本 `review.yml` workflow 只跑 first pass、沒鏈第ĺ�段 cross-agent；且首段 AI 在 ADR/config 類「文件型」PR 上自動跳過 RR 寫入步驟，導致 audit trail 漏記。本 commit 一次補回 7 條 RR、並同步修補 `review.yml` + `.claude/commands/review.md` 強制每個 PR 都寫 RR + 跑 `--cross`。Cross-agent 二審回補留待 Phase 0 之後資源穩定再批次跑（不阻塞 Phase 0 merge）。
 
 <!--

@@ -139,15 +139,6 @@ Last: -
 
 ## D — Deploy / Infra（PaaS 通用坑）
 
-### D1. Internal vs public service URL
-
-多數 PaaS（Railway / Fly / Render / ...）提供兩種 service-to-service URL：
-
-- **Internal hostname**（如 `xxx.internal:port`）— 只能從同 PaaS project 內連
-- **Public URL / TCP proxy** — 外部可連，通常另一個 port
-
-GH Actions runner 在外部，跑 seed / migration / smoke test 要用 **public**，不能用 internal。
-
 ### D2. Deploy 後必驗 health
 
 連 repo + deploy 完，**必跑** `curl https://<service-url>/health` 才算 smoke green。
@@ -239,42 +230,6 @@ brief → spec md → spec html → preview html (UI 才有) → tasks html → 
 2. **再**砍 session
 
 否則下一個 session 又會踩同樣的坑。
-
-### F2. lean-harness 應該是個 git repo
-
-純 local 目錄 → 沒 diff 看不到歷史 → 升級 harness 時容易遺漏。
-
-建議：
-
-```bash
-cd <lean-harness 路徑>
-git init && git add -A && git commit -m "lean-harness vN"
-gh repo create <你的 org>/lean-harness --private --source=. --push
-gh api repos/<owner>/lean-harness --method PATCH -f is_template=true
-```
-
-之後新專案 bootstrap 走：
-
-```bash
-gh repo create <owner>/<new-project> --private --template <owner>/lean-harness
-```
-
-template repo 功能自動拷貝 scaffold，乾淨。
-
-### F3. Secret / Token 不過聊天 channel
-
-`<PROVIDER>_TOKEN` / API key 等：
-
-- ✅ 在 user 自己終端機跑 `gh secret set ... --body -` 貼進 stdin
-- ❌ 貼進 chat 給 agent 設
-
-若不得已貼了 → demo 結束務必 revoke + 重產（**寫進 retro 行動項**）。
-
-### F4. Discord / 外部通訊 必走 tool，不靠 text output
-
-agent 的 text output 不會自動進 Discord / Slack / 等通訊軟體。要通知 user 必跑對應 tool（如 `mcp__plugin_discord_discord__reply`）。
-
-> 真實案例：早期 session agent 以為「我寫了就會傳給 user」，結果 user 在 Discord 看不到任何更新。
 
 ---
 

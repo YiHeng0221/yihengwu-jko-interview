@@ -478,6 +478,25 @@ Phase 1（含 Phase 1.1 polish）正式收尾。所有 22 個 ADR 落地（含 A
 
 ---
 
+## RR-023 — docs: 加 README 「Prompt 迭代摘要」 + 砍 HARNESS-PITFALLS D1/F2/F4
+
+- PR: #152
+- Date: 2026-05-25
+- Reviewer: local Claude Code（first pass）
+- Verdict: changes-requested
+- Findings: 🔴×2 · 🟡×2 · 🟣×0
+- Round: 1 of 3
+
+### Key concerns
+- commit footer `Refs Phase 2 user feedback` 不符 AGENTS.md Hard Rule #9 要求的 `Refs Issue#NN` 格式（與 RR-022 同類問題再次出現）
+- branch name `docs/prompt-iteration-summary` 不符 CLAUDE.md 命名合約 `feature/epic-<NN>-<lane>-issue-<NN>`（同 RR-022）
+- README.md:234 `採用` 欄位列出 React Router v7 與前文否決的 RRv7 full-stack 框架同名，缺少模式區分說明（SPA routing vs Remix full-stack）
+
+### Round history
+- Round 1: 2026-05-25 — changes-requested（2🔴 為結構性 process 偏差，ai-fix 無法修正；2🟡 為文件清晰度改善）
+
+---
+
 > **本批 RR-001 ~ RR-007 為 backfill**：原本 `review.yml` workflow 只跑 first pass、沒鏈第ĺ�段 cross-agent；且首段 AI 在 ADR/config 類「文件型」PR 上自動跳過 RR 寫入步驟，導致 audit trail 漏記。本 commit 一次補回 7 條 RR、並同步修補 `review.yml` + `.claude/commands/review.md` 強制每個 PR 都寫 RR + 跑 `--cross`。Cross-agent 二審回補留待 Phase 0 之後資源穩定再批次跑（不阻塞 Phase 0 merge）。
 
 <!--

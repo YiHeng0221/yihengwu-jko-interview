@@ -114,4 +114,38 @@ describe('useCharityList', () => {
     await waitFor(() => expect(result.current.isError).toBe(true))
     expect(result.current.error).toBeInstanceOf(Error)
   })
+
+  it('includes category_code param when categoryCode is provided', async () => {
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      new Response(JSON.stringify(validPage), { status: 200 }),
+    )
+
+    const { result } = renderHook(
+      () => useCharityList({ tab: 'ORG', categoryCode: 'ELDER_CARE' }),
+      { wrapper: makeWrapper() },
+    )
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true))
+
+    expect(globalThis.fetch).toHaveBeenCalledWith(
+      expect.stringContaining('category_code=ELDER_CARE'),
+      expect.anything(),
+    )
+  })
+
+  it('omits category_code param when categoryCode is null', async () => {
+    const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      new Response(JSON.stringify(validPage), { status: 200 }),
+    )
+
+    const { result } = renderHook(
+      () => useCharityList({ tab: 'ORG', categoryCode: null }),
+      { wrapper: makeWrapper() },
+    )
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true))
+
+    const calledUrl = (fetchSpy.mock.calls[0]?.[0] as string) ?? ''
+    expect(calledUrl).not.toContain('category_code=')
+  })
 })

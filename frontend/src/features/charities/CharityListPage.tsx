@@ -3,11 +3,17 @@ import { StickyHeaderStack } from '../../lib/layout/StickyHeaderStack/StickyHead
 import { SubRow } from '../../lib/layout/SubRow/SubRow'
 import { TopBar } from '../../lib/layout/TopBar/TopBar'
 import { Card } from '../../lib/ui/Card/Card'
+import { CampaignCard } from '../../lib/ui/Card/CampaignCard'
+import { MerchandiseCard } from '../../lib/ui/Card/MerchandiseCard'
 import { Chip } from '../../lib/ui/Chip/Chip'
 import { EndMarker } from '../../lib/ui/EndMarker/EndMarker'
 import { ErrorState } from '../../lib/ui/ErrorState/ErrorState'
 import { IconButton } from '../../lib/ui/IconButton/IconButton'
-import { CardSkeleton } from '../../lib/ui/Skeleton/Skeleton'
+import {
+  CardSkeleton,
+  CampaignCardSkeleton,
+  MerchandiseCardSkeleton,
+} from '../../lib/ui/Skeleton/Skeleton'
 import { Tabs } from '../../lib/ui/Tabs/Tabs'
 import { CategoryDrawerDialog } from '../category/CategoryDrawerDialog'
 import { useCategories } from '../category/useCategories'
@@ -49,7 +55,7 @@ const SearchIcon = () => (
   </svg>
 )
 
-function CharityCardItem({ item }: { item: CharityItem }) {
+function OrgCardItem({ item }: { item: CharityItem }) {
   return (
     <Card
       label={item.title}
@@ -68,6 +74,94 @@ function CharityCardItem({ item }: { item: CharityItem }) {
       }
       className="mx-3 my-2"
     />
+  )
+}
+
+function CampaignCardItem({ item }: { item: CharityItem }) {
+  return (
+    <CampaignCard
+      title={item.title}
+      orgName={item.orgName}
+      bannerSrc={item.bannerImageUrl}
+      tags={item.tags}
+      className="mx-3 my-2"
+    />
+  )
+}
+
+function MerchandiseCardItem({ item }: { item: CharityItem }) {
+  return (
+    <MerchandiseCard
+      title={item.title}
+      orgName={item.orgName}
+      productImageSrc={item.productImageUrl}
+      priceNtd={item.priceNtd}
+    />
+  )
+}
+
+function LoadingSkeletons({ tab }: { tab: CharityTab }) {
+  if (tab === 'MERCHANDISE') {
+    return (
+      <div className="grid grid-cols-2 gap-2 px-3 py-2">
+        {SKELETON_KEYS.map((key) => (
+          <MerchandiseCardSkeleton key={key} />
+        ))}
+      </div>
+    )
+  }
+  if (tab === 'CAMPAIGN') {
+    return (
+      <>
+        {SKELETON_KEYS.map((key) => (
+          <CampaignCardSkeleton key={key} className="mx-3 my-2" />
+        ))}
+      </>
+    )
+  }
+  return (
+    <>
+      {SKELETON_KEYS.map((key) => (
+        <CardSkeleton key={key} className="mx-3 my-2" />
+      ))}
+    </>
+  )
+}
+
+function ItemList({ items, tab }: { items: CharityItem[]; tab: CharityTab }) {
+  if (tab === 'MERCHANDISE') {
+    return (
+      <ul
+        aria-label={`${TAB_LABELS[tab]}列表`}
+        className="grid grid-cols-2 gap-2 px-3 py-2"
+      >
+        {items.map((item) => (
+          <li key={item.id}>
+            <MerchandiseCardItem item={item} />
+          </li>
+        ))}
+      </ul>
+    )
+  }
+  if (tab === 'CAMPAIGN') {
+    return (
+      <ul aria-label={`${TAB_LABELS[tab]}列表`}>
+        {items.map((item) => (
+          <li key={item.id}>
+            <CampaignCardItem item={item} />
+          </li>
+        ))}
+      </ul>
+    )
+  }
+  return (
+    <ul aria-label={`${TAB_LABELS[tab]}列表`}>
+      {items.map((item) => (
+        <li key={item.id}>
+          <OrgCardItem item={item} />
+        </li>
+      ))}
+    </ul>
   )
 }
 
@@ -154,24 +248,14 @@ export function CharityListPage() {
             <ErrorState onRetry={() => void refetch()} />
           ) : isInitialLoading ? (
             <div aria-busy="true" aria-label="載入中">
-              {SKELETON_KEYS.map((key) => (
-                <CardSkeleton key={key} className="mx-3 my-2" />
-              ))}
+              <LoadingSkeletons tab={tab} />
             </div>
           ) : (
             <>
-              <ul aria-label={`${TAB_LABELS[tab]}列表`}>
-                {allItems.map((item) => (
-                  <li key={item.id}>
-                    <CharityCardItem item={item} />
-                  </li>
-                ))}
-              </ul>
+              <ItemList items={allItems} tab={tab} />
               {isFetchingNextPage && (
                 <div aria-busy="true" aria-label="載入更多">
-                  {SKELETON_KEYS.map((key) => (
-                    <CardSkeleton key={key} className="mx-3 my-2" />
-                  ))}
+                  <LoadingSkeletons tab={tab} />
                 </div>
               )}
               {hasPaginationError && <ErrorState onRetry={() => void fetchNextPage()} />}

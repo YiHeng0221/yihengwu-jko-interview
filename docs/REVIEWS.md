@@ -42,23 +42,23 @@ Single-pass AI review has correlated blind spots. A second reviewer with a fresh
 
 <!-- Insert new RR-NNN entries below. Most recent at the top. -->
 
-## RR-014 — feat(web): Spinner 改 iOS-style activity indicator (8-tick chase fade)
-- PR: #108（Issue #106）
+## RR-014 — feat(api): P1-BE-09 GET /charities ?q= pg_trgm 搜尋
+- PR: #102
 - Date: 2026-05-25
-- Reviewer (first): local Claude Code（claude-sonnet-4-6, via `/review`）
+- Reviewer (first): local Claude Code (claude-sonnet-4-6, via `/review`)
 - Reviewer (cross-agent): n/a
 - Verdict: pass
-- Findings: 🔴×0 · 🟡×5 · 🟣×0
-- Round: 2 of 3（Round 1 nits 已由 `review-fix(pr108-round-1)` commit 套用）
+- Findings: 🔴×0 · 🟡×4 · 🟣×0
+- Round: 1 of 3
 
 ### Key concerns
-- `Spinner.tsx:20` + `theme.css:68` — `ANIMATION_DURATION = 1`（TS 常數）與 CSS `1s` 跨檔隱性耦合，建議改用 CSS custom property 顯式同步。
-- `openapi.json:45` — `GET /categories` 混入 Spinner PR，commit 無 `Refs Issue#NN`，API 契約可追蹤性斷鏈。
-- `Spinner.tsx:41` — `clsx` 不解 Tailwind class 衝突，`className` 顏色覆寫在不同打包產出下行為未定義，建議改用 `twMerge`。
+- `test/charities.test.ts:152` — cursor pagination パス（hasMore 判定・next_cursor 生成・limit+1 切り取り・cursor+q 組み合わせ）のテストが欠落。実装の最複雑ロジックがカバレッジゼロ。🟡
+- `app.ts:40` — `new PrismaClient()` が `onClose` フックで disconnect されておらず、グレースフルシャットダウン時に接続が残留する可能性がある。🟡
+- `charities.ts:38` — `q: z.string().min(1)` に maxLength 上限がなく、極端に長いクエリで GIN インデックスが効かないケースがある。🟡
+- `charities.ts:37` vs `:26` — クエリパラメータ名 `category` と レスポンスフィールド名 `tab` が同一 enum を指しているが名称が不一致。🟡
 
 ### Round history
-- Round 1: 2026-05-24 — 4 🟡 nits 已套用（commit `9d4927b`）
-- Round 2: 2026-05-25 — pass（0 🔴，5 🟡 nits；主要是 duration 耦合 + openapi scope + clsx 衝突）
+- Round 1: 2026-05-25 — pass（🔴×0・🟡×4；全て non-blocking）
 
 ---
 

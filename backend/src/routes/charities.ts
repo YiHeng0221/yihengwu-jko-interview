@@ -1,24 +1,14 @@
 import type { Prisma } from '@prisma/client'
 import type { FastifyPluginAsync } from 'fastify'
 import type { ZodTypeProvider } from 'fastify-type-provider-zod'
-import { z } from 'zod'
 import { CursorDecodeError, decodeCursor, encodeCursor } from '../lib/cursor.js'
 import { prisma } from '../lib/prisma.js'
-import { CharityListQuerySchema, CharityListResponseSchema } from '../lib/schemas.js'
+import {
+  CharityListQuerySchema,
+  CharityListResponseSchema,
+  ErrorSchema,
+} from '../lib/schemas.js'
 import { charityToWire } from '../lib/toWire.js'
-
-// 對齊 plugins/zod-validation.ts setErrorHandler 的實際回傳 shape：
-// `{ error: 'invalid', issues: [{ path, message, code }] }`
-// FE 用 openapi.json 做 codegen 才能拿到正確型別。
-const ErrorIssueSchema = z.object({
-  path: z.string(),
-  message: z.string(),
-  code: z.string(),
-})
-const ErrorSchema = z.object({
-  error: z.literal('invalid'),
-  issues: z.array(ErrorIssueSchema).optional(),
-})
 
 export const charitiesRoute: FastifyPluginAsync = async (fastify) => {
   const app = fastify.withTypeProvider<ZodTypeProvider>()

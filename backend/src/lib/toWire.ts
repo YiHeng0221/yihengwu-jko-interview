@@ -1,32 +1,16 @@
-import { z } from 'zod'
+import type { Charity } from '@prisma/client'
+import type { CharityWire } from './schemas.js'
 
-export type CharityTab = 'ORG' | 'CAMPAIGN' | 'MERCHANDISE'
+// CharityRow: Prisma 自動推導的 Charity model 型別。Schema 異動（新增 required
+// 欄位 / 重命名）會直接讓 TS 偵測到對齊問題，比手寫 type 更嚴密。
+export type CharityRow = Charity
 
-export type CharityRow = {
-  id: string
-  title: string
-  description: string
-  tab: CharityTab
-  categoryCode: string
-  logoUrl: string | null
-  amountRaised: number
-  amountGoal: number | null
-  createdAt: Date
-}
+// CharityTab 也直接從 Prisma 拿（schema.prisma 的 enum CharityTab）。
+export type { CharityTab } from '@prisma/client'
 
-export const CharityWireSchema = z.object({
-  id: z.string(),
-  title: z.string(),
-  description: z.string(),
-  tab: z.enum(['ORG', 'CAMPAIGN', 'MERCHANDISE']),
-  category_code: z.string(),
-  logo_url: z.string().nullable(),
-  amount_raised: z.number().int(),
-  amount_goal: z.number().int().nullable(),
-  created_at: z.string().datetime(),
-})
-
-export type CharityWire = z.infer<typeof CharityWireSchema>
+// CharityWire 從 schemas.ts 的 Zod schema 推導（ADR-0004: single source of truth），
+// re-export 方便既有 consumer 從同個 module 拿。
+export type { CharityWire }
 
 export function charityToWire(row: CharityRow): CharityWire {
   return {

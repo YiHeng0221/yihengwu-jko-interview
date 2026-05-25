@@ -287,6 +287,27 @@ describe('unit: GET /charities', () => {
       const call = mockFindMany.mock.calls[0]?.[0]
       expect(call?.where).not.toHaveProperty('tab')
     })
+
+    it('passes categoryCodes.has filter when category_code param provided', async () => {
+      mockFindMany.mockResolvedValue([])
+
+      await app.inject({ method: 'GET', url: '/charities?category_code=CHILD_CARE' })
+
+      expect(mockFindMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: expect.objectContaining({ categoryCodes: { has: 'CHILD_CARE' } }),
+        }),
+      )
+    })
+
+    it('does not filter by categoryCodes when no category_code param', async () => {
+      mockFindMany.mockResolvedValue([])
+
+      await app.inject({ method: 'GET', url: '/charities' })
+
+      const call = mockFindMany.mock.calls[0]?.[0]
+      expect(call?.where).not.toHaveProperty('categoryCodes')
+    })
   })
 
   describe('search (q param)', () => {

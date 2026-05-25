@@ -21,7 +21,12 @@ export const CharityListQuerySchema = z.object({
   cursor: z.string().optional(),
   limit: z.coerce.number().int().min(1).max(50).default(10),
   category: z.enum(['ORG', 'CAMPAIGN', 'MERCHANDISE']).optional(),
-  category_code: z.string().optional(),
+  category_code: z
+    .string()
+    .optional()
+    .describe(
+      'Sub-category filter (single value). Accepts one code per request — single-select UX design. Response field is category_codes (plural array) because each item can belong to multiple categories.',
+    ),
   q: z.string().min(1).optional(),
 })
 

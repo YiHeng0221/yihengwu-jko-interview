@@ -83,7 +83,8 @@
             },
             "in": "query",
             "name": "category_code",
-            "required": false
+            "required": false,
+            "description": "Sub-category filter (single value). Accepts one code per request — single-select UX design. Response field is category_codes (plural array) because each item can belong to multiple categories."
           },
           {
             "schema": {

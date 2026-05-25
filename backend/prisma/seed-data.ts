@@ -133,7 +133,7 @@ function pickCategoryCodes(seq: number): string[] {
   for (let i = 0; i < count; i++) {
     codes.push(pick(CATEGORY_CODES, seq - 1 + i))
   }
-  return codes
+  return [...new Set(codes)]
 }
 
 function codesToLabels(codes: string[]): string[] {

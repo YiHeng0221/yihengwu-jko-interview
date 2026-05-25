@@ -1,6 +1,6 @@
 # Backend Feature Spec — 街口公益捐款列表
 
-> 從 `allen-harness-test` 實際開發內容抽出的 BE 需求 + schema + API。下一輪正式 repo 拿這份為基礎、產對應 ADR + 開 issue。
+> 街口捐款列表 replica 的 BE 需求 + schema + API spec。對應 ADR 詳見 `docs/decisions/`。
 
 ---
 
@@ -271,5 +271,5 @@ export const CATEGORIES = [
 | ADR-0017 | `categoryCode` 用 String 而非 Postgres enum | 🆕 需新寫 |
 | ADR-0018 | OpenAPI 自動 emit + drift CI | 🆕 需新寫 |
 
-> ✅ = `allen-harness-test/docs/decisions/` 內有現成檔案、內容幾乎不用改可直接搬
-> 🆕 = 沒有現成 ADR、下一輪 PM 要新開 issue 寫
+> ✅ = ADR 在 PM phase 前已就位（process 類，可直接沿用）
+> 🆕 = 本專案 PM phase 新寫的 stack/decision ADR

@@ -16,7 +16,7 @@ export function Chip({ label, active = false, className, disabled, type = 'butto
       disabled={disabled}
       aria-pressed={active}
       className={clsx(
-        'inline-flex items-center justify-center rounded-button px-3 py-1 text-sm transition-colors',
+        'inline-flex items-center justify-center rounded-button px-3 py-2 text-sm transition-colors',
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2',
         active
           ? 'border border-brand bg-surface text-brand'

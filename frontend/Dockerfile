@@ -8,16 +8,15 @@ FROM node:22.15-bookworm-slim AS builder
 RUN corepack enable pnpm
 WORKDIR /repo
 
-# Copy workspace manifests + lockfile first for better layer caching
+# 為了讓 pnpm install --frozen-lockfile 通過 lockfile 對齊檢查，
+# 必須 copy 全部 workspace 的 package.json（不只 frontend）。
+# 之前 stub 出空 package.json 會跟 lockfile 已記錄的 dependencies 對不上
+# 而 fail ERR_PNPM_OUTDATED_LOCKFILE。只 copy manifest，source code 不複製，
+# 仍然保留「per-service Dockerfile」的隔離效益。
 COPY pnpm-workspace.yaml package.json pnpm-lock.yaml ./
 COPY frontend/package.json ./frontend/package.json
-
-# Stub other workspace packages so pnpm workspace resolution succeeds
-# even when backend/ and e2e/ are not present in the build context.
-# IMPORTANT: keep this list in sync with pnpm-workspace.yaml packages.
-RUN mkdir -p backend e2e \
-    && printf '{"name":"@yihengwu-jko/backend","version":"0.0.0","private":true}\n' > backend/package.json \
-    && printf '{"name":"e2e","version":"0.0.0","private":true}\n' > e2e/package.json
+COPY backend/package.json ./backend/package.json
+COPY e2e/package.json ./e2e/package.json
 
 RUN pnpm install --frozen-lockfile
 

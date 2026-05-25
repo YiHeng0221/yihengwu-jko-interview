@@ -11,15 +11,13 @@ RUN apt-get update -qq \
 RUN corepack enable pnpm
 WORKDIR /repo
 
-# Copy workspace manifests + lockfile first for better layer caching
+# Copy all workspace package.json — pnpm install --frozen-lockfile 必須能對齊
+# 全部 importer entries（lockfile 已記錄各 workspace 的 dependencies）。
+# Stub 出空 manifest 會 fail ERR_PNPM_OUTDATED_LOCKFILE。
 COPY pnpm-workspace.yaml package.json pnpm-lock.yaml ./
 COPY backend/package.json ./backend/package.json
-
-# Stub other workspace packages so pnpm workspace resolution succeeds
-# even when frontend/ and e2e/ are not present in the build context
-RUN mkdir -p frontend e2e \
-    && printf '{"name":"@yihengwu-jko/frontend","version":"0.0.0","private":true}\n' > frontend/package.json \
-    && printf '{"name":"@yihengwu-jko/e2e","version":"0.0.0","private":true}\n' > e2e/package.json
+COPY frontend/package.json ./frontend/package.json
+COPY e2e/package.json ./e2e/package.json
 
 RUN pnpm install --frozen-lockfile
 

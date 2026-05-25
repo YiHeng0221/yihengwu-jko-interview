@@ -12,6 +12,11 @@ const ErrorSchema = z.object({ error: z.literal('invalid') })
 export const charitiesRoute: FastifyPluginAsync = async (fastify) => {
   const app = fastify.withTypeProvider<ZodTypeProvider>()
 
+  // Graceful shutdown: SIGTERM / Ctrl-C 時清乾淨 PrismaClient connection pool。
+  fastify.addHook('onClose', async () => {
+    await prisma.$disconnect()
+  })
+
   app.get(
     '/charities',
     {

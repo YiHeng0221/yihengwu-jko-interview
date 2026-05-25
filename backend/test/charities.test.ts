@@ -6,6 +6,8 @@ vi.mock('../src/lib/prisma.js', () => ({
     charity: {
       findMany: vi.fn(),
     },
+    // app.ts 在 onClose hook 呼叫 $disconnect()；mock 要提供 noop 否則 teardown 爆。
+    $disconnect: vi.fn().mockResolvedValue(undefined),
   },
 }))
 
@@ -38,7 +40,10 @@ const makeCharity = (overrides: {
   ...overrides,
 })
 
-describe('GET /charities', () => {
+// 命名為 "unit" 因為使用 vi.mock 隔離 Prisma — 不是 integration test。
+// Prisma schema 異動（欄位 rename / index 變動）無法在此被偵測，需另設 e2e
+// 對 real DB 跑（見 .github/workflows/e2e.yml 對 staging 的 Playwright 測試）。
+describe('unit: GET /charities', () => {
   let app: FastifyInstance
 
   beforeEach(async () => {
@@ -300,6 +305,15 @@ describe('GET /charities', () => {
       expect(response.statusCode).toBe(200)
       const body = response.json<{ items: unknown[] }>()
       expect(body.items).toEqual([])
+    })
+
+    it('returns 400 when q is empty string (boundary)', async () => {
+      // CharityListQuerySchema 定義 q: z.string().min(1).optional()
+      // 帶空字串等於違反 min(1) → Zod parse 失敗 → 400
+      const response = await app.inject({ method: 'GET', url: '/charities?q=' })
+
+      expect(response.statusCode).toBe(400)
+      expect(mockFindMany).not.toHaveBeenCalled()
     })
   })
 

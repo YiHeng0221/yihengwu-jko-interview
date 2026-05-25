@@ -23,3 +23,7 @@ export const CharityListResponseSchema = z.object({
   items: z.array(CharityWireSchema),
   next_cursor: z.string().nullable(),
 })
+
+// ADR-0004: Zod schema 是型別 single source of truth；toWire.ts 從這裡 import
+// inferred type，不要在那邊手寫重複 type。
+export type CharityWire = z.infer<typeof CharityWireSchema>

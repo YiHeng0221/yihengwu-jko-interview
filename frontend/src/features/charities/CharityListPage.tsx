@@ -272,7 +272,7 @@ export function CharityListPage() {
       </StickyHeaderStack>
 
       {isSearchOpen ? (
-        <SearchResults query={searchQuery} />
+        <SearchResults query={searchQuery} tab={tab} />
       ) : (
         <main className="flex-1">
           {hasError ? (

@@ -61,7 +61,7 @@ function OrgCardItem({ item }: { item: CharityItem }) {
           <div aria-hidden="true" className="size-12 rounded bg-surface-muted" />
         )
       }
-      className="mx-3 my-2"
+      className="my-2"
     />
   )
 }
@@ -73,7 +73,6 @@ function CampaignCardItem({ item }: { item: CharityItem }) {
       orgName={item.orgName}
       bannerSrc={item.bannerImageUrl}
       tags={item.tags}
-      className="mx-auto my-2 max-w-md"
     />
   )
 }
@@ -92,7 +91,7 @@ function MerchandiseCardItem({ item }: { item: CharityItem }) {
 function LoadingSkeletons({ tab }: { tab: CharityTab }) {
   if (tab === 'MERCHANDISE') {
     return (
-      <div className="mx-auto grid max-w-md grid-cols-2 gap-2 px-3 py-2">
+      <div className="mx-auto grid max-w-7xl grid-cols-2 gap-2 px-3 py-2 sm:grid-cols-3 md:grid-cols-4">
         {SKELETON_KEYS.map((key) => (
           <MerchandiseCardSkeleton key={key} />
         ))}
@@ -101,19 +100,19 @@ function LoadingSkeletons({ tab }: { tab: CharityTab }) {
   }
   if (tab === 'CAMPAIGN') {
     return (
-      <>
+      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-3 px-3 py-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
         {SKELETON_KEYS.map((key) => (
-          <CampaignCardSkeleton key={key} className="mx-auto my-2 max-w-md" />
+          <CampaignCardSkeleton key={key} />
         ))}
-      </>
+      </div>
     )
   }
   return (
-    <>
+    <div className="mx-auto max-w-md px-3">
       {SKELETON_KEYS.map((key) => (
-        <CardSkeleton key={key} className="mx-3 my-2" />
+        <CardSkeleton key={key} className="my-2" />
       ))}
-    </>
+    </div>
   )
 }
 
@@ -122,7 +121,7 @@ function ItemList({ items, tab }: { items: CharityItem[]; tab: CharityTab }) {
     return (
       <ul
         aria-label={`${TAB_LABELS[tab]}列表`}
-        className="mx-auto grid max-w-md grid-cols-2 gap-2 px-3 py-2"
+        className="mx-auto grid max-w-7xl grid-cols-2 gap-2 px-3 py-2 sm:grid-cols-3 md:grid-cols-4"
       >
         {items.map((item) => (
           <li key={item.id}>
@@ -134,7 +133,10 @@ function ItemList({ items, tab }: { items: CharityItem[]; tab: CharityTab }) {
   }
   if (tab === 'CAMPAIGN') {
     return (
-      <ul aria-label={`${TAB_LABELS[tab]}列表`}>
+      <ul
+        aria-label={`${TAB_LABELS[tab]}列表`}
+        className="mx-auto grid max-w-7xl grid-cols-1 gap-3 px-3 py-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
+      >
         {items.map((item) => (
           <li key={item.id}>
             <CampaignCardItem item={item} />
@@ -144,7 +146,7 @@ function ItemList({ items, tab }: { items: CharityItem[]; tab: CharityTab }) {
     )
   }
   return (
-    <ul aria-label={`${TAB_LABELS[tab]}列表`}>
+    <ul aria-label={`${TAB_LABELS[tab]}列表`} className="mx-auto max-w-md px-3">
       {items.map((item) => (
         <li key={item.id}>
           <OrgCardItem item={item} />

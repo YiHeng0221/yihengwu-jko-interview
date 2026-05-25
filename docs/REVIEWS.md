@@ -497,6 +497,30 @@ Phase 1（含 Phase 1.1 polish）正式收尾。所有 22 個 ADR 落地（含 A
 
 ---
 
+## RR-024 — fix(web): drawer/dialog mask 改 w-screen h-screen 鎖死 viewport size
+
+- PR: #154
+- Date: 2026-05-25
+- Reviewer: local Claude Code（first pass）
+- Verdict: pass
+- Findings: 🔴×0 · 🟡×1 · 🟣×1
+- Round: 1 of 3
+
+### Key concerns
+- `Drawer.test.tsx:74` overlay 以 CSS class 選取（`.fixed.top-0.left-0`），樣式再次調整即會斷；`Dialog.test.tsx:82` 已用 `screen.getByRole('dialog').parentElement` 語意選取，建議對齊
+- 🟣 pre-existing：`Dialog.tsx` overlay 用 `onClick`、`Drawer.tsx` 用 `onMouseDown`，語義不一致；超出本 PR 範圍
+
+### Round 2 (2026-05-25)
+- Verdict: pass
+- Findings: 🔴×0 · 🟡×0 · 🟣×0
+- What changed since round 1: Round 1 以後の新規コードコミットなし（`ef776ef` は review docs のみ）。`LoadingSkeletons` skeleton cap と loaded state が同一値で一致していることを独立確認。mask sizing 正確性・security・architecture いずれも新規懸念なし。Round 1 🟡（selector 脆弱性）はオープンのまま改善推奨。
+
+### Round history
+- Round 1: 2026-05-25 — pass（修法正確，根因分析清楚，loading/loaded 兩態 layout shift 無新增）
+- Round 2: 2026-05-25 — pass（独立確認。新規 🔴 ゼロ、verdict 変わらず）
+
+---
+
 > **本批 RR-001 ~ RR-007 為 backfill**：原本 `review.yml` workflow 只跑 first pass、沒鏈第ĺ�段 cross-agent；且首段 AI 在 ADR/config 類「文件型」PR 上自動跳過 RR 寫入步驟，導致 audit trail 漏記。本 commit 一次補回 7 條 RR、並同步修補 `review.yml` + `.claude/commands/review.md` 強制每個 PR 都寫 RR + 跑 `--cross`。Cross-agent 二審回補留待 Phase 0 之後資源穩定再批次跑（不阻塞 Phase 0 merge）。
 
 <!--

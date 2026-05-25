@@ -71,7 +71,7 @@ describe('Drawer', () => {
         <p>x</p>
       </Drawer>,
     )
-    const overlay = document.querySelector('.fixed.inset-0') as HTMLElement
+    const overlay = document.querySelector('.fixed.top-0.left-0') as HTMLElement
     fireEvent.mouseDown(overlay)
     expect(onClose).toHaveBeenCalledTimes(1)
   })

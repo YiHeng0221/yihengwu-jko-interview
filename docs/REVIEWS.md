@@ -52,14 +52,14 @@ Single-pass AI review has correlated blind spots. A second reviewer with a fresh
 - Round: 1 of 3
 
 ### Key concerns
-- `CharityListPage.tsx:174` — `selectedCategoryCode` が `useCharityList` へ未接続。類別選択はラベル表示のみ有効で、リスト過濾は行われない（false affordance）。`UseCharityListParams` に `categoryCode` パラメーターがないため hook 拡張が必要。🟡
-- `CharityListPage.tsx:244` — `SearchOverlay` が `StickyHeaderStack` 外に render され、検索 input bar が sticky でない。多件数の結果スクロール時に input が画面外へ消える。🟡
-- `CharityListPage.tsx:172` — タブ切替時に `selectedCategoryCode` がリセットされず、異なる tab コンテキストで古い類別ラベルが SubRow に残る。🟡
-- `CharityListPage.tsx:43` — `SearchIcon` SVG が `SearchOverlay.tsx:16-29` と重複定義（20×20 vs 16×16）。共有 icons ファイルへ抽出を推奨。🟡
-- `CharityListPage.test.tsx:15` — `useCategories` mock が `data: []` 固定のため AC 2 の「選中類別 label」truthy branch が未テスト。🟡
+- `CharityListPage.tsx:174` — `selectedCategoryCode` 未接入 `useCharityList`；類別選擇僅影響 label 顯示，列表過濾未執行（false affordance）。需在 `UseCharityListParams` 新增 `categoryCode` 欄位後 hook 才能完整傳遞。🟡
+- `CharityListPage.tsx:244` — `SearchOverlay` render 在 `StickyHeaderStack` 之外，搜尋 input bar 不 sticky；捲動多筆結果時 input 會捲出畫面外。🟡
+- `CharityListPage.tsx:172` — 切換 tab 時 `selectedCategoryCode` 未重置，舊類別 label 殘留在不同 tab 的 SubRow。🟡
+- `CharityListPage.tsx:43` — `SearchIcon` SVG 與 `SearchOverlay.tsx:16-29` 重複定義（20×20 vs 16×16），建議提取至共用 icons 檔案。🟡
+- `CharityListPage.test.tsx:15` — `useCategories` mock 固定為 `data: []`，AC 2「選中類別 label」truthy branch 未測試。🟡
 
 ### Round history
-- Round 1: 2026-05-25 — pass（🔴×0・🟡×5；全 non-blocking，全 AC 達成を確認）
+- Round 1: 2026-05-25 — pass（🔴×0・🟡×5；全部 non-blocking，已確認所有 AC 達成）
 
 ---
 

@@ -13,8 +13,7 @@ type CommonCardProps = {
   trailing?: ReactNode
 }
 
-/** HTMLAttributes 本身有 `title?: string`，會跟 CommonCardProps 的 ReactNode 取交集縮窄。
- *  因此用 CommonCardProps.label 命名，並 Omit 掉宿主 element 的 title 避免命名混淆。 */
+// Omit 'title' — HTMLAttributes.title (string) 會跟 CommonCardProps.label (ReactNode) 衝突
 type ArticleCardProps = CommonCardProps & Omit<HTMLAttributes<HTMLElement>, 'title'> & { as?: 'article' | 'div' }
 type AnchorCardProps = CommonCardProps & Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'title'> & { as: 'a' }
 type ButtonCardProps = CommonCardProps & Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'title'> & { as: 'button' }

@@ -24,13 +24,9 @@ export const CharityListResponseSchema = z.object({
   next_cursor: z.string().nullable(),
 })
 
-// ADR-0004: Zod schema 是型別 single source of truth；toWire.ts 從這裡 import
-// inferred type，不要在那邊手寫重複 type。
 export type CharityWire = z.infer<typeof CharityWireSchema>
 
-// 通用 error envelope schemas — 跟 plugins/zod-validation.ts 的 setErrorHandler
-// 實際回傳 shape 對齊：`{ error: 'invalid', issues: [{ path, message, code }] }`。
-// 每個 route 共用，不在 route 檔案各自定義（ADR-0004 single source of truth）。
+// shape 對齊 plugins/zod-validation.ts setErrorHandler
 export const ErrorIssueSchema = z.object({
   path: z.string(),
   message: z.string(),

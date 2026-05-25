@@ -54,7 +54,7 @@ Links / file paths to the resulting commits, PRs, ADRs.
 
 -->
 
-(無 entries — 新專案啟動後填入)
+（無 entries — 本專案改用 README 內「AI 使用聲明」總結 AI 使用方式，不額外保留 prompt log。harness 預留此資料夾給未來 / 其他專案使用。）
 
 ## Privacy
 

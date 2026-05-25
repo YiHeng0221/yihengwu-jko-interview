@@ -1,93 +1,214 @@
-# Lean Harness
+# 街口公益捐款列表 · JKO Charity List Replica
 
-> 一個 **stack-agnostic** 的 AI 開發 harness — 提供流程、agent personas、PR / review / fix loop、label taxonomy。
-> **不假設 tech stack**。你的專案決定用什麼語言 / framework / lint / deploy provider。
+街口支付 App「所有捐款項目」頁面的 SPA 復刻 — 公益團體 / 捐款專案 / 義賣商品 三 tab 列表、cursor 無限滾動、CJK 子字串搜尋、類別 chip 過濾。
 
-## What's in this harness
+7-day take-home interview submission · 2026-05-18 → 2026-05-25。
 
-```
-.claude/
-├── agents/       # 6 個 agent persona（PM / impl / reviewer / ai-fix / orchestrator / qa）
-├── commands/     # 3 slash commands（/review · /fix-pr · /implement-issue）
-├── skills/       # github create-pr skill
-├── hooks/        # pre-bash · scan-secrets · verify-ac
-└── scripts/      # round-counter.sh
+## Demo
 
-.github/
-├── workflows/    # ai-fix.yml · ai-implement.yml · review.yml（agent-driven CI on self-hosted runner）
-├── ISSUE_TEMPLATE/
-└── PULL_REQUEST_TEMPLATE.md
+| Surface | URL |
+|---------|-----|
+| Web app | https://yihengwu-jko-interview-frontend.up.railway.app |
+| API | https://yihengwu-jko-interview-backend.up.railway.app |
+| Swagger UI | https://yihengwu-jko-interview-backend.up.railway.app/docs |
+| Health | https://yihengwu-jko-interview-backend.up.railway.app/health |
 
-docs/
-├── HARNESS-PITFALLS.md   # 從實戰學到的踩坑紀錄（無關 stack）
-├── RUNNER-PITFALLS.md    # self-hosted runner 設定坑
-├── REQUIREMENTS.md       # AC tracker template
-├── RISKS.md              # Risk register template
-├── SCALING.md            # Scaling notes template
-├── TESTING.md            # Testing strategy template
-├── REVIEWS.md            # Cross-agent review log (RR-NNN)
-├── specs/                # PM 產出的 spec 放這
-├── decisions/            # ADRs（含 0001/0002 — harness 自己的 process ADR）
-└── prompts/              # 代表性 AI 對話 log
+詳細 demo 操作流程見 [`docs/DEMO.md`](docs/DEMO.md)。
 
-templates/
-├── adr-template.md
-├── spec-template.md
-├── review-template.md
-├── fe-feature-spec.template.md      # 每個專案 copy → docs/specs/fe-feature-spec.md，記錄 FE stack 拍板
-└── be-feature-spec.template.md      # 每個專案 copy → docs/specs/be-feature-spec.md，記錄 BE stack 拍板
+## Stack
 
-scripts/
-└── setup-labels.sh       # 一鍵建好 35+ 顆 label
-```
+| Layer | Choice | Rationale |
+|-------|--------|---------|
+| FE framework | React 19 + Vite 6 + TypeScript 5.7 | 純 SPA、不需 SSR，Vite cold start 快 [ADR-0003](docs/decisions/0003-react-vite-over-nextjs.md) |
+| FE styling | Tailwind v4 `@theme` CSS-first tokens | 街口紅 / radius / spacing 都吃 design token，避免 PostCSS pipeline [ADR-0008](docs/decisions/0008-tailwind-v4-theme-tokens.md) |
+| FE data layer | TanStack Query v5 | infinite + cursor + AbortController + cache 一次到位 [ADR-0009](docs/decisions/0009-tanstack-query-as-data-layer.md) |
+| FE UI primitives | 自家寫的 Button / Card / Tabs / Drawer / Dialog | a11y own、token 自己控、bundle 小 [ADR-0010](docs/decisions/0010-custom-ui-primitives.md) |
+| FE testing | Vitest + React Testing Library | Vite 同生態 |
+| FE catalog | Storybook 8 + Vite builder | UI primitive 視覺迭代 [ADR-0011](docs/decisions/0011-storybook-8-vite-builder.md) |
+| FE lint | oxlint | 比 ESLint 快約 10× [ADR-0006](docs/decisions/0006-oxlint-over-eslint.md) |
+| BE framework | Fastify 5 + `fastify-type-provider-zod` | Schema-first 與 Zod 嵌得深 [ADR-0013](docs/decisions/0013-fastify-over-express-hono-elysia.md) |
+| BE schema | Zod single source of truth → OpenAPI auto-emit | FE/BE 對齊不漂移 [ADR-0004](docs/decisions/0004-zod-single-source-of-truth.md) · [ADR-0018](docs/decisions/0018-openapi-auto-emit-and-drift-ci.md) |
+| DB | Postgres 16 + pg_trgm GIN | 內建 trigram 處理 CJK 子字串 [ADR-0014](docs/decisions/0014-prisma-over-drizzle-kysely.md) · [ADR-0015](docs/decisions/0015-pg-trgm-gin-over-fts.md) |
+| Pagination | Cursor-based（`{created_at, id}` base64url）| 比 offset 穩、deep page 不會 O(n) [ADR-0005](docs/decisions/0005-cursor-pagination.md) |
+| Wire format | snake_case + FE DTO mapper layer | BE 維持 snake_case 慣例、FE 寫 mapper 拿 camelCase [ADR-0007](docs/decisions/0007-wire-snake-case-with-fe-dto-layer.md) |
+| Deploy | Railway（Docker per-workspace）| 一鍵 deploy + free tier 撐 demo [ADR-0016](docs/decisions/0016-railway-as-deploy-provider.md) |
+| E2E | Playwright + axe-core a11y | 業界 standard，axe 把 a11y 變 enforceable |
+| CI runners | ubuntu-latest（public repo unlimited minutes）| self-hosted mac runner 運維成本不划算後退回 cloud [ADR-0021](docs/decisions/0021-migrate-to-ubuntu-latest-runners.md) |
 
-## What's **NOT** in this harness
+所有 ADR：[`docs/decisions/`](docs/decisions/)
 
-故意拿掉、由各專案自決：
-
-- ❌ Tech stack（FE framework / BE framework / DB / lint / test runner）
-- ❌ `package.json` / `pnpm-workspace.yaml` / `tsconfig.base.json` / `.npmrc` / `.nvmrc`
-- ❌ Lint config（`.oxlintrc.json` / `.eslintrc` / ...）
-- ❌ Build config（`vite.config.ts` / `webpack.config.js` / ...）
-- ❌ Docker / `docker-compose.yml`
-- ❌ Deploy workflow（Railway / Vercel / Fly / AWS specific）
-- ❌ `Makefile` 跟 dev-command alias
-- ❌ Project-specific ADRs（每個專案自己寫 ADR-0003+）
-
-每個專案啟動時，PM agent 第一步是寫 **`docs/specs/0001-<feature>.md`** + **`docs/decisions/0003-stack-choice.md`** 之類的 ADR 決定 stack，然後 impl agent 才開始 bootstrap。
-
-## 使用流程
+## 本機跑
 
 ```bash
-# 1. 從本 harness 啟動新專案
-gh repo create your-project --private --template <你的 harness repo>
-cd your-project
+git clone https://github.com/YiHeng0221/yihengwu-jko-interview.git
+cd yihengwu-jko-interview
+pnpm install
 
-# 2. 一鍵建 label
-./scripts/setup-labels.sh
+# 起 Postgres（docker compose 或本機 Postgres 16）
+docker compose up -d postgres
 
-# 3. 設定必要 secret（依照你選的 deploy provider）
-gh secret set <PROVIDER>_TOKEN
+# backend
+cd backend
+cp .env.example .env  # 改 DATABASE_URL 指向本機
+pnpm prisma migrate deploy
+pnpm tsx prisma/seed.ts  # 270 charities（90 × 3 tabs）
+pnpm dev  # http://localhost:3001
 
-# 4. PM phase：產 spec + ADR + 1 epic + N children
-#    （走 .claude/agents/pm.md 的 process）
-
-# 5. Human 看 tasks.html，拍板，flip status/ai-implement label
-# 6. ai-implement.yml fires → impl agent 動工 → PR 出
-# 7. ci.yml（你自己 bootstrap 的，名稱必為 "ci"） → review.yml 自動 chained
-# 8. review verdict pass → human merge
+# frontend（另一個 terminal）
+cd frontend
+pnpm dev  # http://localhost:5173
 ```
 
-## Self-hosted runner
+## Architecture
 
-review / ai-fix / ai-implement 設計成跑在 **self-hosted runner**，用 user 的 Claude Code CLI（吃 Claude Max 訂閱），不燒 API 額度。
+```
+yihengwu-jko-interview/
+├── backend/                Fastify + Prisma + Zod
+│   ├── prisma/
+│   │   ├── schema.prisma
+│   │   ├── migrations/     init + add_polymorphic_fields + category_codes_array
+│   │   └── seed-data.ts    270 deterministic items, Lorem Picsum images
+│   └── src/
+│       ├── lib/
+│       │   ├── schemas.ts  Zod single-source-of-truth
+│       │   ├── toWire.ts   camelCase → snake_case mapper
+│       │   ├── cursor.ts   base64url cursor codec
+│       │   └── prisma.ts
+│       ├── routes/         charities + categories + health
+│       ├── plugins/        observability / swagger / cors / helmet / compression / rate-limit
+│       └── generated/openapi.json  自動產出、commit 進 repo
+├── frontend/               React + Vite + Tailwind v4
+│   ├── nginx.conf          prod 用，含 CSP headers
+│   └── src/
+│       ├── features/
+│       │   ├── charities/  CharityListPage + useCharityList + dto
+│       │   ├── category/   CategoryDrawerDialog（mobile drawer + desktop dialog）
+│       │   └── search/     SearchBar + SearchResults + useSearch
+│       ├── hooks/          useDebounce / useIntersection / useMediaQuery / useOnline
+│       ├── lib/
+│       │   ├── layout/     TopBar + Tabs + SubRow + StickyHeaderStack
+│       │   ├── ui/         Card / Button / Chip / Drawer / Dialog / icons/
+│       │   └── env.ts      Zod-validated import.meta.env
+│       └── styles/theme.css  Tailwind v4 @theme tokens（街口紅 / radius / spacing）
+├── e2e/                    Playwright + axe-core
+├── docs/
+│   ├── decisions/          22 ADRs
+│   ├── specs/              fe-feature-spec + be-feature-spec
+│   ├── REVIEWS.md          cross-agent review entries (RR-NNN)
+│   ├── HARNESS-PITFALLS.md AI-開發框架本身踩過的坑
+│   ├── DEMO.md             5-min demo walkthrough
+│   └── RETRO-PHASE-1.md    Phase 1 retrospective
+└── .github/workflows/      ci · review · ai-fix · ai-implement · deploy · e2e · manual-seed
+```
 
-設定步驟見 `docs/RUNNER-PITFALLS.md`。Runner label = `[self-hosted, allen-mac]`（或你自己改）。
+## 測試狀態
 
-## ⚠️ 動工前必讀
+| 項目 | 狀態 |
+|------|------|
+| BE unit/integration（charities / categories / cursor / wire / errors） | ✅ 66 tests 全綠 |
+| FE unit/integration（components / hooks / DTO / page with mocked fetch） | ✅ 225 tests 全綠 |
+| E2E `smoke.spec.ts`（health + axe-core 首頁） | ✅ 已 ship |
+| E2E list page golden path | ❌ 未寫 |
+| E2E search overlay flow | ❌ 未寫 |
+| E2E category drawer + filter | ❌ 未寫 |
+| E2E axe-core 多 view state full scan | ❌ 未寫 |
 
-`docs/HARNESS-PITFALLS.md` — 20+ 條從實戰學到的坑。**每個從本 harness 啟動的新專案都會踩同一坑**（除非你先讀過）。
+7-day 期限內前後端 + UI polish + 多輪 AI workflow 占主要時間，先收 unit/integration 完整、E2E 留 smoke。Playwright + axe-core 工具鍊已 wire 好（`playwright.config.ts` + smoke spec + `e2e.yml` workflow），補完估 1-2 hour。Demo 時走 `docs/DEMO.md` 步驟在 production URL 手跑完整流程。
+
+## AI Workflow
+
+本專案不是 IDE 內人開 prompt、AI 寫 code 的傳統工作流，而是把 PM / impl / reviewer / ai-fix 等多個 agent 角色透過 GitHub workflow 串成可重現 pipeline：
+
+```mermaid
+flowchart TB
+    Human([👤 Human<br/>讀 brief / 看 Figma]):::human
+    Spec[📄 docs/specs/*.md<br/>PM agent 寫 spec]:::pm
+    Tasks[📋 tasks.html<br/>PM dry-run]:::pm
+    Issue[📌 GitHub issue<br/>status/human-review]:::issue
+
+    HumanGate1{👤 Human 拍板}:::human
+    Label[status/ai-implement]:::label
+
+    Implement[⚙️ ai-implement.yml<br/>impl agent 寫 code]:::ai
+    PR[🔀 PR opened]:::pr
+    CI[✅ ci.yml<br/>typecheck / lint / test / openapi-drift]:::ci
+
+    Review[🔍 review.yml<br/>reviewer agent<br/>inline 🔴 / 🟡 / 🟣]:::ai
+
+    HumanFork{🔴 finding?}:::human
+    Fix[🛠 ai-fix.yml<br/>round 1-3 cap]:::ai
+    HumanReview([👤 Human review]):::human
+    Merge([🎉 merged to main]):::merged
+    Deploy[🚀 deploy.yml<br/>Railway BE + FE]:::ci
+
+    Human --> Spec --> Tasks --> HumanGate1
+    HumanGate1 -- 同意 scope --> Issue --> Label --> Implement
+    Implement --> PR --> CI --> Review --> HumanFork
+    HumanFork -- yes --> Fix --> CI
+    HumanFork -- no --> HumanReview --> Merge --> Deploy
+
+    classDef human fill:#fef3c7,stroke:#f59e0b,color:#92400e
+    classDef pm fill:#dbeafe,stroke:#3b82f6,color:#1e40af
+    classDef ai fill:#fde2e7,stroke:#e01e3c,color:#831843
+    classDef ci fill:#d1fae5,stroke:#1f9d55,color:#064e3b
+    classDef issue fill:#fff,stroke:#999
+    classDef pr fill:#fff,stroke:#999
+    classDef label fill:#fde68a,stroke:#f59e0b
+    classDef merged fill:#10b981,stroke:#047857,color:white
+```
+
+> Mermaid 看不到的話：[`PIPELINE.md`](PIPELINE.md) 有 ASCII 版。
+
+幾個關鍵設計：
+
+- **Human 在三個 gate 介入**：tasks.html 拍板 / 🔴 finding 是否轉 fix / final merge approval。三個都不可省略，AI 不會自己 merge。
+- **AI-fix loop 有 3 round 上限**：第 3 round 還沒過就 escalate 給 human，避免無限 loop。
+- **review.yml 唯讀**：reviewer agent 只留 inline comment，不會 push code。要改 code 走 ai-fix.yml 另一條 pipeline。
+- **ci.yml 是 review 的前置**：先過 typecheck / lint / test / openapi-drift 才會觸發 review，避免 AI 評估 broken code。
+- **每個 agent 寫成 `.claude/agents/<name>.md` persona file**，跑的時候 Claude Code Action 載入該 persona 當 system prompt。
+
+**Agent personas**（`.claude/agents/`）：
+
+| Persona | Job |
+|---------|-----|
+| `pm` | 讀 brief + Figma → 寫 spec + epic + child issues + tasks.html |
+| `impl` | 讀 issue AC → 寫 code、commit、push、開 PR |
+| `reviewer` | 讀 PR diff → inline-comment 🔴/🟡/🟣 findings（3 lens：correctness / security / architecture）|
+| `ai-fix` | 讀 review comments → 修 🔴、push commit |
+| `qa` | 讀 spec → 寫 Playwright + axe-core tests |
+| `orchestrator` | 上面 multi-step 需要協調時介入 |
+
+詳細流程 + 22 個 ADR + 踩坑紀錄見 [`docs/HARNESS-PITFALLS.md`](docs/HARNESS-PITFALLS.md) + [`PIPELINE.md`](PIPELINE.md)。
+
+## AI 使用聲明
+
+### 使用的 AI 工具
+
+| Tool | 用途 |
+|------|------|
+| **Claude Code（CLI）** | 主要 driver — 跑 agent personas、CI 內 review.yml / ai-fix.yml / ai-implement.yml |
+| **Claude Opus 4.7 / Sonnet 4.6** | 模型本體：heavy reasoning 用 Opus，standard impl / single-lens review 用 Sonnet |
+| **GitHub Actions** | 跑整套 AI workflow — 沒用 Cursor / Copilot 等 IDE 工具 |
+
+### AI 負責的範圍
+
+- 多數 BE / FE / 測試實作（每 issue 走 PM → impl → review → ai-fix → human merge）
+- 22 個 ADR 草稿（人在 fork 階段拍板選項，AI 寫 trade-off + consequences）
+- 270 筆 seed data 生成腳本（template + Lorem Picsum 圖）
+- Storybook stories
+- 多數 Zod / Prisma schema + migration SQL
+- Cross-agent code review（每 PR 跑一次 reviewer agent，留 🔴/🟡/🟣 inline comments）
+- AI-fix loop 自動處理 review 抓到的 🔴 issue（3 round 上限）
+
+### 我自己負責的範圍
+
+- **所有架構決策的 fork 拍板**：選 React vs Next.js、Fastify vs Express、Prisma vs Drizzle、cursor vs offset、oxlint vs ESLint 等 — AI 列 options + trade-offs，最終由我選方向
+- **所有 PR 的 human review + merge approval**：AI review 是 first pass，每張 PR 親自看過再 merge
+- **PM 階段切票顆粒 + scope 控制**：tasks.html dry-run 親自拍板才開 issue，不讓 AI 開出 80 張 trivial ticket
+- **UI / spec 對齊**：街口原 App 對照截圖、所有 Figma-spec 對應的 UI polish（chip 樣式 / 字距 / radius / 顏色 token 等 ~30 點）親自指認，AI 不主動猜
+- **Bug 觀察 / 重現**：實際打開 demo 找到「捐款專案/義賣商品只顯示 title」這類資料層 bug、CSP error、CORS 問題等，先重現再交給 AI 修
+- **Deploy 操作**：Railway 帳號設定、env vars / secrets 配置、DB migrate 觸發、密碼 rotation 等敏感操作
 
 ## License
 
-MIT（內部使用 OK，外發前再決定）。
+MIT（personal interview submission，請勿商用）。

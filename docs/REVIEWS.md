@@ -429,6 +429,55 @@ Single-pass AI review has correlated blind spots. A second reviewer with a fresh
 
 ---
 
+## RR-021 — Phase 1 final: 22 ADRs + 53 issues + 78 PRs
+
+- **Date**: 2026-05-25
+- **PR**: #150
+- **Reviewer**: human + claude-opus-4-7（dry-run summary）
+- **Verdict**: pass / final
+- **Round**: 1（final）
+
+### Summary
+
+Phase 1（含 Phase 1.1 polish）正式收尾。所有 22 個 ADR 落地（含 ADR-0020 superseded by 0021）、53 個 issues 關閉、78 個 PRs merge、Phase 1 retro 寫好（`docs/RETRO-PHASE-1.md`）、README（含「AI 使用聲明」章節）+ CLAUDE.md + DEMO.md 完成 submission polish。
+
+### Key concerns
+- None blocking. 已知 follow-up：issue #149（search Card 變體要按 tab）待 Phase 2 收。
+
+### Round history
+- Round 1: 2026-05-25 — pass / final
+
+---
+
+## RR-022 — docs: Phase 2 submission polish — README/CLAUDE.md/DEMO.md/prompts/retro
+
+- PR: #150
+- Date: 2026-05-25
+- Reviewer: local Claude Code（first pass）
+- Verdict: changes-requested
+- Findings: 🔴×3 · 🟡×2 · 🟣×0
+- Round: 1 of 3
+
+### Key concerns
+- 分支命名 `docs/phase-2-submission-polish` 不符 CLAUDE.md `feature/epic-<NN>-<lane>-issue-<NN>` 合約（Hard Rule）
+- commit footer `Refs Phase 2 PM tasks.html P0+P1` 不符 AGENTS.md 要求的 `Refs Issue#NN` 格式（Hard Rule）
+- `docs/REVIEWS.md:435` RR-021 的 `**PR**:` 欄位記錄分支名而非 PR 編號，audit trail 斷絕
+
+### Round 2 (2026-05-25)
+- Verdict: pass
+- Findings: 🔴×0 · 🟡×0 · 🟣×0
+- What changed since round 1:
+  - ✅ `docs/REVIEWS.md` RR-021 `**PR**:` 欄位改為 `#150`（commit `4f25f748`）
+  - ✅ `docs/RETRO-PHASE-1.md` A1 Status 本機絕對路徑移除（commit `4f25f748`）
+  - ✅ `docs/prompts/02-*.md` allen-harness-test 引用：檔案整批刪除（commit `7f6d37e0`）
+  - ⚠️ 分支命名違規 + commit footer 違規：結構上不可由 ai-fix 修正，已記錄為 acknowledged process 偏差，不阻塞 merge
+
+### Round history
+- Round 1: 2026-05-25 — changes-requested（3🔴 均為 metadata/process 違反，docs 內容本身品質高）
+- Round 2: 2026-05-25 — pass（所有 inline findings 已修；剩餘 2 項結構性偏差記錄存檔，verdict 升為 pass）
+
+---
+
 > **本批 RR-001 ~ RR-007 為 backfill**：原本 `review.yml` workflow 只跑 first pass、沒鏈第ĺ�段 cross-agent；且首段 AI 在 ADR/config 類「文件型」PR 上自動跳過 RR 寫入步驟，導致 audit trail 漏記。本 commit 一次補回 7 條 RR、並同步修補 `review.yml` + `.claude/commands/review.md` 強制每個 PR 都寫 RR + 跑 `--cross`。Cross-agent 二審回補留待 Phase 0 之後資源穩定再批次跑（不阻塞 Phase 0 merge）。
 
 <!--

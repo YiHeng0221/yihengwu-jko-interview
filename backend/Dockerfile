@@ -1,93 +1,68 @@
-# ─────────────────────────────────────────────────────────────────────────────
-# Stage 1: deps — install all workspace dependencies (cached layer)
-# ─────────────────────────────────────────────────────────────────────────────
+# syntax=docker/dockerfile:1.7
+# Build context: repo root — docker build -f backend/Dockerfile -t <image> .
+# Image base: node:22-bookworm-slim — Prisma 需要 glibc + openssl，不能用 alpine。
+
 FROM node:22-bookworm-slim AS deps
-
-# openssl is required by Prisma engine detection at install/generate time
-RUN apt-get update -qq \
-    && apt-get install -y --no-install-recommends openssl \
-    && rm -rf /var/lib/apt/lists/*
-
-RUN corepack enable pnpm
-WORKDIR /repo
-
-# Copy all workspace package.json — pnpm install --frozen-lockfile 必須能對齊
-# 全部 importer entries（lockfile 已記錄各 workspace 的 dependencies）。
-# Stub 出空 manifest 會 fail ERR_PNPM_OUTDATED_LOCKFILE。
-COPY pnpm-workspace.yaml package.json pnpm-lock.yaml ./
-COPY backend/package.json ./backend/package.json
-COPY frontend/package.json ./frontend/package.json
-COPY e2e/package.json ./e2e/package.json
-
-RUN pnpm install --frozen-lockfile
-
-# ─────────────────────────────────────────────────────────────────────────────
-# Stage 2: build — generate Prisma client + compile TypeScript
-# ─────────────────────────────────────────────────────────────────────────────
-FROM deps AS build
-
-# Copy root tsconfig required by backend/tsconfig.json "extends"
-COPY tsconfig.base.json ./
-COPY backend/tsconfig.json backend/tsconfig.build.json ./backend/
-COPY backend/src ./backend/src
-COPY backend/prisma ./backend/prisma
-
-# Generate Prisma client (updates @prisma/client with schema-derived types)
-RUN pnpm --filter @yihengwu-jko/backend exec prisma generate
-
-# Compile TypeScript → dist/
-RUN pnpm --filter @yihengwu-jko/backend run build
-
-# Create standalone deployment: resolves all pnpm symlinks → real files,
-# includes only production dependencies
-RUN pnpm --filter @yihengwu-jko/backend deploy --prod /standalone
-
-# pnpm deploy copies package.json + node_modules, not the compiled output
-# or the Prisma schema — add them manually
-RUN cp -r backend/dist /standalone/dist \
-    && cp -r backend/prisma /standalone/prisma
-
-# prisma CLI is a devDep but is needed for `migrate deploy` at startup.
-# With shamefully-hoist=false, prisma lives in backend/node_modules (not root).
-# Use -rL to follow pnpm symlinks so real files (not dangling links) are copied.
-RUN cp -rL /repo/backend/node_modules/prisma /standalone/node_modules/prisma \
-    && mkdir -p /standalone/node_modules/.bin \
-    && printf '#!/bin/sh\nexec node "$(dirname "$0")/../prisma/build/index.js" "$@"\n' \
-        > /standalone/node_modules/.bin/prisma \
-    && chmod +x /standalone/node_modules/.bin/prisma
-
-# ─────────────────────────────────────────────────────────────────────────────
-# Stage 3: runner — minimal production image
-# ─────────────────────────────────────────────────────────────────────────────
-FROM node:22-bookworm-slim AS runner
-
-# tini: proper PID-1 / SIGTERM forwarding for Node inside Docker
-RUN apt-get update -qq \
-    && apt-get install -y --no-install-recommends tini \
-    && rm -rf /var/lib/apt/lists/*
-
-# Non-root user for security
-RUN groupadd --system --gid 1001 nodejs \
-    && useradd --system --uid 1001 --gid nodejs --shell /bin/false nodejs
-
 WORKDIR /app
 
-# Copy the standalone deployment (real files, no pnpm symlinks)
-COPY --from=build --chown=nodejs:nodejs /standalone ./
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      openssl ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY backend/package.json backend/
+
+RUN corepack enable && \
+    cd backend && pnpm install --frozen-lockfile
+
+FROM node:22-bookworm-slim AS builder
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      openssl ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY --from=deps /app/node_modules ./node_modules
+COPY --from=deps /app/backend/node_modules ./backend/node_modules
+COPY package.json pnpm-workspace.yaml tsconfig.base.json ./
+COPY backend/ ./backend/
+
+WORKDIR /app/backend
+RUN corepack enable && \
+    pnpm prisma generate && \
+    pnpm build
+
+FROM node:22-bookworm-slim AS runner
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      openssl tini ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN groupadd --system --gid 1001 nodejs && \
+    useradd --system --uid 1001 --gid 1001 --shell /sbin/nologin nodejs
 
 ENV NODE_ENV=production
-# Default port; override via -e PORT=... or Railway's injected $PORT
 ENV PORT=3001
-ENV HOST=0.0.0.0
 
+COPY --from=builder --chown=nodejs:nodejs /app/node_modules ./node_modules
+COPY --from=builder --chown=nodejs:nodejs /app/backend/dist ./backend/dist
+COPY --from=builder --chown=nodejs:nodejs /app/backend/node_modules ./backend/node_modules
+COPY --from=builder --chown=nodejs:nodejs /app/backend/prisma ./backend/prisma
+COPY --from=builder --chown=nodejs:nodejs /app/backend/package.json ./backend/package.json
+
+# 用 backend/node_modules/.bin/prisma（版本跟 backend/package.json 同步），
+# 不再裝 global prisma 避免版本漂移
+ENV PATH="/app/backend/node_modules/.bin:${PATH}"
+
+WORKDIR /app/backend
+USER nodejs
 EXPOSE 3001
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
     CMD node -e "require('http').get('http://localhost:'+(process.env.PORT||'3001')+'/health',r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))"
 
-USER nodejs
-
 ENTRYPOINT ["/usr/bin/tini", "--"]
-# Run prisma migrate deploy only when DATABASE_URL is set,
-# so the image can still serve /health in tests without a live DB.
-CMD ["sh", "-c", "if [ -n \"$DATABASE_URL\" ]; then node_modules/.bin/prisma migrate deploy; fi && node dist/server.js"]
+# DATABASE_URL guard — 沒設 DB 時跳過 migrate，讓 image 仍能 serve /health
+# (CI smoke test / 本機無 DB 起動 use case)
+CMD ["sh", "-c", "if [ -n \"$DATABASE_URL\" ]; then prisma migrate deploy; fi && node dist/server.js"]

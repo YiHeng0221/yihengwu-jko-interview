@@ -17,7 +17,8 @@ import {
 import { Tabs } from '../../lib/ui/Tabs/Tabs'
 import { CategoryDrawerDialog } from '../category/CategoryDrawerDialog'
 import { useCategories } from '../category/useCategories'
-import { SearchOverlay } from '../search/SearchOverlay'
+import { SearchBar } from '../search/SearchBar'
+import { SearchResults } from '../search/SearchResults'
 import type { CharityItem } from './dto/charitiesListDTO'
 import { useCharityList } from './useCharityList'
 import { CHARITY_TABS } from './constants'
@@ -52,6 +53,22 @@ const SearchIcon = () => (
   >
     <circle cx="11" cy="11" r="8" />
     <line x1="21" y1="21" x2="16.65" y2="16.65" />
+  </svg>
+)
+
+const ChevronDownIcon = () => (
+  <svg
+    width="14"
+    height="14"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2.5"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+  >
+    <polyline points="5 9 12 16 19 9" />
   </svg>
 )
 
@@ -168,6 +185,7 @@ function ItemList({ items, tab }: { items: CharityItem[]; tab: CharityTab }) {
 export function CharityListPage() {
   const [tab, setTab] = useTabSync()
   const [isSearchOpen, setIsSearchOpen] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
   const [isCategoryDrawerOpen, setIsCategoryDrawerOpen] = useState(false)
   const [selectedCategoryCode, setSelectedCategoryCode] = useState<string | null>(null)
 
@@ -208,12 +226,20 @@ export function CharityListPage() {
   const isDone = !hasNextPage && !hasPaginationError && data !== undefined && !isInitialLoading
 
   const selectedCategory = categories.find((c) => c.code === selectedCategoryCode)
-  const categoryButtonLabel = selectedCategory ? `${selectedCategory.label} ▾` : '全部 ▾'
+  const categoryButtonLabel = selectedCategory ? selectedCategory.label : '全部'
+
+  function handleCloseSearch() {
+    setIsSearchOpen(false)
+    setSearchQuery('')
+  }
 
   return (
-    <div className="flex min-h-screen flex-col bg-surface">
+    <div className="flex min-h-screen flex-col bg-surface-muted">
       <StickyHeaderStack>
         <TopBar title="所有捐款項目" />
+        {isSearchOpen && (
+          <SearchBar value={searchQuery} onChange={setSearchQuery} onClose={handleCloseSearch} />
+        )}
         <Tabs
           items={TAB_ITEMS}
           value={tab}
@@ -225,14 +251,19 @@ export function CharityListPage() {
             leading={
               <button
                 type="button"
-                className="text-sm text-text-primary"
+                className="inline-flex items-center gap-1.5 rounded-button bg-surface-muted px-3 py-1 text-sm text-text-secondary hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2"
                 onClick={() => setIsCategoryDrawerOpen(true)}
               >
-                {categoryButtonLabel}
+                <span>{categoryButtonLabel}</span>
+                <ChevronDownIcon />
               </button>
             }
             trailing={
-              <IconButton aria-label="搜尋" onClick={() => setIsSearchOpen(true)}>
+              <IconButton
+                aria-label="搜尋"
+                onClick={() => setIsSearchOpen(true)}
+                className="text-text-secondary"
+              >
                 <SearchIcon />
               </IconButton>
             }
@@ -241,7 +272,7 @@ export function CharityListPage() {
       </StickyHeaderStack>
 
       {isSearchOpen ? (
-        <SearchOverlay onClose={() => setIsSearchOpen(false)} />
+        <SearchResults query={searchQuery} />
       ) : (
         <main className="flex-1">
           {hasError ? (

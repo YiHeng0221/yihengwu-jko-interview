@@ -130,7 +130,7 @@ export function Tabs<TValue extends string>({
       })}
       <span
         aria-hidden="true"
-        className="absolute bottom-0 left-0 h-[2px] bg-brand"
+        className="absolute bottom-0 left-0 h-[2px] rounded bg-brand"
         style={{
           width: indicator.width,
           transform: `translateX(${indicator.left}px)`,

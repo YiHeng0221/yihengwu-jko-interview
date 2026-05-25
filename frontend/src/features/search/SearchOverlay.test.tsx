@@ -25,25 +25,27 @@ function makeState(overrides: Partial<SearchState>): SearchState {
 describe('SearchOverlay', () => {
   it('autofocuses the input on mount', () => {
     render(<SearchOverlay onClose={() => undefined} />)
-    expect(screen.getByRole('textbox', { name: '搜尋公益項目' })).toHaveFocus()
+    expect(screen.getByRole('textbox', { name: '請輸入關鍵字' })).toHaveFocus()
   })
 
-  it('shows 5 CardSkeleton placeholders while loading', () => {
+  it('shows 5 CardSkeleton placeholders while loading', async () => {
     mockUseSearch.mockReturnValue(makeState({ isLoading: true }))
     const { container } = render(<SearchOverlay onClose={() => undefined} />)
+    await userEvent.type(screen.getByRole('textbox', { name: '請輸入關鍵字' }), 'a')
     const skeletons = container.querySelectorAll('[aria-hidden="true"]')
     // CardSkeleton renders aria-hidden="true" wrapper + inner Skeletons
     expect(skeletons.length).toBeGreaterThan(0)
   })
 
-  it('shows EmptyState when isEmpty is true', () => {
+  it('shows EmptyState when isEmpty is true', async () => {
     mockUseSearch.mockReturnValue(makeState({ isEmpty: true }))
     render(<SearchOverlay onClose={() => undefined} />)
+    await userEvent.type(screen.getByRole('textbox', { name: '請輸入關鍵字' }), 'a')
     expect(screen.getByText('找不到相關項目')).toBeInTheDocument()
     expect(screen.getByText('請嘗試不同的關鍵字')).toBeInTheDocument()
   })
 
-  it('shows result cards when items are returned', () => {
+  it('shows result cards when items are returned', async () => {
     mockUseSearch.mockReturnValue(
       makeState({
         items: [
@@ -62,6 +64,7 @@ describe('SearchOverlay', () => {
       }),
     )
     render(<SearchOverlay onClose={() => undefined} />)
+    await userEvent.type(screen.getByRole('textbox', { name: '請輸入關鍵字' }), 'a')
     expect(screen.getByText('台灣愛心協會')).toBeInTheDocument()
     expect(screen.getByText('幫助弱勢')).toBeInTheDocument()
   })
@@ -82,7 +85,7 @@ describe('SearchOverlay', () => {
 
   it('clears input when ✕ button is clicked', async () => {
     render(<SearchOverlay onClose={() => undefined} />)
-    const input = screen.getByRole('textbox', { name: '搜尋公益項目' })
+    const input = screen.getByRole('textbox', { name: '請輸入關鍵字' })
     await userEvent.type(input, '愛心')
     expect(input).toHaveValue('愛心')
     await userEvent.click(screen.getByRole('button', { name: '清除搜尋' }))
@@ -95,14 +98,16 @@ describe('SearchOverlay', () => {
     expect(screen.queryByText('找不到相關項目')).not.toBeInTheDocument()
   })
 
-  it('shows search results region with aria-label', () => {
+  it('shows search results region with aria-label after typing', async () => {
     render(<SearchOverlay onClose={() => undefined} />)
+    await userEvent.type(screen.getByRole('textbox', { name: '請輸入關鍵字' }), 'a')
     expect(screen.getByRole('region', { name: '搜尋結果' })).toBeInTheDocument()
   })
 
-  it('shows ErrorState when API call fails', () => {
+  it('shows ErrorState when API call fails', async () => {
     mockUseSearch.mockReturnValue(makeState({ error: new Error('HTTP 500') }))
     render(<SearchOverlay onClose={() => undefined} />)
+    await userEvent.type(screen.getByRole('textbox', { name: '請輸入關鍵字' }), 'a')
     expect(screen.getByRole('alert')).toBeInTheDocument()
     expect(screen.getByText('搜尋發生錯誤')).toBeInTheDocument()
     expect(screen.queryByText('找不到相關項目')).not.toBeInTheDocument()

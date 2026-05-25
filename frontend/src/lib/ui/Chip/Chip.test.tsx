@@ -11,6 +11,28 @@ describe('Chip', () => {
     expect(btn).toHaveAttribute('aria-pressed', 'false')
   })
 
+  it('applies rounded-button radius class', () => {
+    render(<Chip label="動保" />)
+    expect(screen.getByRole('button')).toHaveClass('rounded-button')
+  })
+
+  it('inactive chip: gray bg, no standalone border class', () => {
+    render(<Chip label="動保" />)
+    const btn = screen.getByRole('button')
+    expect(btn).toHaveClass('bg-surface-muted')
+    expect(btn).toHaveClass('text-text-primary')
+    expect(btn).not.toHaveClass('border')
+  })
+
+  it('active chip: outlined — red border + white bg + red text', () => {
+    render(<Chip label="動保" active />)
+    const btn = screen.getByRole('button')
+    expect(btn).toHaveClass('border')
+    expect(btn).toHaveClass('border-brand')
+    expect(btn).toHaveClass('bg-surface')
+    expect(btn).toHaveClass('text-brand')
+  })
+
   it('reflects active state via aria-pressed', () => {
     render(<Chip label="動保" active />)
     expect(screen.getByRole('button')).toHaveAttribute('aria-pressed', 'true')

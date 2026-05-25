@@ -271,21 +271,13 @@ export function CharityListPage() {
         onClose={() => setIsCategoryDrawerOpen(false)}
       >
         <div className="grid grid-cols-3 gap-2 p-4">
-          <Chip
-            label="全部"
-            active={selectedCategoryCode === null}
-            onClick={() => {
-              setSelectedCategoryCode(null)
-              setIsCategoryDrawerOpen(false)
-            }}
-          />
           {categories.map((cat) => (
             <Chip
               key={cat.code}
               label={cat.label}
-              active={selectedCategoryCode === cat.code}
+              active={cat.code === 'ALL' ? selectedCategoryCode === null : selectedCategoryCode === cat.code}
               onClick={() => {
-                setSelectedCategoryCode(cat.code)
+                setSelectedCategoryCode(cat.code === 'ALL' ? null : cat.code)
                 setIsCategoryDrawerOpen(false)
               }}
             />

@@ -23,6 +23,25 @@ describe('Drawer', () => {
     expect(screen.getByRole('dialog', { name: '選擇類別' })).toHaveAttribute('aria-modal', 'true')
   })
 
+  it('panel has animate-slide-up class for entrance animation', () => {
+    render(
+      <Drawer open onClose={() => {}} title="選擇類別">
+        <p>內容</p>
+      </Drawer>,
+    )
+    expect(screen.getByRole('dialog')).toHaveClass('animate-slide-up')
+  })
+
+  it('title is centered — header has justify-center layout', () => {
+    render(
+      <Drawer open onClose={() => {}} title="選擇類別">
+        <p>內容</p>
+      </Drawer>,
+    )
+    const header = screen.getByRole('dialog').querySelector('header')
+    expect(header).toHaveClass('justify-center')
+  })
+
   it('closes on Esc', async () => {
     const onClose = vi.fn()
     render(

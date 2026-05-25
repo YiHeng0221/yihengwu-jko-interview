@@ -40,19 +40,20 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 RUN groupadd --system --gid 1001 nodejs && \
-    useradd --system --uid 1001 --gid 1001 --create-home nodejs
+    useradd --system --uid 1001 --gid 1001 --shell /sbin/nologin nodejs
 
 ENV NODE_ENV=production
 ENV PORT=3001
-
-# prisma CLI 裝 global，避開 pnpm workspace symlink 跨 multi-stage COPY 斷裂
-RUN npm install -g prisma@6.0.0
 
 COPY --from=builder --chown=nodejs:nodejs /app/node_modules ./node_modules
 COPY --from=builder --chown=nodejs:nodejs /app/backend/dist ./backend/dist
 COPY --from=builder --chown=nodejs:nodejs /app/backend/node_modules ./backend/node_modules
 COPY --from=builder --chown=nodejs:nodejs /app/backend/prisma ./backend/prisma
 COPY --from=builder --chown=nodejs:nodejs /app/backend/package.json ./backend/package.json
+
+# 用 backend/node_modules/.bin/prisma（版本跟 backend/package.json 同步），
+# 不再裝 global prisma 避免版本漂移
+ENV PATH="/app/backend/node_modules/.bin:${PATH}"
 
 WORKDIR /app/backend
 USER nodejs
@@ -62,4 +63,6 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
     CMD node -e "require('http').get('http://localhost:'+(process.env.PORT||'3001')+'/health',r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))"
 
 ENTRYPOINT ["/usr/bin/tini", "--"]
-CMD ["sh", "-c", "prisma migrate deploy && node dist/server.js"]
+# DATABASE_URL guard — 沒設 DB 時跳過 migrate，讓 image 仍能 serve /health
+# (CI smoke test / 本機無 DB 起動 use case)
+CMD ["sh", "-c", "if [ -n \"$DATABASE_URL\" ]; then prisma migrate deploy; fi && node dist/server.js"]

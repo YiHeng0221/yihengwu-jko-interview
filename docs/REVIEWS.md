@@ -393,6 +393,24 @@ Single-pass AI review has correlated blind spots. A second reviewer with a fresh
 
 ---
 
+## RR-019 — fix(web): 搜尋結果依當前 tab 過濾（useSearch 加入 category 參數）
+- PR: #141
+- Date: 2026-05-25
+- Reviewer: local Claude Code (first pass)
+- Verdict: pass
+- Findings: 🔴×0 · 🟡×3 · 🟣×0
+- Round: 1 of 3
+
+### Key concerns
+- `SearchResults.tsx:10` — `tab?: CharityTab` 選填設計讓呼叫方可無聲省略，`SearchOverlay.tsx:21` 因此靜默 fallback 至 `category=ORG`；API 行為從「無 category」靜默變為「category=ORG」，`SearchOverlay.test.tsx` 無 URL 斷言覆蓋此變更
+- `SearchResults.tsx:10` — 若 `tab` 語意上為必填，改為必填可在編譯期捕捉遺漏
+- `useSearch.ts:4` — 新增 `search → charities` feature 間耦合；`CharityTab` 可移至 `lib/` 共用層以利未來複用
+
+### Round history
+- Round 1: 2026-05-25 — pass
+
+---
+
 > **本批 RR-001 ~ RR-007 為 backfill**：原本 `review.yml` workflow 只跑 first pass、沒鏈第ĺ�段 cross-agent；且首段 AI 在 ADR/config 類「文件型」PR 上自動跳過 RR 寫入步驟，導致 audit trail 漏記。本 commit 一次補回 7 條 RR、並同步修補 `review.yml` + `.claude/commands/review.md` 強制每個 PR 都寫 RR + 跑 `--cross`。Cross-agent 二審回補留待 Phase 0 之後資源穩定再批次跑（不阻塞 Phase 0 merge）。
 
 <!--

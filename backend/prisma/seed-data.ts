@@ -201,7 +201,7 @@ function merch(seq: number): CharityInput {
     bannerImageUrl: null,
     orgName,
     tags: [],
-    productImageUrl: picsum(`mer-${seq}`, 400, 400),
+    productImageUrl: picsum(`mer-${seq}`, 400, 300),
     priceNtd,
   }
 }

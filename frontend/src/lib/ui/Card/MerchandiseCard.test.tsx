@@ -24,19 +24,21 @@ describe('MerchandiseCard', () => {
     expect(screen.queryByText('台灣兒童保育協會')).not.toBeInTheDocument()
   })
 
-  it('renders price with $ currency symbol', () => {
+  it('renders price with NTD prefix', () => {
     render(<MerchandiseCard title="兒童繪本義賣套書" priceNtd={740} />)
-    expect(screen.getByText('$740')).toBeInTheDocument()
+    expect(screen.getByText('NTD 740')).toBeInTheDocument()
   })
 
   it('omits price when not provided', () => {
     render(<MerchandiseCard title="兒童繪本義賣套書" />)
-    expect(screen.queryByText(/\$/)).not.toBeInTheDocument()
+    expect(screen.queryByText(/NTD/)).not.toBeInTheDocument()
   })
 
-  it('renders title with font-bold class', () => {
+  it('renders title without font-bold and at text-sm', () => {
     render(<MerchandiseCard title="兒童繪本義賣套書" />)
-    expect(screen.getByText('兒童繪本義賣套書')).toHaveClass('font-bold')
+    const titleEl = screen.getByText('兒童繪本義賣套書')
+    expect(titleEl).not.toHaveClass('font-bold')
+    expect(titleEl).toHaveClass('text-sm')
   })
 
   it('renders product image when src provided', () => {

@@ -199,7 +199,7 @@ export function CharityListPage() {
     isPending,
     isFetchingNextPage,
     refetch,
-  } = useCharityList({ tab })
+  } = useCharityList({ tab, categoryCode: selectedCategoryCode })
 
   const sentinelRef = useRef<HTMLDivElement>(null)
 
@@ -309,7 +309,6 @@ export function CharityListPage() {
               active={cat.code === 'ALL' ? selectedCategoryCode === null : selectedCategoryCode === cat.code}
               onClick={() => {
                 setSelectedCategoryCode(cat.code === 'ALL' ? null : cat.code)
-                setIsCategoryDrawerOpen(false)
               }}
             />
           ))}

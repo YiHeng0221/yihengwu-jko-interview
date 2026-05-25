@@ -4,7 +4,8 @@ import { act, render, screen, waitFor } from '@testing-library/react'
 import { userEvent } from '@testing-library/user-event'
 import type { ReactNode } from 'react'
 import { MemoryRouter, Route, Routes } from 'react-router'
-import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
+import { useCategories } from '../category/useCategories'
 import { CharityListPage } from './CharityListPage'
 
 vi.mock('../../lib/env', () => ({
@@ -12,7 +13,7 @@ vi.mock('../../lib/env', () => ({
 }))
 
 vi.mock('../category/useCategories', () => ({
-  useCategories: () => ({ data: [] }),
+  useCategories: vi.fn(() => ({ data: [] })),
 }))
 
 const makeItem = (id: string) => ({
@@ -226,5 +227,42 @@ describe('CharityListPage', () => {
     await user.click(screen.getByRole('button', { name: '取消' }))
     expect(screen.queryByRole('search')).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: '搜尋' })).toBeInTheDocument()
+  })
+})
+
+describe('chip 點擊修正（bug fix #139）', () => {
+  beforeEach(() => {
+    vi.mocked(useCategories).mockReturnValue({
+      data: [
+        { code: 'ALL', label: '全部' },
+        { code: 'ELDER_CARE', label: '老人照護' },
+      ],
+    } as ReturnType<typeof useCategories>)
+  })
+
+  afterEach(() => {
+    vi.mocked(useCategories).mockReturnValue({ data: [] } as ReturnType<typeof useCategories>)
+  })
+
+  it('點 chip 後 drawer 保持開啟且 fetch URL 帶 category_code= param', async () => {
+    const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      new Response(JSON.stringify({ items: [], next_cursor: null }), { status: 200 }),
+    )
+    const user = userEvent.setup()
+    setup()
+
+    await user.click(screen.getByRole('button', { name: '全部' }))
+    expect(screen.getByRole('dialog')).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: '老人照護' }))
+
+    expect(screen.getByRole('dialog')).toBeInTheDocument()
+
+    await waitFor(() =>
+      expect(fetchSpy).toHaveBeenCalledWith(
+        expect.stringContaining('category_code=ELDER_CARE'),
+        expect.anything(),
+      ),
+    )
   })
 })

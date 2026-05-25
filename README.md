@@ -113,7 +113,7 @@ yihengwu-jko-interview/
 | E2E category drawer + filter | ❌ 未寫 |
 | E2E axe-core 多 view state full scan | ❌ 未寫 |
 
-7-day 期限內前後端 + UI polish + 多輪 AI workflow 占主要時間，先收 unit/integration 完整、E2E 留 smoke。Playwright + axe-core 工具鍊已 wire 好（`playwright.config.ts` + smoke spec + `e2e.yml` workflow），補完估 1-2 hour。Demo 時走 `docs/DEMO.md` 步驟在 production URL 手跑完整流程。
+7-day 期限內前後端 + UI polish + 多輪 AI workflow 占主要時間，先收 unit/integration 完整、E2E 留 smoke。Playwright + axe-core 工具鍊已 wire 好（`playwright.config.ts` + smoke spec + `e2e.yml` workflow），剩下 4 條 spec 寫法已列在 backlog。Demo 時走 `docs/DEMO.md` 步驟在 production URL 手跑完整流程。
 
 ## AI Workflow
 

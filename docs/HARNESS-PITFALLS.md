@@ -231,15 +231,6 @@ brief → spec md → spec html → preview html (UI 才有) → tasks html → 
 
 否則下一個 session 又會踩同樣的坑。
 
-### F3. Secret / Token 不過聊天 channel
-
-`<PROVIDER>_TOKEN` / API key 等：
-
-- ✅ 在 user 自己終端機跑 `gh secret set ... --body -` 貼進 stdin
-- ❌ 貼進 chat 給 agent 設
-
-若不得已貼了 → demo 結束務必 revoke + 重產（**寫進 retro 行動項**）。
-
 ---
 
 ## 維護本文件

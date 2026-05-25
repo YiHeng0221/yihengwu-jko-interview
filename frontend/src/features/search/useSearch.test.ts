@@ -71,7 +71,7 @@ describe('useSearch', () => {
       title: '台灣愛心',
       description: '幫助更多人',
       tab: 'ORG',
-      category_code: 'ELDER_CARE',
+      category_codes: ['ELDER_CARE'],
       logo_url: null,
       amount_raised: 0,
       amount_goal: null,
@@ -88,7 +88,7 @@ describe('useSearch', () => {
     expect(result.current.items[0]).toMatchObject({
       id: 'c1',
       title: '台灣愛心',
-      categoryCode: 'ELDER_CARE',
+      categoryCodes: ['ELDER_CARE'],
       logoUrl: null,
       amountRaised: 0,
     })

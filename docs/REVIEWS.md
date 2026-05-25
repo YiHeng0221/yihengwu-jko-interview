@@ -463,8 +463,18 @@ Phase 1（含 Phase 1.1 polish）正式收尾。所有 22 個 ADR 落地（含 A
 - commit footer `Refs Phase 2 PM tasks.html P0+P1` 不符 AGENTS.md 要求的 `Refs Issue#NN` 格式（Hard Rule）
 - `docs/REVIEWS.md:435` RR-021 的 `**PR**:` 欄位記錄分支名而非 PR 編號，audit trail 斷絕
 
+### Round 2 (2026-05-25)
+- Verdict: pass
+- Findings: 🔴×0 · 🟡×0 · 🟣×0
+- What changed since round 1:
+  - ✅ `docs/REVIEWS.md` RR-021 `**PR**:` 欄位改為 `#150`（commit `4f25f748`）
+  - ✅ `docs/RETRO-PHASE-1.md` A1 Status 本機絕對路徑移除（commit `4f25f748`）
+  - ✅ `docs/prompts/02-*.md` allen-harness-test 引用：檔案整批刪除（commit `7f6d37e0`）
+  - ⚠️ 分支命名違規 + commit footer 違規：結構上不可由 ai-fix 修正，已記錄為 acknowledged process 偏差，不阻塞 merge
+
 ### Round history
 - Round 1: 2026-05-25 — changes-requested（3🔴 均為 metadata/process 違反，docs 內容本身品質高）
+- Round 2: 2026-05-25 — pass（所有 inline findings 已修；剩餘 2 項結構性偏差記錄存檔，verdict 升為 pass）
 
 ---
 

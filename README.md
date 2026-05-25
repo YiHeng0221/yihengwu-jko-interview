@@ -209,6 +209,61 @@ flowchart TB
 - **Bug 觀察 / 重現**：實際打開 demo 找到「捐款專案/義賣商品只顯示 title」這類資料層 bug、CSP error、CORS 問題等，先重現再交給 AI 修
 - **Deploy 操作**：Railway 帳號設定、env vars / secrets 配置、DB migrate 觸發、密碼 rotation 等敏感操作
 
+## Prompt 迭代摘要
+
+挑 3 個代表性對話，呈現「怎麼下 prompt → AI 第一次回 → 修方向 → 採用結果」的迭代軌跡。
+
+### 1. FE framework 拍板 — 從 Next.js push-back 到 Vite + React（2 rounds）
+
+最初請 AI 直接產 FE，AI 預設用 **Next.js**（沒問需求）。
+
+**Round 1 push-back**：丟 3 個質疑 + 1 句 framing：
+- 作業沒要求 Next.js
+- RSC 學習成本高
+- Turbopack 難用
+- 「Next.js 解決了 20% 的進階效能問題，卻把剩下 80% 的簡單事情變得極度痛苦與不安全。」
+
+AI 認可拋出的訴求，但要求提供具體替代方案再做研究。
+
+**Round 2 research**：給 3 個候選 — TanStack Start（用 TanStack Router）/ React Router v7（前 Remix）/ Astro（用 React）。AI research 後逐個否決：
+- **TanStack Start**：太新、SSR 心智模型仍在；feature-set 演進中
+- **React Router v7**：full-stack 路線跟「Pure SPA」spec 矛盾
+- **Astro**：MPA + islands 模型，FE 動態行為（infinite scroll + filter + drawer）反而綁手綁腳
+
+回到 first principles，AI 收斂提案到 **Vite + React**（不在原候選 3 個內）。
+
+**採用**：Vite 6 + React 19 + React Router v7。`vite build < 15s`、HMR < 200ms、FE/BE 獨立 Docker image。詳見 [ADR-0003](docs/decisions/0003-react-vite-over-nextjs.md)。
+
+**Lesson**：AI 第一次預設熱門 framework 是 social proof bias，給具體 spec 約束 + 質疑 + 候選名單後才會回到 first principles 重新評估。
+
+### 2. Harness pitfall — 一次性 ops 塞進 deploy chain（[HARNESS-PITFALLS §C1](docs/HARNESS-PITFALLS.md)）
+
+第一版 BE Dockerfile 把 `prisma db seed` 塞進 CMD 想說「deploy 一次到位」。
+
+**Outcome**：每次 BE redeploy 都 re-seed → row 重複 + 計數爆掉 + log 全是 unique violation error。
+
+**修法 iteration**：
+- Round 1：AI 提議把 `--upsert` flag 加進 seed script — 治標但 deploy chain 仍非冪等
+- Round 2：抽成獨立 `manual-seed.yml` workflow_dispatch，需要 demo 才手動 trigger；CMD 只留 `prisma migrate deploy && node dist/server.js`
+- Bonus：Manual workflow 加 `confirm: 'seed'` input guard 避免誤觸
+
+**Lesson**：deploy chain 只能放冪等 ops；一次性 ops 必須獨立 entry point + 加 confirm guard。
+
+### 3. Harness pitfall — Cross-agent reviewer 看到一審結果 → correlated blind spots（[HARNESS-PITFALLS §C5](docs/HARNESS-PITFALLS.md)）
+
+設計 cross-agent review pipeline 時，第一版把 first reviewer 的 findings paste 進 second reviewer 的 prompt。
+
+**症狀**：兩個 reviewer 高度一致認可 PR，但 PR merge 後仍有明顯 bug。Cross-agent review 變成 echo chamber。
+
+**根因**：second reviewer 被 first reviewer 的 reasoning frame 拉住，盲點對齊（correlated errors）。
+
+**修法**：
+- second reviewer 必須 **fresh context** — 只看 PR diff，不看 first reviewer 留下任何 inline comment / summary
+- 兩個 reviewer 都寫獨立 verdict 進 `docs/REVIEWS.md` 同一個 RR-NNN 條目下，明白標 disagreement
+- agreement 高的 PR 跟 disagreement 高的 PR 都記錄，後者反而是訊號強的
+
+**Lesson**：真要交叉驗證，information barrier 要實作對；不然「兩個 AI 看過」反而比一個還糟（false confidence）。
+
 ## License
 
 MIT（personal interview submission，請勿商用）。

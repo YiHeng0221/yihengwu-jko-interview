@@ -134,6 +134,28 @@
                           "created_at": {
                             "type": "string",
                             "format": "date-time"
+                          },
+                          "banner_image_url": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "org_name": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "tags": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          },
+                          "product_image_url": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "price_ntd": {
+                            "type": "integer",
+                            "nullable": true
                           }
                         },
                         "required": [
@@ -145,7 +167,12 @@
                           "logo_url",
                           "amount_raised",
                           "amount_goal",
-                          "created_at"
+                          "created_at",
+                          "banner_image_url",
+                          "org_name",
+                          "tags",
+                          "product_image_url",
+                          "price_ntd"
                         ],
                         "additionalProperties": false
                       }
@@ -267,6 +294,28 @@
                     "created_at": {
                       "type": "string",
                       "format": "date-time"
+                    },
+                    "banner_image_url": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "org_name": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "tags": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "product_image_url": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "price_ntd": {
+                      "type": "integer",
+                      "nullable": true
                     }
                   },
                   "required": [
@@ -278,7 +327,12 @@
                     "logo_url",
                     "amount_raised",
                     "amount_goal",
-                    "created_at"
+                    "created_at",
+                    "banner_image_url",
+                    "org_name",
+                    "tags",
+                    "product_image_url",
+                    "price_ntd"
                   ],
                   "additionalProperties": false
                 }

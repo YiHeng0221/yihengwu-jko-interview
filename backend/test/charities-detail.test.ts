@@ -15,6 +15,11 @@ const FIXTURE: CharityRow = {
   amountRaised: 12345,
   amountGoal: 50000,
   createdAt: new Date('2026-05-01T00:00:00.000Z'),
+  bannerImageUrl: null,
+  orgName: null,
+  tags: [],
+  productImageUrl: null,
+  priceNtd: null,
 }
 
 describe('GET /charities/:id', () => {

@@ -61,7 +61,7 @@ export function SearchBar({ value, onChange, onClose }: SearchBarProps) {
   }, [])
 
   return (
-    <div role="search" className="flex h-subrow items-center gap-2 border-b border-border bg-surface-muted px-3">
+    <div role="search" className="flex h-subrow items-center gap-2 border-b border-border bg-surface px-3">
       <Input
         ref={inputRef}
         value={value}
@@ -77,7 +77,7 @@ export function SearchBar({ value, onChange, onClose }: SearchBarProps) {
             </IconButton>
           ) : null
         }
-        className="flex-1"
+        className="flex-1 bg-surface-muted border-transparent"
         inputSize="sm"
       />
       <button

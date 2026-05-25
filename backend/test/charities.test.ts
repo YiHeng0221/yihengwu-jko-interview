@@ -27,6 +27,11 @@ const makeCharity = (overrides: {
   amountRaised?: number
   amountGoal?: number | null
   createdAt?: Date
+  bannerImageUrl?: string | null
+  orgName?: string | null
+  tags?: string[]
+  productImageUrl?: string | null
+  priceNtd?: number | null
 } = {}) => ({
   id: 'ck001',
   title: '測試公益組織',
@@ -37,6 +42,11 @@ const makeCharity = (overrides: {
   amountRaised: 0,
   amountGoal: null,
   createdAt: new Date('2026-05-01T00:00:00.000Z'),
+  bannerImageUrl: null,
+  orgName: null,
+  tags: [],
+  productImageUrl: null,
+  priceNtd: null,
   ...overrides,
 })
 

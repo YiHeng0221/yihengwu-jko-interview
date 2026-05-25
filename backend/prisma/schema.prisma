@@ -24,6 +24,13 @@ model Charity {
   amountGoal   Int?
   createdAt    DateTime   @default(now())
 
+  // Polymorphic per-tab 欄位（option A — 全部 nullable 在 Charity，不獨立 model）
+  bannerImageUrl  String?  // CAMPAIGN 上方 banner 圖
+  orgName         String?  // CAMPAIGN + MERCHANDISE 所屬公益團體名稱
+  tags            String[] @default([]) // CAMPAIGN 紅色 tag pill（categoryCode label list）
+  productImageUrl String?  // MERCHANDISE 商品方圖
+  priceNtd        Int?     // MERCHANDISE 售價（NTD）
+
   @@index([tab, createdAt(sort: Desc)])
   @@index([categoryCode])
 }

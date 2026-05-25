@@ -1,6 +1,7 @@
 import { clsx } from 'clsx'
 import { useEffect, useId, useRef, type MouseEvent, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
+import { CloseIcon } from '../icons/CloseIcon'
 
 export type DialogProps = {
   open: boolean
@@ -108,10 +109,7 @@ export function Dialog({ open, onClose, title, children, closeLabel = '關閉', 
             aria-label={closeLabel}
             className="rounded-button p-1 text-text-secondary transition-colors hover:bg-surface-muted hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
           >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
-              <line x1="18" y1="6" x2="6" y2="18" />
-              <line x1="6" y1="6" x2="18" y2="18" />
-            </svg>
+            <CloseIcon size={20} />
           </button>
         </header>
         <div className="flex-1 overflow-auto px-4 py-4">{children}</div>

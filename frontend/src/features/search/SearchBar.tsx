@@ -1,42 +1,14 @@
 import { useEffect, useRef } from 'react'
 import { IconButton } from '../../lib/ui/IconButton/IconButton'
 import { Input } from '../../lib/ui/Input/Input'
+import { SearchIcon } from '../../lib/ui/icons/SearchIcon'
+import { CloseIcon } from '../../lib/ui/icons/CloseIcon'
 
 export type SearchBarProps = {
   value: string
   onChange: (value: string) => void
   onClose: () => void
 }
-
-const SearchIcon = () => (
-  <svg
-    width="16"
-    height="16"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    aria-hidden="true"
-  >
-    <circle cx="11" cy="11" r="8" />
-    <line x1="21" y1="21" x2="16.65" y2="16.65" />
-  </svg>
-)
-
-const CloseIcon = () => (
-  <svg
-    width="16"
-    height="16"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    aria-hidden="true"
-  >
-    <line x1="18" y1="6" x2="6" y2="18" />
-    <line x1="6" y1="6" x2="18" y2="18" />
-  </svg>
-)
 
 export function SearchBar({ value, onChange, onClose }: SearchBarProps) {
   const inputRef = useRef<HTMLInputElement>(null)

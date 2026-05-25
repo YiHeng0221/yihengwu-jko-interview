@@ -24,14 +24,19 @@ describe('MerchandiseCard', () => {
     expect(screen.queryByText('台灣兒童保育協會')).not.toBeInTheDocument()
   })
 
-  it('renders price in TWD format', () => {
+  it('renders price with $ currency symbol', () => {
     render(<MerchandiseCard title="兒童繪本義賣套書" priceNtd={740} />)
-    expect(screen.getByText('TWD 740')).toBeInTheDocument()
+    expect(screen.getByText('$740')).toBeInTheDocument()
   })
 
   it('omits price when not provided', () => {
     render(<MerchandiseCard title="兒童繪本義賣套書" />)
-    expect(screen.queryByText(/TWD/)).not.toBeInTheDocument()
+    expect(screen.queryByText(/\$/)).not.toBeInTheDocument()
+  })
+
+  it('renders title with font-bold class', () => {
+    render(<MerchandiseCard title="兒童繪本義賣套書" />)
+    expect(screen.getByText('兒童繪本義賣套書')).toHaveClass('font-bold')
   })
 
   it('renders product image when src provided', () => {

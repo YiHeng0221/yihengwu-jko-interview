@@ -1,7 +1,7 @@
 # 街口公益捐款列表 · JKO Charity List Replica
 
-> 街口支付 App 「所有捐款項目」頁面的 SPA 復刻 — 公益團體 / 捐款專案 / 義賣商品 三 tab 列表、cursor 無限滾動、CJK 子字串搜尋、類別 chip 過濾。
-> 7-day take-home interview submission · 2026-05-18 → 2026-05-25
+> 我 7 天內復刻街口支付 App「所有捐款項目」頁面 — 公益團體 / 捐款專案 / 義賣商品 三 tab 列表、cursor 無限滾動、CJK 子字串搜尋、類別 chip 過濾。
+> Take-home interview submission · 2026-05-18 → 2026-05-25
 
 ## Demo
 
@@ -14,25 +14,25 @@
 
 詳細 demo 操作流程見 [`docs/DEMO.md`](docs/DEMO.md)。
 
-## Stack
+## 我的 Stack 選擇
 
-| Layer | Choice | ADR |
-|-------|--------|-----|
-| FE framework | React 19 + Vite 6 + TypeScript 5.7 | [ADR-0003](docs/decisions/0003-react-vite-over-nextjs.md) |
-| FE styling | Tailwind v4 `@theme` CSS-first tokens | [ADR-0008](docs/decisions/0008-tailwind-v4-theme-tokens.md) |
-| FE data layer | TanStack Query v5（infinite + cursor）| [ADR-0009](docs/decisions/0009-tanstack-query-as-data-layer.md) |
-| FE UI primitives | 自家寫的 Button / Card / Tabs / Drawer / Dialog（不引 MUI/Headless） | [ADR-0010](docs/decisions/0010-custom-ui-primitives.md) |
-| FE testing | Vitest + React Testing Library | — |
-| FE catalog | Storybook 8 + Vite builder | [ADR-0011](docs/decisions/0011-storybook-8-vite-builder.md) |
-| FE lint | oxlint over ESLint | [ADR-0006](docs/decisions/0006-oxlint-over-eslint.md) |
-| BE framework | Fastify 5 + `fastify-type-provider-zod` | [ADR-0013](docs/decisions/0013-fastify-over-express-hono-elysia.md) |
-| BE schema | Zod single source of truth → OpenAPI auto-emit | [ADR-0004](docs/decisions/0004-zod-single-source-of-truth.md) · [ADR-0018](docs/decisions/0018-openapi-auto-emit-and-drift-ci.md) |
-| DB | Postgres 16 + pg_trgm GIN（CJK substring）| [ADR-0014](docs/decisions/0014-prisma-over-drizzle-kysely.md) · [ADR-0015](docs/decisions/0015-pg-trgm-gin-over-fts.md) |
-| Pagination | Cursor-based（`{created_at, id}` base64url）| [ADR-0005](docs/decisions/0005-cursor-pagination.md) |
-| Wire format | snake_case + FE DTO mapper layer | [ADR-0007](docs/decisions/0007-wire-snake-case-with-fe-dto-layer.md) |
-| Deploy | Railway（Docker per-workspace pattern）| [ADR-0016](docs/decisions/0016-railway-as-deploy-provider.md) |
-| E2E | Playwright + axe-core a11y | — |
-| CI runners | ubuntu-latest（public repo unlimited minutes）| [ADR-0021](docs/decisions/0021-migrate-to-ubuntu-latest-runners.md) |
+| Layer | Choice | 為什麼選 |
+|-------|--------|---------|
+| FE framework | React 19 + Vite 6 + TypeScript 5.7 | 純 SPA，不需要 SSR；Vite cold start 比 Next 快 [ADR-0003](docs/decisions/0003-react-vite-over-nextjs.md) |
+| FE styling | Tailwind v4 `@theme` CSS-first tokens | 街口 spec 的紅 / radius / spacing 想用 design token，不想再寫 PostCSS pipeline [ADR-0008](docs/decisions/0008-tailwind-v4-theme-tokens.md) |
+| FE data layer | TanStack Query v5 | 列表要 infinite + cursor + AbortController + cache，自己手寫太多細節 [ADR-0009](docs/decisions/0009-tanstack-query-as-data-layer.md) |
+| FE UI primitives | 自家寫的 Button / Card / Tabs / Drawer / Dialog | 不引 MUI 是要把 a11y own、token 自己控、bundle 小 [ADR-0010](docs/decisions/0010-custom-ui-primitives.md) |
+| FE testing | Vitest + React Testing Library | Vite 同生態 + 跑得快 |
+| FE catalog | Storybook 8 + Vite builder | 每個 primitive 都有 story 方便視覺迭代 [ADR-0011](docs/decisions/0011-storybook-8-vite-builder.md) |
+| FE lint | oxlint | 比 ESLint 快 10×，對個人專案的 lint pipeline 體感差很多 [ADR-0006](docs/decisions/0006-oxlint-over-eslint.md) |
+| BE framework | Fastify 5 + `fastify-type-provider-zod` | Schema-first 跟 Zod 嵌得最深，Express 沒有 [ADR-0013](docs/decisions/0013-fastify-over-express-hono-elysia.md) |
+| BE schema | Zod single source of truth → OpenAPI auto-emit | 一份 Zod 寫一次，FE/BE 對齊不漂移 [ADR-0004](docs/decisions/0004-zod-single-source-of-truth.md) · [ADR-0018](docs/decisions/0018-openapi-auto-emit-and-drift-ci.md) |
+| DB | Postgres 16 + pg_trgm GIN（CJK substring）| Postgres 內建 trigram 處理中文子字串比 FTS 還好 [ADR-0014](docs/decisions/0014-prisma-over-drizzle-kysely.md) · [ADR-0015](docs/decisions/0015-pg-trgm-gin-over-fts.md) |
+| Pagination | Cursor-based（`{created_at, id}` base64url）| 比 offset 穩、deep page 不會 O(n) [ADR-0005](docs/decisions/0005-cursor-pagination.md) |
+| Wire format | snake_case + FE DTO mapper layer | BE 維持 snake_case 慣例、FE 寫 mapper 拿 camelCase 用 [ADR-0007](docs/decisions/0007-wire-snake-case-with-fe-dto-layer.md) |
+| Deploy | Railway（Docker per-workspace pattern）| 一鍵 deploy + free tier 撐得起 demo [ADR-0016](docs/decisions/0016-railway-as-deploy-provider.md) |
+| E2E | Playwright + axe-core a11y | 業界 standard，axe 把 a11y 變 enforceable |
+| CI runners | ubuntu-latest（public repo unlimited minutes）| 試過 self-hosted 兩顆 mac runner，發現運維成本不划算就回 cloud [ADR-0021](docs/decisions/0021-migrate-to-ubuntu-latest-runners.md) |
 
 所有 ADR：[`docs/decisions/`](docs/decisions/)
 
@@ -94,7 +94,6 @@ yihengwu-jko-interview/
 ├── docs/
 │   ├── decisions/          22 ADRs
 │   ├── specs/              fe-feature-spec + be-feature-spec
-│   ├── prompts/            代表性 AI 對話 log
 │   ├── REVIEWS.md          cross-agent review entries (RR-NNN)
 │   ├── HARNESS-PITFALLS.md AI-開發框架本身踩過的坑
 │   ├── DEMO.md             5-min demo walkthrough
@@ -102,121 +101,115 @@ yihengwu-jko-interview/
 └── .github/workflows/      ci · review · ai-fix · ai-implement · deploy · e2e · manual-seed
 ```
 
-## 功能涵蓋
-
-- ✅ 三 tab：公益團體 / 捐款專案 / 義賣商品（各 90 筆）
-- ✅ Cursor 無限滾動 + Skeleton loading
-- ✅ Polymorphic Card：每 tab 不同 layout（ORG icon+text、CAMPAIGN banner+tags、MERCHANDISE grid+price）
-- ✅ Tab 切換 sticky URL + `?category=` 同步
-- ✅ Tab 切換有 floating indicator 動畫
-- ✅ 搜尋 overlay（白底 SearchBar 介於 TopBar 與 Tabs 之間）+ 300ms debounce + AbortController
-- ✅ 搜尋按 tab 過濾（不會跨 tab）
-- ✅ 類別 chip drawer（mobile）/ dialog（desktop）→ slide-up 動畫
-- ✅ 類別 chip 點擊立刻 refetch（`?category_code=`）+ drawer 不自動關
-- ✅ a11y：所有 interactive 有 aria-label、focus ring、Tab 巡覽順序、aria-pressed/aria-selected
-- ✅ Error / Empty / Offline state
-- ✅ ErrorBoundary 接 5xx/4xx-non-401
-- ✅ `x-request-id` reflect + auto-gen，Pino structured logs
-- ✅ pg_trgm GIN index for CJK substring search
-- ❌ Detail page（contract 保留但 UI out-of-scope）
-- ❌ 真實金流 / 登入（spec 明示 out-of-scope）
-- ⏸ **E2E 完整 happy path**（時間關係未完成 — 詳見下方）
-
 ## E2E 測試狀態
 
-**Unit / integration coverage**：
-- BE 66 tests（charities / categories / cursor / toWire 對齊 / 錯誤 envelope / a11y on response）
-- FE 225 tests（components / hooks / DTO / page integration with mocked fetch）
+| 部分 | 狀態 |
+|------|------|
+| BE unit/integration（charities / categories / cursor / wire / errors） | ✅ 66 tests 全綠 |
+| FE unit/integration（components / hooks / DTO / page with mocked fetch） | ✅ 225 tests 全綠 |
+| E2E `smoke.spec.ts`（health + axe-core 首頁） | ✅ 已 ship |
+| E2E list page golden path | ❌ 未寫 |
+| E2E search overlay flow | ❌ 未寫 |
+| E2E category drawer + filter | ❌ 未寫 |
+| E2E axe-core 多 view state full scan | ❌ 未寫 |
 
-**E2E（Playwright + axe-core）— 部分完成**：
-- ✅ `e2e/specs/smoke.spec.ts`：`/health` 200 + 首頁 axe-core a11y 0 violations
-- ❌ List page golden path（load → tab 切 → infinite scroll → 結尾 EndMarker）— **未寫**
-- ❌ Search overlay flow（搜尋 → debounce → 結果 → 清空 → 取消）— **未寫**
-- ❌ Category drawer + filter（drawer 開 → chip 點 → API 帶 `category_code=` → drawer 不關）— **未寫**
-- ❌ axe-core 多 view state full scan（list / search / drawer 開）— **未寫**
+7-day 期限內前後端 + UI polish + 多輪 AI workflow 占主要時間，我選擇先收 unit/integration 完整、E2E 留 smoke。Playwright + axe-core 工具鍊已 wire 好（`playwright.config.ts` + smoke spec + `e2e.yml` workflow），補完估 1-2 hour。Demo 時我會用 `docs/DEMO.md` 步驟在 production URL 手跑完整流程。
 
-**未完成原因**：7-day 期限內前後端 + UI polish + 多輪 AI workflow 占主要時間，E2E 4 張票被列為 Phase 2 P1 但被 user 主動 defer（"e2e 之後再說"）。Playwright + axe-core 工具鍊已 wire 好（`playwright.config.ts` + smoke spec + `e2e.yml` workflow 已就緒），補完只需要 1-2 hour 寫 spec 即可。
+## 我怎麼開發出來的（AI workflow）
 
-**手動 QA**：用 `docs/DEMO.md` 步驟在 production URL 手跑完整流程，視覺截圖在 demo 時口頭 walkthrough。
+整個專案我都用一套自己設計的 **AI-driven harness** 跑，pipeline 長這樣：
 
-## 怎麼開發出來的（AI workflow）
+```mermaid
+flowchart TB
+    Human([👤 我（human）<br/>讀 brief / 看 Figma]):::human
+    Spec[📄 docs/specs/*.md<br/>PM agent 寫 spec]:::pm
+    Tasks[📋 tasks.html<br/>PM dry-run]:::pm
+    Issue[📌 GitHub issue<br/>status/human-review]:::issue
 
-整個專案在 **AI-driven harness** 上跑：
+    HumanGate1{👤 我拍板}:::human
+    Label[status/ai-implement]:::label
 
+    Implement[⚙️ ai-implement.yml<br/>impl agent 寫 code]:::ai
+    PR[🔀 PR opened]:::pr
+    CI[✅ ci.yml<br/>typecheck / lint / test / openapi-drift]:::ci
+
+    Review[🔍 review.yml<br/>reviewer agent<br/>inline 🔴 / 🟡 / 🟣]:::ai
+
+    HumanFork{🔴 finding?}:::human
+    Fix[🛠 ai-fix.yml<br/>round 1-3 cap]:::ai
+    HumanReview([👤 我 human review]):::human
+    Merge([🎉 merged to main]):::merged
+    Deploy[🚀 deploy.yml<br/>Railway BE + FE]:::ci
+
+    Human --> Spec --> Tasks --> HumanGate1
+    HumanGate1 -- 同意 scope --> Issue --> Label --> Implement
+    Implement --> PR --> CI --> Review --> HumanFork
+    HumanFork -- yes --> Fix --> CI
+    HumanFork -- no --> HumanReview --> Merge --> Deploy
+
+    classDef human fill:#fef3c7,stroke:#f59e0b,color:#92400e
+    classDef pm fill:#dbeafe,stroke:#3b82f6,color:#1e40af
+    classDef ai fill:#fde2e7,stroke:#e01e3c,color:#831843
+    classDef ci fill:#d1fae5,stroke:#1f9d55,color:#064e3b
+    classDef issue fill:#fff,stroke:#999
+    classDef pr fill:#fff,stroke:#999
+    classDef label fill:#fde68a,stroke:#f59e0b
+    classDef merged fill:#10b981,stroke:#047857,color:white
 ```
-docs/specs (PM 寫)
-    ↓
-GitHub issue（status/human-review → status/ai-implement）
-    ↓
-.github/workflows/ai-implement.yml
-    ↓
-Claude Code Action 跑 impl agent → 開 PR
-    ↓
-.github/workflows/review.yml（chained CI 後觸發）
-    ↓
-review agent 留 inline comment（lens：correctness / security / arch）
-    ↓
-🔴 finding → ai-fix.yml 自動修；🟡/🟣 → human 看了再決定
-    ↓
-human merge（最終 gate）
-```
+
+> 圖看不到的話：[`PIPELINE.md`](PIPELINE.md) 有 ASCII 版。
+
+幾個關鍵設計：
+
+- **Human 在三個 gate 介入**：tasks.html 拍板 / 🔴 finding 是否轉 fix / final merge approval。三個都是不可省略，AI 不會自己 merge。
+- **AI-fix loop 有 3 round 上限**：第 3 round 還沒過就 escalate 給 human，避免無限 loop。
+- **review.yml 不會 push code**：reviewer agent 是唯讀，只留 inline comment。要改 code 走 ai-fix.yml 另一條 pipeline。
+- **ci.yml 是 review 的前置**：先過 typecheck / lint / test / openapi-drift 才會觸發 review，避免 AI 評估 broken code。
+- **每個 agent 寫成一個 `.claude/agents/<name>.md` persona file**，跑的時候 Claude Code Action 載入該 persona 當 system prompt。
 
 **Agent personas**（`.claude/agents/`）：
 
 | Persona | Job |
 |---------|-----|
-| `pm` | Read brief + Figma → write spec + epic + child issues |
-| `impl` | Read issue AC → write code, commit, push, open PR |
-| `reviewer` | Read PR diff → inline-comment 🔴/🟡/🟣 findings |
-| `ai-fix` | Read review comments → apply 🔴 fixes, push commit |
-| `qa` | Read spec → write Playwright + axe-core tests |
-| `orchestrator` | Coordinate above when multi-step is needed |
-
-**Hard rules**（`AGENTS.md`）：
-
-- 一張票 = 一件事（不切碎成 80 個 trivial PR）
-- 每張 PR ≤ 800 lines diff（user policy 拉到 ≤ 500）
-- 3-round AI-fix 上限（防無限 loop）
-- ADR 必寫：任何「兩個合理 alternatives 且選錯成本高」的決策
-- `--no-verify` / 跳 CI 一律禁
-- Conventional Commits + Refs Issue#NN footer
-
-**Labels**（`scripts/setup-labels.sh`）：
-
-`kind/` · `area/` · `status/` · `agent/` · `risk/` · `size/` · `severity/` · `epic/<NN>` · `phase/<N>`
+| `pm` | 讀 brief + Figma → 寫 spec + epic + child issues + tasks.html |
+| `impl` | 讀 issue AC → 寫 code、commit、push、開 PR |
+| `reviewer` | 讀 PR diff → inline-comment 🔴/🟡/🟣 findings（3 lens：correctness / security / architecture）|
+| `ai-fix` | 讀 review comments → 修 🔴、push commit |
+| `qa` | 讀 spec → 寫 Playwright + axe-core tests |
+| `orchestrator` | 上面 multi-step 需要協調時介入 |
 
 詳細流程 + 22 個 ADR + 踩坑紀錄見 [`docs/HARNESS-PITFALLS.md`](docs/HARNESS-PITFALLS.md) + [`PIPELINE.md`](PIPELINE.md)。
 
 ## AI 使用聲明
 
-### 使用的 AI 工具
+### 我用的 AI 工具
 
-| Tool | Role |
+| Tool | 怎麼用 |
 |------|------|
-| **Claude Code（CLI）** | 主要 driver — 跑 agent personas（PM / impl / reviewer / ai-fix / qa）、CI 內 review.yml / ai-fix.yml / ai-implement.yml |
-| **Claude（claude-opus-4-7 / sonnet-4-6）** | 模型本體：heavy reasoning 用 Opus，standard impl / single-lens review 用 Sonnet |
-| **GitHub Actions** | 跑 AI workflow（review / fix / implement / e2e / deploy）— 不另外用 Cursor / Copilot 等 IDE 工具 |
+| **Claude Code（CLI）** | 主要 driver — 跑 agent personas、CI 內 review.yml / ai-fix.yml / ai-implement.yml |
+| **Claude Opus 4.7 / Sonnet 4.6** | 模型本體：heavy reasoning 用 Opus，standard impl / single-lens review 用 Sonnet |
+| **GitHub Actions** | 跑整套 AI workflow — 我沒用 Cursor / Copilot 等 IDE 工具 |
 
 ### AI 負責的範圍
 
-- ✅ 多數 BE / FE / 測試實作（每 issue 走 PM → impl → review → ai-fix → human merge）
-- ✅ 22 個 ADR 草稿（人在 fork 階段拍板選項，AI 寫 trade-off + consequences）
-- ✅ 270 筆 seed data 生成腳本（template + Lorem Picsum 圖）
-- ✅ Storybook stories
-- ✅ 多數 Zod / Prisma schema + migration SQL
-- ✅ Cross-agent code review（每 PR 跑一次 reviewer agent，留 🔴/🟡/🟣 inline comments）
-- ✅ AI-fix loop 自動處理 review 抓到的 🔴 issue（3 round 上限）
+- 多數 BE / FE / 測試實作（每 issue 走 PM → impl → review → ai-fix → human merge）
+- 22 個 ADR 草稿（我在 fork 階段拍板選項，AI 寫 trade-off + consequences）
+- 270 筆 seed data 生成腳本（template + Lorem Picsum 圖）
+- Storybook stories
+- 多數 Zod / Prisma schema + migration SQL
+- Cross-agent code review（每 PR 跑一次 reviewer agent，留 🔴/🟡/🟣 inline comments）
+- AI-fix loop 自動處理 review 抓到的 🔴 issue（3 round 上限）
 
 ### 我自己負責的範圍
 
-- ✅ **所有架構決策的 fork 拍板**：選 React vs Next.js、Fastify vs Express、Prisma vs Drizzle、cursor vs offset、oxlint vs ESLint 等 — AI 列 options + trade-offs，我選方向
-- ✅ **All PR human review + merge approval**：AI review 是 first pass，每張 PR 我親自看過再 merge
-- ✅ **PM 階段切票顆粒 + scope 控制**：tasks.html dry-run 我拍板才開 issue，不讓 AI 開出 80 張 trivial ticket
-- ✅ **UI / spec 對齊**：街口原 App 對照截圖、所有 Figma-spec 對應的 UI polish（chip 樣式 / 字距 / radius / 顏色 token 等 ~30 點）親自指認，AI 不主動猜
-- ✅ **Bug 觀察 / 重現**：實際打開 demo、找到「捐款專案/義賣商品只顯示 title」這類資料層 bug、CSP error、CORS 問題等，先重現再交給 AI 修
-- ✅ **Deploy 操作**：Railway 帳號設定、env vars / secrets 配置、DB migrate 觸發、密碼 rotation 等敏感操作
+- **所有架構決策的 fork 拍板**：選 React vs Next.js、Fastify vs Express、Prisma vs Drizzle、cursor vs offset、oxlint vs ESLint 等 — AI 列 options + trade-offs，我選方向
+- **All PR human review + merge approval**：AI review 是 first pass，每張 PR 我親自看過再 merge
+- **PM 階段切票顆粒 + scope 控制**：tasks.html dry-run 我拍板才開 issue，不讓 AI 開出 80 張 trivial ticket
+- **UI / spec 對齊**：街口原 App 對照截圖、所有 Figma-spec 對應的 UI polish（chip 樣式 / 字距 / radius / 顏色 token 等 ~30 點）我親自指認，AI 不主動猜
+- **Bug 觀察 / 重現**：實際打開 demo、找到「捐款專案/義賣商品只顯示 title」這類資料層 bug、CSP error、CORS 問題等，我先重現再交給 AI 修
+- **Deploy 操作**：Railway 帳號設定、env vars / secrets 配置、DB migrate 觸發、密碼 rotation 等敏感操作
 
-> 這個專案的真正亮點是把 **AI 開發流程本身當主軸**：PM/impl/reviewer/ai-fix 等多個 agent 角色透過 GitHub workflow 串成可重現的 pipeline，而不是「人開 prompt、AI 寫 code、人 copy paste」這種較傳統的工作流。完整 pipeline 見 `PIPELINE.md` + `.claude/agents/` + `.github/workflows/`。
+> 我這個專案的真正亮點是把 **AI 開發流程本身當主軸**：PM / impl / reviewer / ai-fix 等多個 agent 角色透過 GitHub workflow 串成可重現的 pipeline，而不是「人開 prompt、AI 寫 code、人 copy paste」這種較傳統的工作流。
 
 ## License
 

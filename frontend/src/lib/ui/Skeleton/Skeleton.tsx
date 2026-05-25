@@ -43,3 +43,35 @@ export function CardSkeleton({ className }: { className?: string }) {
     </div>
   )
 }
+
+export function CampaignCardSkeleton({ className }: { className?: string }) {
+  return (
+    <div
+      className={clsx('overflow-hidden rounded-card border border-border bg-surface', className)}
+      aria-hidden="true"
+    >
+      <div className="aspect-video w-full animate-pulse bg-surface-muted" />
+      <div className="space-y-2 p-3">
+        <div className="h-[1em] w-1/3 animate-pulse rounded bg-surface-muted" />
+        <div className="h-[1em] w-full animate-pulse rounded bg-surface-muted" />
+        <div className="h-[1em] w-2/3 animate-pulse rounded bg-surface-muted" />
+      </div>
+    </div>
+  )
+}
+
+export function MerchandiseCardSkeleton({ className }: { className?: string }) {
+  return (
+    <div
+      className={clsx('overflow-hidden rounded-card border border-border bg-surface', className)}
+      aria-hidden="true"
+    >
+      <div className="aspect-square w-full animate-pulse bg-surface-muted" />
+      <div className="space-y-1 p-2">
+        <div className="h-[1em] w-full animate-pulse rounded bg-surface-muted" />
+        <div className="h-[1em] w-2/3 animate-pulse rounded bg-surface-muted" />
+        <div className="h-[1em] w-1/3 animate-pulse rounded bg-surface-muted" />
+      </div>
+    </div>
+  )
+}

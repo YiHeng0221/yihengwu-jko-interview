@@ -60,4 +60,47 @@ describe('charitiesListResponseSchema', () => {
     const raw = { items: [{ id: 'x' }], next_cursor: null }
     expect(() => charitiesListResponseSchema.parse(raw)).toThrow()
   })
+
+  it('maps CAMPAIGN tab-specific fields', () => {
+    const campaignItem = {
+      ...validItem,
+      tab: 'CAMPAIGN',
+      banner_image_url: 'https://example.com/banner.png',
+      org_name: '台灣兒童保育協會',
+      tags: ['身心障礙服務', '特殊醫療'],
+    }
+    const raw = { items: [campaignItem], next_cursor: null }
+    const result = charitiesListResponseSchema.parse(raw)
+    const item = result.items[0]
+    expect(item?.bannerImageUrl).toBe('https://example.com/banner.png')
+    expect(item?.orgName).toBe('台灣兒童保育協會')
+    expect(item?.tags).toEqual(['身心障礙服務', '特殊醫療'])
+  })
+
+  it('maps MERCHANDISE tab-specific fields', () => {
+    const merchItem = {
+      ...validItem,
+      tab: 'MERCHANDISE',
+      product_image_url: 'https://example.com/product.png',
+      org_name: '台灣動物保護協會',
+      price_ntd: 740,
+    }
+    const raw = { items: [merchItem], next_cursor: null }
+    const result = charitiesListResponseSchema.parse(raw)
+    const item = result.items[0]
+    expect(item?.productImageUrl).toBe('https://example.com/product.png')
+    expect(item?.orgName).toBe('台灣動物保護協會')
+    expect(item?.priceNtd).toBe(740)
+  })
+
+  it('defaults tab-specific fields to null/[] when absent', () => {
+    const raw = { items: [validItem], next_cursor: null }
+    const result = charitiesListResponseSchema.parse(raw)
+    const item = result.items[0]
+    expect(item?.bannerImageUrl).toBeNull()
+    expect(item?.orgName).toBeNull()
+    expect(item?.tags).toEqual([])
+    expect(item?.productImageUrl).toBeNull()
+    expect(item?.priceNtd).toBeNull()
+  })
 })

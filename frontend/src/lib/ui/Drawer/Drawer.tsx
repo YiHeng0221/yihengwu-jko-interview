@@ -1,6 +1,7 @@
 import { clsx } from 'clsx'
 import { useEffect, useId, useRef, type MouseEvent, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
+import { useBodyScrollLock } from '../../../hooks/useBodyScrollLock'
 import { CloseIcon } from '../icons/CloseIcon'
 
 export type DrawerProps = {
@@ -22,13 +23,12 @@ export function Drawer({ open, onClose, title, children, closeLabel = '關閉', 
   onCloseRef.current = onClose
   const titleId = useId()
 
+  useBodyScrollLock(open)
+
   useEffect(() => {
     if (!open) return
 
     previousActiveRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null
-
-    const previousOverflow = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
 
     const container = containerRef.current
     const firstFocusable = container?.querySelector<HTMLElement>(FOCUSABLE_SELECTOR)
@@ -59,7 +59,6 @@ export function Drawer({ open, onClose, title, children, closeLabel = '關閉', 
     document.addEventListener('keydown', handleKey)
     return () => {
       document.removeEventListener('keydown', handleKey)
-      document.body.style.overflow = previousOverflow
       previousActiveRef.current?.focus()
     }
   }, [open])

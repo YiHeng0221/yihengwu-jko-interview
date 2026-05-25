@@ -42,6 +42,25 @@ Single-pass AI review has correlated blind spots. A second reviewer with a fresh
 
 <!-- Insert new RR-NNN entries below. Most recent at the top. -->
 
+## RR-016 — chore(infra): adopt allen-harness-test 的 per-workspace Dockerfile 模式
+- PR: #117
+- Date: 2026-05-25
+- Reviewer (first): local Claude Code (claude-sonnet-4-6, via `/review`)
+- Reviewer (cross-agent): n/a
+- Verdict: changes-requested
+- Findings: 🔴×1 · 🟡×1 · 🟣×0
+- Round: 2 of 3
+
+### Key concerns
+- `backend/Dockerfile:50` — runner stage が devDependencies 含む `backend/node_modules` を raw COPY（`typescript`・`vitest`・`tsx` 等が production image に混入）。PR #115 の `pnpm deploy --prod` からの退行。
+- `backend/Dockerfile:16` — pnpm partial-workspace install（sibling manifest 不在）は公式仕様外；pnpm バージョン固定推奨。🟡
+
+### Round history
+- Round 1: 2026-05-25 — 3 🟡（useradd shell / global prisma / DATABASE_URL guard）→ 全修正 in `667600a`
+- Round 2: 2026-05-25 — changes-requested（1 🔴 devDeps in runner）
+
+---
+
 ## RR-015 — feat(web): Spinner 改 iOS-style activity indicator (8-tick chase fade)
 - PR: #108
 - Date: 2026-05-25

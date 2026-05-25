@@ -75,7 +75,7 @@ export function Drawer({ open, onClose, title, children, closeLabel = '關閉', 
     <div
       onMouseDown={handleOverlayClick}
       className={clsx(
-        'fixed inset-0 z-50 flex items-end justify-center bg-surface-overlay',
+        'fixed top-0 left-0 z-50 h-screen w-screen flex items-end justify-center bg-surface-overlay',
       )}
     >
       <div

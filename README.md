@@ -120,6 +120,24 @@ yihengwu-jko-interview/
 - ✅ pg_trgm GIN index for CJK substring search
 - ❌ Detail page（contract 保留但 UI out-of-scope）
 - ❌ 真實金流 / 登入（spec 明示 out-of-scope）
+- ⏸ **E2E 完整 happy path**（時間關係未完成 — 詳見下方）
+
+## E2E 測試狀態
+
+**Unit / integration coverage**：
+- BE 66 tests（charities / categories / cursor / toWire 對齊 / 錯誤 envelope / a11y on response）
+- FE 225 tests（components / hooks / DTO / page integration with mocked fetch）
+
+**E2E（Playwright + axe-core）— 部分完成**：
+- ✅ `e2e/specs/smoke.spec.ts`：`/health` 200 + 首頁 axe-core a11y 0 violations
+- ❌ List page golden path（load → tab 切 → infinite scroll → 結尾 EndMarker）— **未寫**
+- ❌ Search overlay flow（搜尋 → debounce → 結果 → 清空 → 取消）— **未寫**
+- ❌ Category drawer + filter（drawer 開 → chip 點 → API 帶 `category_code=` → drawer 不關）— **未寫**
+- ❌ axe-core 多 view state full scan（list / search / drawer 開）— **未寫**
+
+**未完成原因**：7-day 期限內前後端 + UI polish + 多輪 AI workflow 占主要時間，E2E 4 張票被列為 Phase 2 P1 但被 user 主動 defer（"e2e 之後再說"）。Playwright + axe-core 工具鍊已 wire 好（`playwright.config.ts` + smoke spec + `e2e.yml` workflow 已就緒），補完只需要 1-2 hour 寫 spec 即可。
+
+**手動 QA**：用 `docs/DEMO.md` 步驟在 production URL 手跑完整流程，視覺截圖在 demo 時口頭 walkthrough。
 
 ## 怎麼開發出來的（AI workflow）
 

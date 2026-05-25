@@ -3,7 +3,7 @@
 - **Date**: 2026-05-24
 - **Status**: Accepted
 - **Deciders**: project owner
-- **Related**: [ADR-0020](./0020-dual-runner-split.md)（superseded），`docs/HARNESS-PITFALLS.md` §C7、§D3
+- **Related**: [ADR-0020](./0020-dual-runner-split.md)（superseded），`docs/HARNESS-PITFALLS.md` §D3
 
 ## Context
 
@@ -32,7 +32,7 @@ OAuth token 透過 `secrets.CLAUDE_CODE_OAUTH_TOKEN`（已存在 repo secrets）
 
 - Pros: 不維護 runner / token 一份就好 / public repo unlimited minutes / 死了 GitHub 會自動重啟新 VM
 - Cons: 每次 cold-start clone repo + npm install claude CLI 大概 1-2 min overhead
-- Reference: HARNESS-PITFALLS §D3 「OAuth token 可以塞 env var」
+- Reference: HARNESS-PITFALLS §D3（個人 runner 只能綁單一 repo 的限制；migrate 到 ubuntu-latest 可消除雙 runner 維護成本）
 
 ### Option C — 混搭：review 用 ubuntu、fix/implement 用 self-hosted
 

@@ -301,7 +301,7 @@ export function CharityListPage() {
         open={isCategoryDrawerOpen}
         onClose={() => setIsCategoryDrawerOpen(false)}
       >
-        <div className="grid grid-cols-3 gap-2 p-4">
+        <div className="grid grid-cols-3 gap-3 p-4">
           {categories.map((cat) => (
             <Chip
               key={cat.code}

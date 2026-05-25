@@ -432,7 +432,7 @@ Single-pass AI review has correlated blind spots. A second reviewer with a fresh
 ## RR-021 — Phase 1 final: 22 ADRs + 53 issues + 78 PRs
 
 - **Date**: 2026-05-25
-- **PR**: docs/phase-2-submission-polish
+- **PR**: #150
 - **Reviewer**: human + claude-opus-4-7（dry-run summary）
 - **Verdict**: pass / final
 - **Round**: 1（final）

@@ -1,11 +1,5 @@
 @import "tailwindcss";
 
-/* 桌面端 app 框外的留白色（mobile-first frame 在 desktop 居中，框外用淺灰，
-   不刺眼的白底）。Mobile 看不見此 layer（內框寬度 = viewport）。 */
-body {
-  background-color: #e5e5e5;
-}
-
 /* Design tokens — Tailwind v4 @theme CSS-first 模式
    來源：街口公益捐款列表 Figma Style Guide
    AC: AC-028 (header 44px), AC-036 (token), AC-037 (sticky layout heights) */

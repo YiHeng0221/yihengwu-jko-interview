@@ -73,7 +73,7 @@ function CampaignCardItem({ item }: { item: CharityItem }) {
       orgName={item.orgName}
       bannerSrc={item.bannerImageUrl}
       tags={item.tags}
-      className="mx-3 my-2"
+      className="mx-auto my-2 max-w-md"
     />
   )
 }
@@ -92,7 +92,7 @@ function MerchandiseCardItem({ item }: { item: CharityItem }) {
 function LoadingSkeletons({ tab }: { tab: CharityTab }) {
   if (tab === 'MERCHANDISE') {
     return (
-      <div className="grid grid-cols-2 gap-2 px-3 py-2">
+      <div className="mx-auto grid max-w-md grid-cols-2 gap-2 px-3 py-2">
         {SKELETON_KEYS.map((key) => (
           <MerchandiseCardSkeleton key={key} />
         ))}
@@ -103,7 +103,7 @@ function LoadingSkeletons({ tab }: { tab: CharityTab }) {
     return (
       <>
         {SKELETON_KEYS.map((key) => (
-          <CampaignCardSkeleton key={key} className="mx-3 my-2" />
+          <CampaignCardSkeleton key={key} className="mx-auto my-2 max-w-md" />
         ))}
       </>
     )
@@ -122,7 +122,7 @@ function ItemList({ items, tab }: { items: CharityItem[]; tab: CharityTab }) {
     return (
       <ul
         aria-label={`${TAB_LABELS[tab]}列表`}
-        className="grid grid-cols-2 gap-2 px-3 py-2"
+        className="mx-auto grid max-w-md grid-cols-2 gap-2 px-3 py-2"
       >
         {items.map((item) => (
           <li key={item.id}>
@@ -206,7 +206,7 @@ export function CharityListPage() {
   }
 
   return (
-    <div className="mx-auto flex min-h-screen w-full max-w-md flex-col bg-surface-muted">
+    <div className="flex min-h-screen flex-col bg-surface-muted">
       <StickyHeaderStack>
         <TopBar title="所有捐款項目" />
         {isSearchOpen && (

@@ -68,6 +68,7 @@ export function SearchBar({ value, onChange, onClose }: SearchBarProps) {
         onChange={(e) => onChange(e.target.value)}
         placeholder="請輸入關鍵字"
         aria-label="請輸入關鍵字"
+        aria-controls="search-results-region"
         leadingIcon={<SearchIcon />}
         trailingSlot={
           value.length > 0 ? (
@@ -82,7 +83,7 @@ export function SearchBar({ value, onChange, onClose }: SearchBarProps) {
       <button
         type="button"
         onClick={onClose}
-        className="rounded px-2 py-1 text-sm font-medium text-[var(--color-link)] hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-link)] focus-visible:ring-offset-2"
+        className="rounded px-2 py-1 text-sm font-medium text-link hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-link focus-visible:ring-offset-2"
       >
         取消
       </button>

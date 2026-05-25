@@ -1,7 +1,7 @@
 # ADR-0020 — Split self-hosted runner: review vs fix lanes
 
 - **Date**: 2026-05-24
-- **Status**: Accepted
+- **Status**: Superseded by [ADR-0021](./0021-migrate-to-ubuntu-latest-runners.md) on 2026-05-24
 - **Deciders**: project owner
 - **Related**: ADR-0002 cross-agent review，`docs/HARNESS-PITFALLS.md` §C7
 
@@ -91,3 +91,4 @@ echo '{"labels":["runner-review"]}' | gh api -X POST \
 ## Status notes
 
 - 2026-05-24 — Accepted；runner 2 上線 17:59；workflow 切換進 main 後立刻生效
+- 2026-05-24 — **Superseded**：晚間發現公開 repo + GitHub Actions free minutes 足以 cover demo 期所有 review/fix/implement workload，雙 self-hosted runner 反而引入 OAuth token 雙份維護成本 + mac launchd 不穩風險。所有 workflow `runs-on` 改回 `ubuntu-latest`。見 [ADR-0021](./0021-migrate-to-ubuntu-latest-runners.md)。

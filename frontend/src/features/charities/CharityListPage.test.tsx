@@ -191,7 +191,7 @@ describe('CharityListPage', () => {
       new Response(JSON.stringify({ items: [], next_cursor: null }), { status: 200 }),
     )
     setup()
-    expect(screen.getByRole('button', { name: '全部 ▾' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: '全部' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: '搜尋' })).toBeInTheDocument()
   })
 
@@ -201,7 +201,7 @@ describe('CharityListPage', () => {
     )
     const user = userEvent.setup()
     setup()
-    await user.click(screen.getByRole('button', { name: '全部 ▾' }))
+    await user.click(screen.getByRole('button', { name: '全部' }))
     expect(screen.getByRole('dialog')).toBeInTheDocument()
   })
 

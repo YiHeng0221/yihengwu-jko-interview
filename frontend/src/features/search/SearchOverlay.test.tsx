@@ -25,7 +25,7 @@ function makeState(overrides: Partial<SearchState>): SearchState {
 describe('SearchOverlay', () => {
   it('autofocuses the input on mount', () => {
     render(<SearchOverlay onClose={() => undefined} />)
-    expect(screen.getByRole('textbox', { name: '搜尋公益項目' })).toHaveFocus()
+    expect(screen.getByRole('textbox', { name: '請輸入關鍵字' })).toHaveFocus()
   })
 
   it('shows 5 CardSkeleton placeholders while loading', () => {
@@ -82,7 +82,7 @@ describe('SearchOverlay', () => {
 
   it('clears input when ✕ button is clicked', async () => {
     render(<SearchOverlay onClose={() => undefined} />)
-    const input = screen.getByRole('textbox', { name: '搜尋公益項目' })
+    const input = screen.getByRole('textbox', { name: '請輸入關鍵字' })
     await userEvent.type(input, '愛心')
     expect(input).toHaveValue('愛心')
     await userEvent.click(screen.getByRole('button', { name: '清除搜尋' }))

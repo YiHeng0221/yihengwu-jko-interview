@@ -42,6 +42,22 @@ Single-pass AI review has correlated blind spots. A second reviewer with a fresh
 
 <!-- Insert new RR-NNN entries below. Most recent at the top. -->
 
+## RR-015 — Revert #112: types-drift back to strict (commit regen openapi.json per PR is the right approach)
+- PR: #113
+- Date: 2026-05-25
+- Reviewer: local Claude Code (claude-sonnet-4-6, first pass)
+- Verdict: pass
+- Findings: 🔴×0 · 🟡×1 · 🟣×0
+- Round: 1 of 3
+
+### Key concerns
+- `.github/workflows/ci.yml:157` — インラインコメントを全削除したため、将来の読者が strict mode の意図を ci.yml 単体から把握できない。PR body に背景はあるが、step 内に一行補足を残すことを推奨（blocking なし）。🟡
+
+### Round history
+- Round 1: 2026-05-25 — pass（🔴×0・🟡×1；全て non-blocking）
+
+---
+
 ## RR-014 — feat(api): P1-BE-09 GET /charities ?q= pg_trgm 搜尋
 - PR: #102
 - Date: 2026-05-25

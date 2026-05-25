@@ -2,14 +2,16 @@ import { Card } from '../../lib/ui/Card/Card'
 import { EmptyState } from '../../lib/ui/EmptyState/EmptyState'
 import { ErrorState } from '../../lib/ui/ErrorState/ErrorState'
 import { CardSkeleton } from '../../lib/ui/Skeleton/Skeleton'
+import type { CharityTab } from '../charities/constants'
 import { useSearch } from './useSearch'
 
 export type SearchResultsProps = {
   query: string
+  tab?: CharityTab
 }
 
-export function SearchResults({ query }: SearchResultsProps) {
-  const { items, isLoading, isEmpty, error } = useSearch(query)
+export function SearchResults({ query, tab = 'ORG' }: SearchResultsProps) {
+  const { items, isLoading, isEmpty, error } = useSearch(query, tab)
 
   if (!query) return null
 

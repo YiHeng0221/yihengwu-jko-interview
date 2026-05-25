@@ -21,6 +21,8 @@ import { SearchBar } from '../search/SearchBar'
 import { SearchResults } from '../search/SearchResults'
 import type { CharityItem } from './dto/charitiesListDTO'
 import { useCharityList } from './useCharityList'
+import { SearchIcon } from '../../lib/ui/icons/SearchIcon'
+import { ChevronDownIcon } from '../../lib/ui/icons/ChevronDownIcon'
 import { CHARITY_TABS } from './constants'
 import type { CharityTab } from './constants'
 import { useTabSync } from './useTabSync'
@@ -41,36 +43,6 @@ const SKELETON_KEYS = [
   'sk-5', 'sk-6', 'sk-7', 'sk-8', 'sk-9',
 ] as const
 
-const SearchIcon = () => (
-  <svg
-    width="20"
-    height="20"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    aria-hidden="true"
-  >
-    <circle cx="11" cy="11" r="8" />
-    <line x1="21" y1="21" x2="16.65" y2="16.65" />
-  </svg>
-)
-
-const ChevronDownIcon = () => (
-  <svg
-    width="14"
-    height="14"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2.5"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    aria-hidden="true"
-  >
-    <polyline points="5 9 12 16 19 9" />
-  </svg>
-)
 
 function OrgCardItem({ item }: { item: CharityItem }) {
   return (
@@ -199,7 +171,7 @@ export function CharityListPage() {
     isPending,
     isFetchingNextPage,
     refetch,
-  } = useCharityList({ tab })
+  } = useCharityList({ tab, categoryCode: selectedCategoryCode })
 
   const sentinelRef = useRef<HTMLDivElement>(null)
 
@@ -264,7 +236,7 @@ export function CharityListPage() {
                 onClick={() => setIsSearchOpen(true)}
                 className="text-text-secondary"
               >
-                <SearchIcon />
+                <SearchIcon size={20} />
               </IconButton>
             }
           />
@@ -272,7 +244,7 @@ export function CharityListPage() {
       </StickyHeaderStack>
 
       {isSearchOpen ? (
-        <SearchResults query={searchQuery} />
+        <SearchResults query={searchQuery} tab={tab} />
       ) : (
         <main className="flex-1">
           {hasError ? (
@@ -309,7 +281,6 @@ export function CharityListPage() {
               active={cat.code === 'ALL' ? selectedCategoryCode === null : selectedCategoryCode === cat.code}
               onClick={() => {
                 setSelectedCategoryCode(cat.code === 'ALL' ? null : cat.code)
-                setIsCategoryDrawerOpen(false)
               }}
             />
           ))}

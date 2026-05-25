@@ -1,6 +1,7 @@
 import '@testing-library/jest-dom/vitest'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { act, render, screen, waitFor } from '@testing-library/react'
+import { userEvent } from '@testing-library/user-event'
 import type { ReactNode } from 'react'
 import { MemoryRouter, Route, Routes } from 'react-router'
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -8,6 +9,10 @@ import { CharityListPage } from './CharityListPage'
 
 vi.mock('../../lib/env', () => ({
   env: { VITE_API_BASE_URL: 'http://localhost:3000' },
+}))
+
+vi.mock('../category/useCategories', () => ({
+  useCategories: () => ({ data: [] }),
 }))
 
 const makeItem = (id: string) => ({
@@ -52,6 +57,19 @@ beforeAll(() => {
       disconnect: vi.fn(),
     }),
   )
+  Object.defineProperty(window, 'matchMedia', {
+    writable: true,
+    value: (query: string) => ({
+      matches: false,
+      media: query,
+      onchange: null,
+      addListener: () => {},
+      removeListener: () => {},
+      addEventListener: () => {},
+      removeEventListener: () => {},
+      dispatchEvent: () => false,
+    }),
+  })
 })
 
 beforeEach(() => {
@@ -166,5 +184,47 @@ describe('CharityListPage', () => {
     )
     setup('/?category=CAMPAIGN')
     expect(screen.getByRole('tab', { name: '捐款專案' })).toHaveAttribute('aria-selected', 'true')
+  })
+
+  it('smoke: SubRow 顯示「全部 ▾」按鈕與搜尋 IconButton（AC 2+3）', () => {
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      new Response(JSON.stringify({ items: [], next_cursor: null }), { status: 200 }),
+    )
+    setup()
+    expect(screen.getByRole('button', { name: '全部 ▾' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: '搜尋' })).toBeInTheDocument()
+  })
+
+  it('點類別按鈕開啟 CategoryDrawerDialog（AC 4）', async () => {
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      new Response(JSON.stringify({ items: [], next_cursor: null }), { status: 200 }),
+    )
+    const user = userEvent.setup()
+    setup()
+    await user.click(screen.getByRole('button', { name: '全部 ▾' }))
+    expect(screen.getByRole('dialog')).toBeInTheDocument()
+  })
+
+  it('點搜尋 IconButton 開啟 SearchOverlay（AC 5）', async () => {
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      new Response(JSON.stringify({ items: [], next_cursor: null }), { status: 200 }),
+    )
+    const user = userEvent.setup()
+    setup()
+    await user.click(screen.getByRole('button', { name: '搜尋' }))
+    expect(screen.getByRole('search')).toBeInTheDocument()
+  })
+
+  it('SearchOverlay 關閉後 SubRow 回原位（AC 5）', async () => {
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      new Response(JSON.stringify({ items: [], next_cursor: null }), { status: 200 }),
+    )
+    const user = userEvent.setup()
+    setup()
+    await user.click(screen.getByRole('button', { name: '搜尋' }))
+    expect(screen.getByRole('search')).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: '取消' }))
+    expect(screen.queryByRole('search')).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: '搜尋' })).toBeInTheDocument()
   })
 })

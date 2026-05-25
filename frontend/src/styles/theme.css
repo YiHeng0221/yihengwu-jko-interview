@@ -1,5 +1,11 @@
 @import "tailwindcss";
 
+/* 防止 list 高度變化（filter / tab switch）造成 scrollbar 出現/消失，連帶 fixed
+   元素（drawer / dialog）跳動 ~15px。`stable` = 永遠保留 scrollbar gutter space。 */
+html {
+  scrollbar-gutter: stable;
+}
+
 /* Design tokens — Tailwind v4 @theme CSS-first 模式
    來源：街口公益捐款列表 Figma Style Guide
    AC: AC-028 (header 44px), AC-036 (token), AC-037 (sticky layout heights) */

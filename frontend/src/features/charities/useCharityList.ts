@@ -9,10 +9,12 @@ export type UseCharityListParams = {
   q?: string
 }
 
+type PageParam = string | null
+
 type FetchParams = {
   tab: CharityTab
   q: string | undefined
-  cursor: string | null
+  cursor: PageParam
   signal: AbortSignal
 }
 
@@ -31,8 +33,17 @@ async function fetchCharitiesPage(params: FetchParams): Promise<CharitiesListRes
 }
 
 export function useCharityList({ tab, q }: UseCharityListParams) {
-  return useInfiniteQuery({
-    queryKey: ['charities', tab, q ?? ''],
+  // 顯式 generic：TQueryFnData=CharitiesListResponse / TError=Error /
+  // TData=InfiniteData / TQueryKey=string array / TPageParam=string|null
+  // 沒指定的話 pageParam 預設 unknown，會讓 fetchCharitiesPage 的 cursor 型別爆。
+  return useInfiniteQuery<
+    CharitiesListResponse,
+    Error,
+    { pages: CharitiesListResponse[]; pageParams: PageParam[] },
+    readonly [string, CharityTab, string],
+    PageParam
+  >({
+    queryKey: ['charities', tab, q ?? ''] as const,
     queryFn: ({ pageParam, signal }) =>
       fetchCharitiesPage({ tab, q, cursor: pageParam, signal }),
     initialPageParam: null,

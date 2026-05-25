@@ -1,7 +1,7 @@
 import type { FastifyInstance } from 'fastify'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { buildApp } from '../src/app.js'
-import { CharityWireSchema } from '../src/lib/toWire.js'
+import { CharityWireSchema } from '../src/lib/schemas.js'
 import type { CharityDb } from '../src/routes/charities.js'
 import type { CharityRow } from '../src/lib/toWire.js'
 

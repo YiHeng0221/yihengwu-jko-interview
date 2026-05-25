@@ -1,4 +1,5 @@
 import { clsx } from 'clsx'
+import { TagIcon } from '../icons/TagIcon'
 
 export type CampaignCardProps = {
   bannerSrc?: string | null
@@ -7,22 +8,6 @@ export type CampaignCardProps = {
   tags?: string[]
   className?: string
 }
-
-const TagIcon = ({ className }: { className?: string }) => (
-  <svg
-    width="12"
-    height="12"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    aria-hidden="true"
-    className={clsx('shrink-0', className)}
-  >
-    <path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z" />
-    <line x1="7" y1="7" x2="7.01" y2="7" />
-  </svg>
-)
 
 export function CampaignCard({ bannerSrc, orgName, title, tags, className }: CampaignCardProps) {
   return (
@@ -44,7 +29,7 @@ export function CampaignCard({ bannerSrc, orgName, title, tags, className }: Cam
         <div className="line-clamp-2 text-base font-bold text-text-primary">{title}</div>
         {tags && tags.length > 0 && (
           <div className="mt-2 flex items-center gap-1">
-            <TagIcon className="text-brand opacity-50" />
+            <TagIcon size={12} className="shrink-0 text-brand opacity-50" />
             <span className="text-xs text-text-tertiary">{tags.join('・')}</span>
           </div>
         )}

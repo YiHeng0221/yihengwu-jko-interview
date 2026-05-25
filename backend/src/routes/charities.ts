@@ -1,15 +1,19 @@
 import type { Prisma } from '@prisma/client'
 import type { FastifyPluginAsync } from 'fastify'
 import type { ZodTypeProvider } from 'fastify-type-provider-zod'
+import { z } from 'zod'
 import { CursorDecodeError, decodeCursor, encodeCursor } from '../lib/cursor.js'
 import { prisma } from '../lib/prisma.js'
 import {
   CharityListQuerySchema,
   CharityListResponseSchema,
+  CharityWireSchema,
   ErrorSchema,
 } from '../lib/schemas.js'
 import { charityToWire } from '../lib/toWire.js'
+import type { CharityRow } from '../lib/toWire.js'
 
+// BE-08 (#98) — `GET /charities` list + cursor + category filter + q search
 export const charitiesRoute: FastifyPluginAsync = async (fastify) => {
   const app = fastify.withTypeProvider<ZodTypeProvider>()
 
@@ -87,6 +91,33 @@ export const charitiesRoute: FastifyPluginAsync = async (fastify) => {
         items: pageRows.map(charityToWire),
         next_cursor,
       }
+    },
+  )
+}
+
+// BE-10 (#99) — `GET /charities/:id` detail with DI-style db prop for testability
+export interface CharityDb {
+  findById(id: string): Promise<CharityRow | null>
+}
+
+const NotFoundSchema = z.object({ error: z.literal('not_found') })
+
+export const charitiesDetailRoute: FastifyPluginAsync<{ db: CharityDb }> = async (fastify, opts) => {
+  const app = fastify.withTypeProvider<ZodTypeProvider>()
+
+  app.get(
+    '/charities/:id',
+    {
+      schema: {
+        params: z.object({ id: z.string().min(1) }),
+        response: { 200: CharityWireSchema, 404: NotFoundSchema },
+      },
+    },
+    async (request, reply) => {
+      const { id } = request.params
+      const row = await opts.db.findById(id)
+      if (!row) return reply.status(404).send({ error: 'not_found' })
+      return charityToWire(row)
     },
   )
 }

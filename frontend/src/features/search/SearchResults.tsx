@@ -11,8 +11,10 @@ export type SearchResultsProps = {
 export function SearchResults({ query }: SearchResultsProps) {
   const { items, isLoading, isEmpty, error } = useSearch(query)
 
+  if (!query) return null
+
   return (
-    <div role="region" aria-label="搜尋結果" className="flex flex-col gap-2 p-3">
+    <div id="search-results-region" role="region" aria-label="搜尋結果" className="flex flex-col gap-2 p-3">
       {isLoading && Array.from({ length: 5 }, (_, i) => <CardSkeleton key={i} />)}
       {!isLoading && error && (
         <ErrorState title="搜尋發生錯誤" description="請稍後再試" retryLabel={null} />

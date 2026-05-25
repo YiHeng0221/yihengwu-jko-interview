@@ -1,6 +1,6 @@
 import { clsx } from 'clsx'
 import type { KeyboardEvent, ReactNode } from 'react'
-import { useRef } from 'react'
+import { useLayoutEffect, useRef, useState } from 'react'
 
 export type TabItem<TValue extends string> = {
   value: TValue
@@ -16,10 +16,6 @@ export type TabsProps<TValue extends string> = {
   className?: string
 }
 
-/**
- * Sticky-friendly tab bar — active 標的 = 紅字 + 底線。
- * 配 `role="tablist"`，可用鍵盤 ←→/Home/End 切換。
- */
 export function Tabs<TValue extends string>({
   items,
   value,
@@ -29,15 +25,28 @@ export function Tabs<TValue extends string>({
 }: TabsProps<TValue>) {
   const activeIndex = items.findIndex((item) => item.value === value)
   const tablistRef = useRef<HTMLDivElement>(null)
+  const tabRefs = useRef<(HTMLButtonElement | null)[]>([])
+  const labelRefs = useRef<(HTMLSpanElement | null)[]>([])
+  const [indicator, setIndicator] = useState({ left: 0, width: 0 })
 
   if (import.meta.env.DEV && activeIndex === -1) {
     // eslint-disable-next-line no-console
     console.warn(`[Tabs] value "${value}" not found in items`)
   }
 
+  useLayoutEffect(() => {
+    const activeTab = tabRefs.current[activeIndex]
+    const activeLabel = labelRefs.current[activeIndex]
+    if (!activeTab || !activeLabel) return
+    const labelWidth = activeLabel.offsetWidth
+    setIndicator({
+      left: activeTab.offsetLeft + (activeTab.offsetWidth - labelWidth) / 2,
+      width: labelWidth,
+    })
+  }, [activeIndex])
+
   function focusTab(index: number) {
-    const buttons = tablistRef.current?.querySelectorAll<HTMLButtonElement>('[role="tab"]')
-    buttons?.[index]?.focus()
+    tabRefs.current[index]?.focus()
   }
 
   function handleKeyDown(event: KeyboardEvent<HTMLDivElement>) {
@@ -82,15 +91,18 @@ export function Tabs<TValue extends string>({
       aria-label={ariaLabel}
       onKeyDown={handleKeyDown}
       className={clsx(
-        'flex h-tabbar w-full items-stretch border-b border-border bg-surface',
+        'relative flex h-tabbar w-full items-stretch border-b border-border bg-surface',
         className,
       )}
     >
-      {items.map((item) => {
+      {items.map((item, idx) => {
         const selected = item.value === value
         return (
           <button
             key={item.value}
+            ref={(el) => {
+              tabRefs.current[idx] = el
+            }}
             type="button"
             role="tab"
             aria-selected={selected}
@@ -98,22 +110,33 @@ export function Tabs<TValue extends string>({
             disabled={item.disabled}
             onClick={() => onChange(item.value)}
             className={clsx(
-              'relative flex-1 px-3 text-sm font-medium transition-colors',
+              'relative flex-1 px-3 transition-all duration-200 ease-out',
               'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-inset',
-              selected ? 'text-brand' : 'text-text-secondary hover:text-text-primary',
+              selected
+                ? 'text-lg font-bold text-text-primary'
+                : 'text-base font-medium text-text-secondary hover:text-text-primary',
               item.disabled && 'cursor-not-allowed opacity-40',
             )}
           >
-            {item.label}
-            {selected && (
-              <span
-                aria-hidden="true"
-                className="absolute inset-x-3 bottom-0 h-[2px] bg-brand"
-              />
-            )}
+            <span
+              ref={(el) => {
+                labelRefs.current[idx] = el
+              }}
+            >
+              {item.label}
+            </span>
           </button>
         )
       })}
+      <span
+        aria-hidden="true"
+        className="absolute bottom-0 left-0 h-[2px] bg-brand"
+        style={{
+          width: indicator.width,
+          transform: `translateX(${indicator.left}px)`,
+          transition: 'transform 200ms ease-out, width 200ms ease-out',
+        }}
+      />
     </div>
   )
 }

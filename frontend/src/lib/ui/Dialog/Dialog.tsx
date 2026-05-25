@@ -87,7 +87,7 @@ export function Dialog({ open, onClose, title, children, closeLabel = '關閉', 
     <div
       onClick={handleOverlayClick}
       className={clsx(
-        'fixed inset-0 z-50 flex items-center justify-center bg-surface-overlay p-4',
+        'fixed top-0 left-0 z-50 h-screen w-screen flex items-center justify-center bg-surface-overlay p-4',
       )}
     >
       <div

@@ -26,11 +26,16 @@ const wireItemSchema = z.object({
   title: z.string(),
   description: z.string(),
   tab: z.enum(['ORG', 'CAMPAIGN', 'MERCHANDISE']),
-  category_code: categoryCodeSchema,
+  category_codes: z.array(categoryCodeSchema),
   logo_url: z.string().nullable(),
   amount_raised: z.number().int(),
   amount_goal: z.number().int().nullable(),
   created_at: z.string(),
+  banner_image_url: z.string().nullable().optional(),
+  org_name: z.string().nullable().optional(),
+  tags: z.array(z.string()).optional(),
+  product_image_url: z.string().nullable().optional(),
+  price_ntd: z.number().int().nullable().optional(),
 })
 
 type WireItem = z.infer<typeof wireItemSchema>
@@ -41,11 +46,16 @@ function toItem(raw: WireItem) {
     title: raw.title,
     description: raw.description,
     tab: raw.tab,
-    categoryCode: raw.category_code,
+    categoryCodes: raw.category_codes,
     logoUrl: raw.logo_url,
     amountRaised: raw.amount_raised,
     amountGoal: raw.amount_goal,
     createdAt: raw.created_at,
+    bannerImageUrl: raw.banner_image_url ?? null,
+    orgName: raw.org_name ?? null,
+    tags: raw.tags ?? [],
+    productImageUrl: raw.product_image_url ?? null,
+    priceNtd: raw.price_ntd ?? null,
   }
 }
 

@@ -79,6 +79,15 @@
           },
           {
             "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "category_code",
+            "required": false,
+            "description": "Sub-category filter (single value). Accepts one code per request — single-select UX design. Response field is category_codes (plural array) because each item can belong to multiple categories."
+          },
+          {
+            "schema": {
               "type": "string",
               "minLength": 1
             },
@@ -117,8 +126,11 @@
                               "MERCHANDISE"
                             ]
                           },
-                          "category_code": {
-                            "type": "string"
+                          "category_codes": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
                           },
                           "logo_url": {
                             "type": "string",
@@ -163,7 +175,7 @@
                           "title",
                           "description",
                           "tab",
-                          "category_code",
+                          "category_codes",
                           "logo_url",
                           "amount_raised",
                           "amount_goal",
@@ -277,8 +289,11 @@
                         "MERCHANDISE"
                       ]
                     },
-                    "category_code": {
-                      "type": "string"
+                    "category_codes": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
                     },
                     "logo_url": {
                       "type": "string",
@@ -323,7 +338,7 @@
                     "title",
                     "description",
                     "tab",
-                    "category_code",
+                    "category_codes",
                     "logo_url",
                     "amount_raised",
                     "amount_goal",

@@ -5,7 +5,7 @@ export const CharityWireSchema = z.object({
   title: z.string(),
   description: z.string(),
   tab: z.enum(['ORG', 'CAMPAIGN', 'MERCHANDISE']),
-  category_code: z.string(),
+  category_codes: z.array(z.string()),
   logo_url: z.string().nullable(),
   amount_raised: z.number().int(),
   amount_goal: z.number().int().nullable(),
@@ -21,6 +21,12 @@ export const CharityListQuerySchema = z.object({
   cursor: z.string().optional(),
   limit: z.coerce.number().int().min(1).max(50).default(10),
   category: z.enum(['ORG', 'CAMPAIGN', 'MERCHANDISE']).optional(),
+  category_code: z
+    .string()
+    .optional()
+    .describe(
+      'Sub-category filter (single value). Accepts one code per request — single-select UX design. Response field is category_codes (plural array) because each item can belong to multiple categories.',
+    ),
   q: z.string().min(1).optional(),
 })
 

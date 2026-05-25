@@ -21,7 +21,7 @@ const makeItem = (id: string) => ({
   title: `Org ${id}`,
   description: `Description ${id}`,
   tab: 'ORG',
-  category_code: 'ELDER_CARE',
+  category_codes: ['ELDER_CARE'],
   logo_url: null,
   amount_raised: 0,
   amount_goal: null,

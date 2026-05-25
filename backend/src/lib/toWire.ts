@@ -18,7 +18,7 @@ export function charityToWire(row: CharityRow): CharityWire {
     title: row.title,
     description: row.description,
     tab: row.tab,
-    category_code: row.categoryCode,
+    category_codes: row.categoryCodes,
     logo_url: row.logoUrl,
     amount_raised: row.amountRaised,
     amount_goal: row.amountGoal,

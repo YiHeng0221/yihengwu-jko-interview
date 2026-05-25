@@ -42,6 +42,27 @@ Single-pass AI review has correlated blind spots. A second reviewer with a fresh
 
 <!-- Insert new RR-NNN entries below. Most recent at the top. -->
 
+## RR-017 — fix(web): CharityListPage 補上 SubRow leading/trailing（搜尋 + 類別按鈕）
+- PR: #125
+- Date: 2026-05-25
+- Reviewer (first): local Claude Code (claude-sonnet-4-6, via `/review`)
+- Reviewer (cross-agent): n/a
+- Verdict: pass
+- Findings: 🔴×0 · 🟡×5 · 🟣×0
+- Round: 1 of 3
+
+### Key concerns
+- `CharityListPage.tsx:174` — `selectedCategoryCode` が `useCharityList` へ未接続。類別選択はラベル表示のみ有効で、リスト過濾は行われない（false affordance）。`UseCharityListParams` に `categoryCode` パラメーターがないため hook 拡張が必要。🟡
+- `CharityListPage.tsx:244` — `SearchOverlay` が `StickyHeaderStack` 外に render され、検索 input bar が sticky でない。多件数の結果スクロール時に input が画面外へ消える。🟡
+- `CharityListPage.tsx:172` — タブ切替時に `selectedCategoryCode` がリセットされず、異なる tab コンテキストで古い類別ラベルが SubRow に残る。🟡
+- `CharityListPage.tsx:43` — `SearchIcon` SVG が `SearchOverlay.tsx:16-29` と重複定義（20×20 vs 16×16）。共有 icons ファイルへ抽出を推奨。🟡
+- `CharityListPage.test.tsx:15` — `useCategories` mock が `data: []` 固定のため AC 2 の「選中類別 label」truthy branch が未テスト。🟡
+
+### Round history
+- Round 1: 2026-05-25 — pass（🔴×0・🟡×5；全 non-blocking，全 AC 達成を確認）
+
+---
+
 ## RR-016 — fix(web): Tabs active 樣式修正 + 浮動 indicator 切換動畫
 - PR: #123
 - Date: 2026-05-25

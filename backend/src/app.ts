@@ -7,10 +7,12 @@ import {
   serializerCompiler,
   validatorCompiler,
 } from 'fastify-type-provider-zod'
+import { prisma } from './lib/prisma.js'
 import { genReqId, requestIdPlugin } from './plugins/request-id.js'
 import { swaggerPlugin } from './plugins/swagger.js'
 import { zodValidationPlugin } from './plugins/zod-validation.js'
 import { categoriesRoute } from './routes/categories.js'
+import { charitiesRoute } from './routes/charities.js'
 import { healthRoute } from './routes/health.js'
 
 export async function buildApp() {
@@ -34,7 +36,15 @@ export async function buildApp() {
   await app.register(rateLimit, { max: 100, timeWindow: '1 minute' })
 
   await app.register(healthRoute)
+  await app.register(charitiesRoute)
   await app.register(categoriesRoute)
+
+  // Graceful shutdown: SIGTERM / Ctrl-C 時清乾淨 PrismaClient connection pool。
+  // 放在 buildApp() 而非個別 route plugin，因 prisma 是 module-level singleton，
+  // 生命週期跟 app 對齊而非單一 route。多 route 都動到 prisma 時也不必重複加 hook。
+  app.addHook('onClose', async () => {
+    await prisma.$disconnect()
+  })
 
   return app
 }

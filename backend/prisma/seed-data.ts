@@ -5,7 +5,7 @@ type CharityInput = {
   title: string
   description: string
   tab: CharityTab
-  categoryCode: string
+  categoryCodes: string[]
   logoUrl: string | null
   amountRaised: number
   amountGoal: number | null
@@ -23,7 +23,7 @@ function addDays(isoBase: string, days: number): Date {
   return d
 }
 
-// Lorem Picsum：用 ?seed=xxx 保 deterministic、用 path /600/300 控比例
+// Lorem Picsum：用 ?seed=xxx 保 deterministic、用 path /w/h 控比例
 function picsum(seed: string, width: number, height: number): string {
   return `https://picsum.photos/seed/${seed}/${width}/${height}`
 }
@@ -126,9 +126,23 @@ function formatTitle(tpl: string, label: string): string {
   return tpl.replace('%s', label)
 }
 
+// 每筆 item 1-3 個 categoryCode（rotate 鄰居），共用所有 tab
+function pickCategoryCodes(seq: number): string[] {
+  const count = 1 + (seq % 3)
+  const codes: string[] = []
+  for (let i = 0; i < count; i++) {
+    codes.push(pick(CATEGORY_CODES, seq - 1 + i))
+  }
+  return codes
+}
+
+function codesToLabels(codes: string[]): string[] {
+  return codes.map((c) => CATEGORY_LABEL[c] ?? c)
+}
+
 function org(seq: number): CharityInput {
-  const categoryCode = pick(CATEGORY_CODES, seq - 1)
-  const label = CATEGORY_LABEL[categoryCode] ?? '公益'
+  const categoryCodes = pickCategoryCodes(seq)
+  const label = CATEGORY_LABEL[categoryCodes[0]!] ?? '公益'
   const title = formatTitle(pick(ORG_TITLE_TPL, seq - 1), label)
   const description = pick(DESC_TPL, seq - 1)
   return {
@@ -136,7 +150,7 @@ function org(seq: number): CharityInput {
     title,
     description,
     tab: CharityTab.ORG,
-    categoryCode,
+    categoryCodes,
     logoUrl: picsum(`org-${seq}`, 120, 120),
     amountRaised: 50000 + (seq - 1) * 1500,
     amountGoal: null,
@@ -150,50 +164,42 @@ function org(seq: number): CharityInput {
 }
 
 function campaign(seq: number): CharityInput {
-  const categoryCode = pick(CATEGORY_CODES, seq - 1)
-  const label = CATEGORY_LABEL[categoryCode] ?? '公益'
+  const categoryCodes = pickCategoryCodes(seq)
+  const label = CATEGORY_LABEL[categoryCodes[0]!] ?? '公益'
   const title = formatTitle(pick(CAMPAIGN_TITLE_TPL, seq - 1), label)
   const description = pick(DESC_TPL, seq - 1)
   const orgName = pick(ORG_NAME_BASE, seq - 1)
-  // 為 campaign 多帶 1-3 個 tag（rotate categoryCode 鄰居）
-  const tagCount = 1 + (seq % 3)
-  const tags: string[] = []
-  for (let i = 0; i < tagCount; i++) {
-    const code = pick(CATEGORY_CODES, seq - 1 + i)
-    tags.push(CATEGORY_LABEL[code] ?? code)
-  }
   return {
     id: `seed-cam-${String(seq).padStart(3, '0')}`,
     title,
     description,
     tab: CharityTab.CAMPAIGN,
-    categoryCode,
+    categoryCodes,
     logoUrl: null,
     amountRaised: 10000 + (seq - 1) * 1200,
     amountGoal: 100000 + (seq - 1) * 2000,
     createdAt: addDays('2026-02-01', seq - 1),
     bannerImageUrl: picsum(`cam-${seq}`, 640, 360),
     orgName,
-    tags,
+    tags: codesToLabels(categoryCodes),
     productImageUrl: null,
     priceNtd: null,
   }
 }
 
 function merch(seq: number): CharityInput {
-  const categoryCode = pick(CATEGORY_CODES, seq - 1)
-  const label = CATEGORY_LABEL[categoryCode] ?? '公益'
+  const categoryCodes = pickCategoryCodes(seq)
+  const label = CATEGORY_LABEL[categoryCodes[0]!] ?? '公益'
   const title = formatTitle(pick(MERCH_TITLE_TPL, seq - 1), label)
   const description = pick(DESC_TPL, seq - 1)
   const orgName = pick(ORG_NAME_BASE, seq - 1)
-  // Price between $99 - $3,899, deterministic
   const priceNtd = 99 + ((seq * 137) % 39) * 100
   return {
     id: `seed-mer-${String(seq).padStart(3, '0')}`,
     title,
     description,
     tab: CharityTab.MERCHANDISE,
-    categoryCode,
+    categoryCodes,
     logoUrl: null,
     amountRaised: 2000 + (seq - 1) * 300,
     amountGoal: 20000 + (seq - 1) * 600,

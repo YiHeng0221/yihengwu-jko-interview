@@ -22,7 +22,7 @@ const makeCharity = (overrides: {
   title?: string
   description?: string
   tab?: 'ORG' | 'CAMPAIGN' | 'MERCHANDISE'
-  categoryCode?: string
+  categoryCodes?: string[]
   logoUrl?: string | null
   amountRaised?: number
   amountGoal?: number | null
@@ -37,7 +37,7 @@ const makeCharity = (overrides: {
   title: '測試公益組織',
   description: '這是測試描述',
   tab: 'ORG' as const,
-  categoryCode: 'CHILD_CARE',
+  categoryCodes: ['CHILD_CARE'],
   logoUrl: null,
   amountRaised: 0,
   amountGoal: null,
@@ -86,7 +86,7 @@ describe('unit: GET /charities', () => {
           title: '愛心組織',
           description: '幫助弱勢',
           tab: 'ORG',
-          categoryCode: 'POVERTY_RELIEF',
+          categoryCodes: ['POVERTY_RELIEF'],
           logoUrl: 'https://example.com/logo.png',
           amountRaised: 5000,
           amountGoal: 20000,
@@ -103,7 +103,7 @@ describe('unit: GET /charities', () => {
         title: '愛心組織',
         description: '幫助弱勢',
         tab: 'ORG',
-        category_code: 'POVERTY_RELIEF',
+        category_codes: ['POVERTY_RELIEF'],
         logo_url: 'https://example.com/logo.png',
         amount_raised: 5000,
         amount_goal: 20000,

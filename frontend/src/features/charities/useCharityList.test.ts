@@ -17,7 +17,7 @@ const validPage = {
       title: 'Test Org',
       description: 'desc',
       tab: 'ORG',
-      category_code: 'ELDER_CARE',
+      category_codes: ['ELDER_CARE'],
       logo_url: null,
       amount_raised: 0,
       amount_goal: null,

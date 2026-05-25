@@ -10,7 +10,7 @@ const FIXTURE: CharityRow = {
   title: 'ACC 中華耆幼關懷協會',
   description: '你身上有光，能照亮不確定的黑暗',
   tab: 'ORG',
-  categoryCode: 'ELDER_CARE',
+  categoryCodes: ['ELDER_CARE'],
   logoUrl: 'https://example.com/logo.png',
   amountRaised: 12345,
   amountGoal: 50000,
@@ -49,7 +49,7 @@ describe('GET /charities/:id', () => {
     const body = result.data!
     expect(body.id).toBe('clxxx')
     expect(body.tab).toBe('ORG')
-    expect(body.category_code).toBe('ELDER_CARE')
+    expect(body.category_codes).toEqual(['ELDER_CARE'])
     expect(body.logo_url).toBe('https://example.com/logo.png')
     expect(body.amount_raised).toBe(12345)
     expect(body.amount_goal).toBe(50000)

@@ -79,6 +79,14 @@
           },
           {
             "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "category_code",
+            "required": false
+          },
+          {
+            "schema": {
               "type": "string",
               "minLength": 1
             },
@@ -117,8 +125,11 @@
                               "MERCHANDISE"
                             ]
                           },
-                          "category_code": {
-                            "type": "string"
+                          "category_codes": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
                           },
                           "logo_url": {
                             "type": "string",
@@ -163,7 +174,7 @@
                           "title",
                           "description",
                           "tab",
-                          "category_code",
+                          "category_codes",
                           "logo_url",
                           "amount_raised",
                           "amount_goal",
@@ -277,8 +288,11 @@
                         "MERCHANDISE"
                       ]
                     },
-                    "category_code": {
-                      "type": "string"
+                    "category_codes": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
                     },
                     "logo_url": {
                       "type": "string",
@@ -323,7 +337,7 @@
                     "title",
                     "description",
                     "tab",
-                    "category_code",
+                    "category_codes",
                     "logo_url",
                     "amount_raised",
                     "amount_goal",

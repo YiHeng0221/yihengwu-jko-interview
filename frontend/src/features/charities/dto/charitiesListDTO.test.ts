@@ -6,7 +6,7 @@ const validItem = {
   title: 'ACC 中華耆幼關懷協會',
   description: '幫助長者',
   tab: 'ORG',
-  category_code: 'ELDER_CARE',
+  category_codes: ['ELDER_CARE'],
   logo_url: 'https://example.com/logo.png',
   amount_raised: 12345,
   amount_goal: 50000,
@@ -23,7 +23,7 @@ describe('charitiesListResponseSchema', () => {
 
     const item = result.items[0]
     expect(item?.id).toBe('ckabc')
-    expect(item?.categoryCode).toBe('ELDER_CARE')
+    expect(item?.categoryCodes).toEqual(['ELDER_CARE'])
     expect(item?.logoUrl).toBe('https://example.com/logo.png')
     expect(item?.amountRaised).toBe(12345)
     expect(item?.amountGoal).toBe(50000)

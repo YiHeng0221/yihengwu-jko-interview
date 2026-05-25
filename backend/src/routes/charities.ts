@@ -26,7 +26,7 @@ export const charitiesRoute: FastifyPluginAsync = async (fastify) => {
       },
     },
     async (request, reply) => {
-      const { cursor: cursorToken, limit, category, q } = request.query
+      const { cursor: cursorToken, limit, category, category_code, q } = request.query
 
       let cursor: { created_at: string; id: string } | undefined
       if (cursorToken !== undefined) {
@@ -44,6 +44,10 @@ export const charitiesRoute: FastifyPluginAsync = async (fastify) => {
 
       if (category !== undefined) {
         conditions.push({ tab: category })
+      }
+
+      if (category_code !== undefined) {
+        conditions.push({ categoryCodes: { has: category_code } })
       }
 
       if (q !== undefined) {

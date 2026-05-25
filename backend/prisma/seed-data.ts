@@ -186,7 +186,7 @@ function merch(seq: number): CharityInput {
   const title = formatTitle(pick(MERCH_TITLE_TPL, seq - 1), label)
   const description = pick(DESC_TPL, seq - 1)
   const orgName = pick(ORG_NAME_BASE, seq - 1)
-  // Price between $99 - $3,999, deterministic
+  // Price between $99 - $3,899, deterministic
   const priceNtd = 99 + ((seq * 137) % 39) * 100
   return {
     id: `seed-mer-${String(seq).padStart(3, '0')}`,

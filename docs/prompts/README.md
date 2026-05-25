@@ -54,11 +54,7 @@ Links / file paths to the resulting commits, PRs, ADRs.
 
 -->
 
-| # | Topic | Date |
-|---|-------|------|
-| 01 | [Polymorphic schema 漏網事件（→ PR #138 + #148）](01-polymorphic-schema-missed.md) | 2026-05-25 |
-| 02 | [Railway Dockerfile + pnpm workspace lockfile 戰（→ PR #117）](02-railway-dockerfile-pnpm-workspace.md) | 2026-05-24 |
-| 03 | [CSP img-src 漸進放寬（→ PR #138 → #146）](03-csp-img-src-progressive.md) | 2026-05-25 |
+（無 entries — 本專案改用 README 內「AI 使用聲明」總結 AI 使用方式，不額外保留 prompt log。harness 預留此資料夾給未來 / 其他專案使用。）
 
 ## Privacy
 

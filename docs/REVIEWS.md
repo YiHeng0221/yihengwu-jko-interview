@@ -429,7 +429,7 @@ Single-pass AI review has correlated blind spots. A second reviewer with a fresh
 
 ---
 
-## RR-021 — Phase 1 final: 22 ADRs + 53 issues + 78 PRs + 3 prompt logs
+## RR-021 — Phase 1 final: 22 ADRs + 53 issues + 78 PRs
 
 - **Date**: 2026-05-25
 - **PR**: docs/phase-2-submission-polish
@@ -439,7 +439,7 @@ Single-pass AI review has correlated blind spots. A second reviewer with a fresh
 
 ### Summary
 
-Phase 1（含 Phase 1.1 polish）正式收尾。所有 22 個 ADR 落地（含 ADR-0020 superseded by 0021）、53 個 issues 關閉、78 個 PRs merge、3 個代表性 prompt log 進 `docs/prompts/`、Phase 1 retro 寫好（`docs/RETRO-PHASE-1.md`）、README + CLAUDE.md + DEMO.md 完成 submission polish。
+Phase 1（含 Phase 1.1 polish）正式收尾。所有 22 個 ADR 落地（含 ADR-0020 superseded by 0021）、53 個 issues 關閉、78 個 PRs merge、Phase 1 retro 寫好（`docs/RETRO-PHASE-1.md`）、README（含「AI 使用聲明」章節）+ CLAUDE.md + DEMO.md 完成 submission polish。
 
 ### Key concerns
 - None blocking. 已知 follow-up：issue #149（search Card 變體要按 tab）待 Phase 2 收。

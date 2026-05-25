@@ -169,13 +169,36 @@ human merge（最終 gate）
 
 詳細流程 + 22 個 ADR + 踩坑紀錄見 [`docs/HARNESS-PITFALLS.md`](docs/HARNESS-PITFALLS.md) + [`PIPELINE.md`](PIPELINE.md)。
 
-## 代表性 AI 對話
+## AI 使用聲明
 
-挑了 3 個代表性對話放在 [`docs/prompts/`](docs/prompts/)：
+### 使用的 AI 工具
 
-1. [polymorphic schema 漏網事件](docs/prompts/01-polymorphic-schema-missed.md) — 為什麼 Card UI 改了但拿不到資料
-2. [Railway Dockerfile 偏執修法](docs/prompts/02-railway-dockerfile-pnpm-workspace.md) — 雙 Docker 工作區的 lockfile 戰爭
-3. [CSP img-src 漸進放寬](docs/prompts/03-csp-img-src-progressive.md) — 從精準 whitelist 到 https: wildcard
+| Tool | Role |
+|------|------|
+| **Claude Code（CLI）** | 主要 driver — 跑 agent personas（PM / impl / reviewer / ai-fix / qa）、CI 內 review.yml / ai-fix.yml / ai-implement.yml |
+| **Claude（claude-opus-4-7 / sonnet-4-6）** | 模型本體：heavy reasoning 用 Opus，standard impl / single-lens review 用 Sonnet |
+| **GitHub Actions** | 跑 AI workflow（review / fix / implement / e2e / deploy）— 不另外用 Cursor / Copilot 等 IDE 工具 |
+
+### AI 負責的範圍
+
+- ✅ 多數 BE / FE / 測試實作（每 issue 走 PM → impl → review → ai-fix → human merge）
+- ✅ 22 個 ADR 草稿（人在 fork 階段拍板選項，AI 寫 trade-off + consequences）
+- ✅ 270 筆 seed data 生成腳本（template + Lorem Picsum 圖）
+- ✅ Storybook stories
+- ✅ 多數 Zod / Prisma schema + migration SQL
+- ✅ Cross-agent code review（每 PR 跑一次 reviewer agent，留 🔴/🟡/🟣 inline comments）
+- ✅ AI-fix loop 自動處理 review 抓到的 🔴 issue（3 round 上限）
+
+### 我自己負責的範圍
+
+- ✅ **所有架構決策的 fork 拍板**：選 React vs Next.js、Fastify vs Express、Prisma vs Drizzle、cursor vs offset、oxlint vs ESLint 等 — AI 列 options + trade-offs，我選方向
+- ✅ **All PR human review + merge approval**：AI review 是 first pass，每張 PR 我親自看過再 merge
+- ✅ **PM 階段切票顆粒 + scope 控制**：tasks.html dry-run 我拍板才開 issue，不讓 AI 開出 80 張 trivial ticket
+- ✅ **UI / spec 對齊**：街口原 App 對照截圖、所有 Figma-spec 對應的 UI polish（chip 樣式 / 字距 / radius / 顏色 token 等 ~30 點）親自指認，AI 不主動猜
+- ✅ **Bug 觀察 / 重現**：實際打開 demo、找到「捐款專案/義賣商品只顯示 title」這類資料層 bug、CSP error、CORS 問題等，先重現再交給 AI 修
+- ✅ **Deploy 操作**：Railway 帳號設定、env vars / secrets 配置、DB migrate 觸發、密碼 rotation 等敏感操作
+
+> 這個專案的真正亮點是把 **AI 開發流程本身當第一公民**：PM/impl/reviewer/ai-fix 等多個 agent 角色透過 GitHub workflow 串成可重現的 pipeline，而不是「人開 prompt、AI 寫 code、人 copy paste」這種較傳統的工作流。完整 pipeline 見 `PIPELINE.md` + `.claude/agents/` + `.github/workflows/`。
 
 ## License
 

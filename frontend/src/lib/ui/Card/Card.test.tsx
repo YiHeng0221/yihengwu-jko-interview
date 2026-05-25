@@ -46,4 +46,9 @@ describe('Card', () => {
     const { container } = render(<Card interactive label="可點" />)
     expect(container.firstChild).toHaveClass('cursor-pointer')
   })
+
+  it('does not set w-full — width is intentionally controlled by parent', () => {
+    const { container } = render(<Card label="X" />)
+    expect(container.firstChild).not.toHaveClass('w-full')
+  })
 })

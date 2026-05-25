@@ -99,7 +99,7 @@ export function Tabs<TValue extends string>({
             onClick={() => onChange(item.value)}
             className={clsx(
               'relative flex-1 px-3 text-sm font-medium transition-colors',
-              'focus-visible:outline-none focus-visible:bg-surface-muted',
+              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-inset',
               selected ? 'text-brand' : 'text-text-secondary hover:text-text-primary',
               item.disabled && 'cursor-not-allowed opacity-40',
             )}

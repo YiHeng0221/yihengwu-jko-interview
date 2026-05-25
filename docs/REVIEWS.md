@@ -411,6 +411,24 @@ Single-pass AI review has correlated blind spots. A second reviewer with a fresh
 
 ---
 
+## RR-020 — docs(review): RR-019 PR #143 review pass round 1
+- PR: #145
+- Date: 2026-05-25
+- Reviewer: local Claude Code (first pass, claude-sonnet-4-6)
+- Verdict: changes-requested
+- Findings: 🔴×1 · 🟡×1 · 🟣×0
+- Round: 1 of 1（PR #145 closed without merge after round 1）
+
+### Key concerns
+- `docs/REVIEWS.md:396` — 🔴 RR 編號衝突，PR #141 的稽核記錄遭覆蓋。commit `34e3592` 已在 main 加入 RR-019（PR #141 審查），但本 PR 分支基於 `34e3592` 之前的節點，因此計算出相同編號 19，導致原有條目被覆寫。違反 AGENTS.md Hard Rule #6。修正方式：先執行 `git rebase main`，再將 PR #143 的審查內容以新的 RR-020 加入。
+- `docs/REVIEWS.md` — 🟡 建議在計算 RR 編號前先執行 `git pull --rebase origin main`，可避免編號衝突。
+
+### Round history
+- Round 1: 2026-05-25 — changes-requested
+- PR #145 closed without merge（changes not addressed）
+
+---
+
 > **本批 RR-001 ~ RR-007 為 backfill**：原本 `review.yml` workflow 只跑 first pass、沒鏈第ĺ�段 cross-agent；且首段 AI 在 ADR/config 類「文件型」PR 上自動跳過 RR 寫入步驟，導致 audit trail 漏記。本 commit 一次補回 7 條 RR、並同步修補 `review.yml` + `.claude/commands/review.md` 強制每個 PR 都寫 RR + 跑 `--cross`。Cross-agent 二審回補留待 Phase 0 之後資源穩定再批次跑（不阻塞 Phase 0 merge）。
 
 <!--

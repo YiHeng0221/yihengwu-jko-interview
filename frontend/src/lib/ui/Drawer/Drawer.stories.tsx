@@ -31,7 +31,7 @@ function Demo({ title }: { title: string }) {
             <button
               key={c}
               type="button"
-              className="rounded-chip border border-border bg-surface px-3 py-1 text-sm text-text-primary"
+              className="rounded-button bg-surface-muted px-3 py-1 text-sm text-text-primary"
             >
               {c}
             </button>

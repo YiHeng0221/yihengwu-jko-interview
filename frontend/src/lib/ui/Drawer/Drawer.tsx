@@ -84,17 +84,17 @@ export function Drawer({ open, onClose, title, children, closeLabel = '關閉', 
         aria-modal="true"
         aria-labelledby={titleId}
         className={clsx(
-          'relative flex max-h-[85vh] w-full flex-col overflow-hidden rounded-t-card bg-surface shadow-md',
+          'animate-slide-up relative flex max-h-[85vh] w-full flex-col overflow-hidden rounded-t-card bg-surface shadow-md',
           className,
         )}
       >
-        <header className="flex items-center justify-between border-b border-border px-4 py-3">
+        <header className="relative flex items-center justify-center border-b border-border px-4 py-3">
           <h2 id={titleId} className="text-lg font-medium text-text-primary">{title}</h2>
           <button
             type="button"
             onClick={onClose}
             aria-label={closeLabel}
-            className="rounded-button p-1 text-text-secondary transition-colors hover:bg-surface-muted hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+            className="absolute right-4 rounded-button p-1 text-text-secondary transition-colors hover:bg-surface-muted hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
               <line x1="18" y1="6" x2="6" y2="18" />

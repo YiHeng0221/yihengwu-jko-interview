@@ -206,7 +206,7 @@ export function CharityListPage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-surface-muted">
+    <div className="mx-auto flex min-h-screen w-full max-w-md flex-col bg-surface-muted">
       <StickyHeaderStack>
         <TopBar title="所有捐款項目" />
         {isSearchOpen && (

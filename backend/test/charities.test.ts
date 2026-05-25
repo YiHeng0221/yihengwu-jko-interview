@@ -308,6 +308,17 @@ describe('unit: GET /charities', () => {
       const call = mockFindMany.mock.calls[0]?.[0]
       expect(call?.where).not.toHaveProperty('categoryCodes')
     })
+
+    it('combines tab + categoryCodes.has when both params provided', async () => {
+      mockFindMany.mockResolvedValue([])
+
+      await app.inject({ method: 'GET', url: '/charities?category=CAMPAIGN&category_code=CHILD_CARE' })
+
+      const call = mockFindMany.mock.calls[0]?.[0]
+      expect(call?.where).toEqual({
+        AND: [{ tab: 'CAMPAIGN' }, { categoryCodes: { has: 'CHILD_CARE' } }],
+      })
+    })
   })
 
   describe('search (q param)', () => {

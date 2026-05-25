@@ -20,4 +20,10 @@ describe('EndMarker', () => {
     render(<EndMarker className="my-extra" />)
     expect(screen.getByRole('separator')).toHaveClass('my-extra')
   })
+
+  it('renders two line dividers', () => {
+    render(<EndMarker />)
+    expect(screen.getByTestId('end-marker-line-left')).toBeInTheDocument()
+    expect(screen.getByTestId('end-marker-line-right')).toBeInTheDocument()
+  })
 })

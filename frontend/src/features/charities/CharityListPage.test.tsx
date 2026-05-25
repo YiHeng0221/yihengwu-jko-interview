@@ -237,11 +237,11 @@ describe('chip 點擊修正（bug fix #139）', () => {
         { code: 'ALL', label: '全部' },
         { code: 'ELDER_CARE', label: '老人照護' },
       ],
-    } as ReturnType<typeof useCategories>)
+    } as unknown as ReturnType<typeof useCategories>)
   })
 
   afterEach(() => {
-    vi.mocked(useCategories).mockReturnValue({ data: [] } as ReturnType<typeof useCategories>)
+    vi.mocked(useCategories).mockReturnValue({ data: [] } as unknown as ReturnType<typeof useCategories>)
   })
 
   it('點 chip 後 drawer 保持開啟且 fetch URL 帶 category_code= param', async () => {

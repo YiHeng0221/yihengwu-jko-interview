@@ -393,18 +393,18 @@ Single-pass AI review has correlated blind spots. A second reviewer with a fresh
 
 ---
 
-## RR-019 — fix(web): 搜尋結果依當前 tab 過濾（useSearch 加入 category 參數）
-- PR: #141
+## RR-019 — fix(web): 類別 chip 點擊不再關閉 drawer 且接 category_code query
+- PR: #143
 - Date: 2026-05-25
-- Reviewer: local Claude Code (first pass)
+- Reviewer: local Claude Code (first pass, claude-sonnet-4-6)
 - Verdict: pass
 - Findings: 🔴×0 · 🟡×3 · 🟣×0
 - Round: 1 of 3
 
 ### Key concerns
-- `SearchResults.tsx:10` — `tab?: CharityTab` 選填設計讓呼叫方可無聲省略，`SearchOverlay.tsx:21` 因此靜默 fallback 至 `category=ORG`；API 行為從「無 category」靜默變為「category=ORG」，`SearchOverlay.test.tsx` 無 URL 斷言覆蓋此變更
-- `SearchResults.tsx:10` — 若 `tab` 語意上為必填，改為必填可在編譯期捕捉遺漏
-- `useSearch.ts:4` — 新增 `search → charities` feature 間耦合；`CharityTab` 可移至 `lib/` 共用層以利未來複用
+- `CharityListPage.tsx:202` — tab 切換後 `selectedCategoryCode` 不重置，本 PR 起 category filter 跨 tab 持續；BE 若不接受跨 tab category 組合，使用者會看到空畫面卻無錯誤訊息（Issue #139 AC 未涵蓋，建議 follow-up issue）
+- `CharityListPage.test.tsx:233` — `describe` 名稱帶 issue 編號 `（bug fix #139）`，rot risk
+- `CharityListPage.test.tsx:244` — `afterEach` 用 `mockReturnValue` 保留呼叫歷史，語意不如 `mockReset()`
 
 ### Round history
 - Round 1: 2026-05-25 — pass

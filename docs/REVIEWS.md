@@ -42,6 +42,25 @@ Single-pass AI review has correlated blind spots. A second reviewer with a fresh
 
 <!-- Insert new RR-NNN entries below. Most recent at the top. -->
 
+## RR-015 — feat(web): P1-FE-12 CategoryDrawerDialog + useCategories + categoriesDTO
+- PR: #100
+- Date: 2026-05-25
+- Reviewer (first): local Claude Code (claude-sonnet-4-6, via `/review`)
+- Reviewer (cross-agent): n/a
+- Verdict: pass
+- Findings: 🔴×0 · 🟡×2 · 🟣×1
+- Round: 1 of 3
+
+### Key concerns
+- `useCategories.ts:9` — `queryFn` 未接收 `{ signal }`，`apiFetch` 無法被 TanStack Query 取消（`apiFetch` 已支援 signal 參數，屬漏接）。🟡
+- `useCategories.ts:13` — `staleTime: Infinity` 搭配預設 `gcTime: 5min`；5 分鐘後 cache 被 GC，與 PR 意圖「類別資料幾乎不變動」不完全一致，建議補 `gcTime: Infinity`。🟡
+- `Drawer.tsx:76` vs `Dialog.tsx:88` — overlay 事件分別為 `onMouseDown` / `onClick`，行為不一致，pre-existing（diff 外）。🟣
+
+### Round history
+- Round 1: 2026-05-25 — pass（Zod schema 與 OpenAPI 完全一致；a11y / focus trap / test coverage 俱全；無 🔴 blocker）
+
+---
+
 ## RR-014 — feat(api): P1-BE-09 GET /charities ?q= pg_trgm 搜尋
 - PR: #102
 - Date: 2026-05-25

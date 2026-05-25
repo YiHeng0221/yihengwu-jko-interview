@@ -42,6 +42,27 @@ Single-pass AI review has correlated blind spots. A second reviewer with a fresh
 
 <!-- Insert new RR-NNN entries below. Most recent at the top. -->
 
+## RR-017 — fix(web): CharityListPage 補上 SubRow leading/trailing（搜尋 + 類別按鈕）
+- PR: #125
+- Date: 2026-05-25
+- Reviewer (first): local Claude Code (claude-sonnet-4-6, via `/review`)
+- Reviewer (cross-agent): n/a
+- Verdict: pass
+- Findings: 🔴×0 · 🟡×5 · 🟣×0
+- Round: 1 of 3
+
+### Key concerns
+- `CharityListPage.tsx:174` — `selectedCategoryCode` 未接入 `useCharityList`；類別選擇僅影響 label 顯示，列表過濾未執行（false affordance）。需在 `UseCharityListParams` 新增 `categoryCode` 欄位後 hook 才能完整傳遞。🟡
+- `CharityListPage.tsx:244` — `SearchOverlay` render 在 `StickyHeaderStack` 之外，搜尋 input bar 不 sticky；捲動多筆結果時 input 會捲出畫面外。🟡
+- `CharityListPage.tsx:172` — 切換 tab 時 `selectedCategoryCode` 未重置，舊類別 label 殘留在不同 tab 的 SubRow。🟡
+- `CharityListPage.tsx:43` — `SearchIcon` SVG 與 `SearchOverlay.tsx:16-29` 重複定義（20×20 vs 16×16），建議提取至共用 icons 檔案。🟡
+- `CharityListPage.test.tsx:15` — `useCategories` mock 固定為 `data: []`，AC 2「選中類別 label」truthy branch 未測試。🟡
+
+### Round history
+- Round 1: 2026-05-25 — pass（🔴×0・🟡×5；全部 non-blocking，已確認所有 AC 達成）
+
+---
+
 ## RR-016 — fix(web): Tabs active 樣式修正 + 浮動 indicator 切換動畫
 - PR: #123
 - Date: 2026-05-25

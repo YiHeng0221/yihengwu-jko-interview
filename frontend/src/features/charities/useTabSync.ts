@@ -1,9 +1,7 @@
 import { useCallback } from 'react'
 import { useSearchParams } from 'react-router'
-
-export const CHARITY_TABS = ['ORG', 'CAMPAIGN', 'MERCHANDISE'] as const
-export type CharityTab = (typeof CHARITY_TABS)[number]
-export const DEFAULT_TAB: CharityTab = 'ORG'
+import { CHARITY_TABS, DEFAULT_TAB } from './constants'
+import type { CharityTab } from './constants'
 
 function isCharityTab(value: string | null): value is CharityTab {
   return value !== null && CHARITY_TABS.some((t) => t === value)

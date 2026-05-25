@@ -1,8 +1,11 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import './styles/theme.css'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { AppRoutes } from './routes'
+import './styles/theme.css'
+
+const queryClient = new QueryClient()
 
 const rootEl = document.getElementById('root')
 if (!rootEl) throw new Error('Root element not found')
@@ -10,7 +13,9 @@ if (!rootEl) throw new Error('Root element not found')
 createRoot(rootEl).render(
   <StrictMode>
     <ErrorBoundary>
-      <AppRoutes />
+      <QueryClientProvider client={queryClient}>
+        <AppRoutes />
+      </QueryClientProvider>
     </ErrorBoundary>
   </StrictMode>,
 )

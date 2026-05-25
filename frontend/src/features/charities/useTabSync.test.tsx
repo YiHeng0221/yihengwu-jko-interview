@@ -4,7 +4,8 @@ import { userEvent } from '@testing-library/user-event'
 import type { ReactNode } from 'react'
 import { MemoryRouter, Route, Routes } from 'react-router'
 import { describe, expect, it } from 'vitest'
-import { CHARITY_TABS, DEFAULT_TAB, useTabSync } from './useTabSync'
+import { CHARITY_TABS, DEFAULT_TAB } from './constants'
+import { useTabSync } from './useTabSync'
 
 function wrap(initialPath: string) {
   return function Wrapper({ children }: { children: ReactNode }) {

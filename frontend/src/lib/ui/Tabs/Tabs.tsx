@@ -30,7 +30,7 @@ export function Tabs<TValue extends string>({
   const activeIndex = items.findIndex((item) => item.value === value)
   const tablistRef = useRef<HTMLDivElement>(null)
 
-  if (process.env.NODE_ENV !== 'production' && activeIndex === -1) {
+  if (import.meta.env.DEV && activeIndex === -1) {
     // eslint-disable-next-line no-console
     console.warn(`[Tabs] value "${value}" not found in items`)
   }

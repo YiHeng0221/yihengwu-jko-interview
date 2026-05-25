@@ -198,7 +198,7 @@ human merge（最終 gate）
 - ✅ **Bug 觀察 / 重現**：實際打開 demo、找到「捐款專案/義賣商品只顯示 title」這類資料層 bug、CSP error、CORS 問題等，先重現再交給 AI 修
 - ✅ **Deploy 操作**：Railway 帳號設定、env vars / secrets 配置、DB migrate 觸發、密碼 rotation 等敏感操作
 
-> 這個專案的真正亮點是把 **AI 開發流程本身當第一公民**：PM/impl/reviewer/ai-fix 等多個 agent 角色透過 GitHub workflow 串成可重現的 pipeline，而不是「人開 prompt、AI 寫 code、人 copy paste」這種較傳統的工作流。完整 pipeline 見 `PIPELINE.md` + `.claude/agents/` + `.github/workflows/`。
+> 這個專案的真正亮點是把 **AI 開發流程本身當主軸**：PM/impl/reviewer/ai-fix 等多個 agent 角色透過 GitHub workflow 串成可重現的 pipeline，而不是「人開 prompt、AI 寫 code、人 copy paste」這種較傳統的工作流。完整 pipeline 見 `PIPELINE.md` + `.claude/agents/` + `.github/workflows/`。
 
 ## License
 

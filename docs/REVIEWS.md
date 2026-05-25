@@ -417,14 +417,15 @@ Single-pass AI review has correlated blind spots. A second reviewer with a fresh
 - Reviewer: local Claude Code (first pass, claude-sonnet-4-6)
 - Verdict: changes-requested
 - Findings: 🔴×1 · 🟡×1 · 🟣×0
-- Round: 1 of 3
+- Round: 1 of 1（PR #145 closed without merge after round 1）
 
 ### Key concerns
-- `docs/REVIEWS.md:396` — 🔴 RR 番號衝突によりPR #141 の audit trail 消滅。commit `34e3592` が main に RR-019（PR #141 審查）を既に追加済みだが、本 PR ブランチが `34e3592` より前のベースから切られたため同じ 19 を計算し既存エントリを上書き。AGENTS.md Hard Rule #6 違反。修正：`git rebase main` 後、PR #143 の審查内容を新規 RR-020 として追加する
-- `docs/REVIEWS.md` — 🟡 RR 番號計算前に `git pull --rebase origin main` でベース更新を習慣化すると衝突を防げる
+- `docs/REVIEWS.md:396` — 🔴 RR 編號衝突，PR #141 的稽核記錄遭覆蓋。commit `34e3592` 已在 main 加入 RR-019（PR #141 審查），但本 PR 分支基於 `34e3592` 之前的節點，因此計算出相同編號 19，導致原有條目被覆寫。違反 AGENTS.md Hard Rule #6。修正方式：先執行 `git rebase main`，再將 PR #143 的審查內容以新的 RR-020 加入。
+- `docs/REVIEWS.md` — 🟡 建議在計算 RR 編號前先執行 `git pull --rebase origin main`，可避免編號衝突。
 
 ### Round history
 - Round 1: 2026-05-25 — changes-requested
+- PR #145 closed without merge（changes not addressed）
 
 ---
 

@@ -42,6 +42,34 @@ Single-pass AI review has correlated blind spots. A second reviewer with a fresh
 
 <!-- Insert new RR-NNN entries below. Most recent at the top. -->
 
+## RR-015 — feat(web): Spinner 改 iOS-style activity indicator (8-tick chase fade)
+- PR: #108
+- Date: 2026-05-25
+- Reviewer (first): local Claude Code (claude-sonnet-4-6, via `/review`)
+- Reviewer (cross-agent): n/a
+- Verdict: pass
+- Findings: 🔴×0 · 🟡×5 · 🟣×0
+- Round: 3 of 3
+
+### Key concerns
+- `Spinner.tsx:20` — `ANIMATION_DURATION = 1`（TS）與 `theme.css:68` 的 `1s` 形成跨檔隱性結合，任一方單獨修改將導致視覺錯位（靜默失效）。🟡
+- `Spinner.tsx:22-30` — 7 行 JSDoc 違反 CLAUDE.md「one short line max」規則；內容屬 Storybook/ADR 範疇。🟡
+- `Spinner.tsx:41` — `clsx` 無 `tailwind-merge`；呼叫方傳入衝突顏色 utility 時，勝者由 stylesheet source order 決定，可能因打包結果不同而行為不一致。🟡
+- `backend/src/generated/openapi.json:215` — Spinner PR 帶入 categories API 契約變更，commit footer 無對應 `Refs Issue#NN`，可追蹤性缺失。🟡
+- `Spinner.tsx:22` — 同上 JSDoc 問題的第二面：`@keyframes` 交叉引用說明應移至 `theme.css` 的 section comment，而非重複記載在元件頭部。🟡
+
+### 備注
+- Round 1（2026-05-24）：首次審查 4 🟡；`9d4927b` 全數修正
+- Round 2（2026-05-25）：二審 5 🟡；截至本次審查全部未修正（non-blocking）
+- Round 3（2026-05-25）：獨立確認 round 2 所有 🟡 有效，無新增 🔴；VERDICT 維持 pass
+
+### Round history
+- Round 1: 2026-05-24 — pass（4 🟡 全修正後）
+- Round 2: 2026-05-25 — pass（5 🟡 non-blocking；未修正）
+- Round 3: 2026-05-25 — pass（獨立確認 round 2 🟡；無新 🔴）
+
+---
+
 ## RR-014 — feat(api): P1-BE-09 GET /charities ?q= pg_trgm 搜尋
 - PR: #102
 - Date: 2026-05-25
